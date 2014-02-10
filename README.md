@@ -15,7 +15,7 @@ The SDK uses Composer for dependency management and auto loading. After you've [
     cd <INSTALL_DIRECTORY>
     curl -sS https://getcomposer.org/installer | php
 
-This will install composer into the SDK. Checkout [composer](https://getcomposer.org) for more details on installation options.
+This will install composer into the SDK. Checkout [Composer](https://getcomposer.org) for more details on installation options.
 
 Check to see that composer has been installed:
 
