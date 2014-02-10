@@ -1,6 +1,6 @@
 <?php
 
-namespace mediasilo;
+namespace mediasilo\config;
 
 class Meta {
 

@@ -2,18 +2,33 @@
 
 namespace mediasilo;
 
-use mediasilo\MediaSiloResourcePaths;
+require 'vendor/autoload.php';
+
+if (!function_exists('curl_init')) {
+    throw new Exception('We need cURL for the API to work. Have a look here: http://us3.php.net/curl');
+}
+
+if (!function_exists('json_decode')) {
+    throw new Exception('We need json_decode for the API to work. If you\'re running a linux distro install this package: php-pecl-json');
+}
+
+use mediasilo\http\MediaSiloResourcePaths;
+use mediasilo\project\ProjectProxy;
 use mediasilo\http\WebClient;
-use stdClass;
+use mediasilo\favorite\FavoriteProxy;
+use mediasilo\project\Project;
 
 class MediaSiloAPI
 {
-
     private $webClient;
+    private $favoriteProxy;
+    private $projectProxy;
 
-    public function __construct()
+    public function __construct($username, $password, $host)
     {
-        $this->webClient = new WebClient();
+        $this->webClient = new WebClient($username, $password, $host);
+        $this->favoriteProxy = new FavoriteProxy($this->webClient);
+        $this->projectProxy = new ProjectProxy($this->webClient);
     }
 
     public function me()
@@ -21,24 +36,91 @@ class MediaSiloAPI
         return json_decode($this->webClient->get(MediaSiloResourcePaths::ME));
     }
 
-    public function getProject($id)
+    // Projects //
+
+    /**
+     * Creates a new project. The project in MediaSilo of the given project model.
+     * @param Project $project
+     */
+    public function createProject(Project $project)
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::PROJECTS . "/" . $id));
+        $this->projectProxy->createProject($project);
     }
 
-    public function getFavorite($id)
+    /**
+     * Gets an existing project for a given project Id.
+     * @param $id
+     * @return Project
+     */
+    public function getProject($id)
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::FAVORITES . "/" . $id));
+        return $this->projectProxy->getProject($id);
+    }
+
+    /**
+     * Updates an existing project. ID must be a valid project Id.
+     * @param Project $project
+     */
+    public function updateProject(Project $project)
+    {
+        $this->projectProxy->updateProject($project);
+    }
+
+    /**
+     * Deletes an existing project from a given project Id.
+     * @param $id
+     */
+    public function deleteProject($id) {
+        $this->projectProxy->deleteProject($id);
+    }
+
+    /**
+     * Copies the structure and users of an existing project to a new project
+     * @param $projectId
+     * @return mixed
+     */
+    public function cloneProject($projectId)
+    {
+        return $this->projectProxy->cloneProject($projectId);
+    }
+
+    public function getUsersProjects($userId)
+    {
+        return $this->projectProxy->getUsersProjects($userId);
+    }
+
+    // Favorites //
+
+    /**
+     * Set a given project as one of your favorites
+     * @param $projectId
+     */
+    public function favorProject($projectId)
+    {
+        $this->favoriteProxy->favorProject($projectId);
+    }
+
+    /**
+     * Remove a given project from you list of favorites
+     * @param $projectId
+     */
+    public function unfavor($projectId)
+    {
+        $this->favoriteProxy->unfavor($projectId);
+    }
+
+    /**
+     * Get all of your favorite projects
+     * @return array
+     */
+    public function getFavoriteProjects()
+    {
+        return $this->favoriteProxy->getFavoriteProjects();
     }
 
     public function getUser($userId)
     {
         return json_decode($this->webClient->get(MediaSiloResourcePaths::USERS . "/" . $userId));
-    }
-
-    public function getFavorites()
-    {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::FAVORITES));
     }
 
     public function getSavedSearch($id)
@@ -118,12 +200,6 @@ class MediaSiloAPI
         return json_decode($this->webClient->get($resourcePath));
     }
 
-    public function getUsersProjects($userId)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::USERS_PROJECTS, $userId);
-        return json_decode($this->webClient->get($resourcePath));
-    }
-
     public function getProjectUsers($projectId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_USERS, $projectId);
@@ -158,36 +234,5 @@ class MediaSiloAPI
         return json_decode($this->webClient->get($resourcePath));
     }
 
-    public function cloneProject($projectId)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::CLONE_PROJECTS, $projectId);
-        return json_decode($this->webClient->post($resourcePath, null));
-    }
-
-    public function createProject($name, $description = null, $isFavorite = false)
-    {
-        $object = new stdClass();
-        $object->name = $name;
-        $object->description = $description;
-        $object->isFavorite = $isFavorite;
-
-        return json_decode($this->webClient->post(MediaSiloResourcePaths::PROJECTS, json_encode($object)));
-    }
-
-    public function updateProject($id, $name, $description = null, $isFavorite = false)
-    {
-        $object = new stdClass();
-        $object->id = $id;
-        $object->name = $name;
-        $object->description = $description;
-        $object->isFavorite = $isFavorite;
-
-        return json_decode($this->webClient->put(MediaSiloResourcePaths::PROJECTS, json_encode($object)));
-    }
-
-    public function deleteProject($id)
-    {
-        return json_decode($this->webClient->delete(MediaSiloResourcePaths::PROJECTS . "/" . $id));
-    }
 
 }

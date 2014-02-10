@@ -1,11 +1,10 @@
 <?php
 
-namespace mediasilo\http;
+namespace mediasilo\http\exception;
 
 use Exception;
-use mediasilo\http\ratelimit\RateLimt;
 
-class NotAuthorizedException extends Exception {
+class NotFoundException extends Exception {
 
     public function __construct($message, $errors) {
         parent::__construct($message);

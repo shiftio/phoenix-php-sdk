@@ -1,9 +1,9 @@
 <?php
 
-namespace mediasilo\http\ratelimit;
+namespace mediasilo\http\ratelimit\exception;
 
 use Exception;
-use mediasilo\http\ratelimit\RateLimt;
+use mediasilo\http\RateLimt;
 
 class RateLimitException extends Exception {
 

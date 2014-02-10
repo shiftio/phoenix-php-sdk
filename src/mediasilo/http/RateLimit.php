@@ -1,6 +1,6 @@
 <?php
 
-namespace mediasilo\http\ratelimit;
+namespace mediasilo\http;
 
 class RateLimit {
 

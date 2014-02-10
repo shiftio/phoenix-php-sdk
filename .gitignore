@@ -1,0 +1,6 @@
+composer.phar
+vendor/
+.idea/
+out/
+.idea_modules/
+atlassian-ide-plugin.xml

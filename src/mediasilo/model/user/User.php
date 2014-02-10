@@ -2,6 +2,7 @@
 
 namespace mediasilo\model;
 
+use mediasilo\model\Address;
 
 class User {
     private $id;

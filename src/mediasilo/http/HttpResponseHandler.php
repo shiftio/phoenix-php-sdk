@@ -2,8 +2,9 @@
 
 namespace mediasilo\http;
 
-use mediasilo\http\ratelimit\RateLimitException;
-use mediasilo\http\validation\ValidationException;
+use mediasilo\http\exception\RateLimitException;
+use mediasilo\http\exception\ValidationException;
+use mediasilo\http\exception\NotFoundException;
 
 class HttpResponseHandler {
     public function handle($response, $responseCode) {
@@ -17,6 +18,10 @@ class HttpResponseHandler {
 
         if($responseCode == 400) {
             throw new ValidationException("The request was invalid. Review the error collection to see what the problem was.", json_decode($response));
+        }
+
+        if($responseCode == 404) {
+            throw new NotFoundException("There was no resource matching the request.", json_decode($response));
         }
     }
 
