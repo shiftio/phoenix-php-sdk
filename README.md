@@ -22,3 +22,14 @@ Install the SDK's dependencies:
     php composer.phar install
     
 #### Usage
+
+    // Set your credentials
+    $username = "PoohBear";
+    $password = "T!gger!sPushy";
+    $host = "100acreforest";
+    
+    // Instantiate client
+    $mediasiloapi = new MediaSiloAPI($username, $password, $host);
+    
+    // Start making some calls
+    $me = $mediasiloapi->me();
