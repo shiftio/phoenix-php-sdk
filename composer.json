@@ -1,4 +1,6 @@
 {
+    "name" : "mediasilo/phoenix-php-sdk",
+    "version" : "0.1.0",
     "autoload": {
         "psr-0": {
             "mediasilo\\": "src/"
