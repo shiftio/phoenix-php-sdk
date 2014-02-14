@@ -17,18 +17,23 @@ use mediasilo\project\ProjectProxy;
 use mediasilo\http\WebClient;
 use mediasilo\favorite\FavoriteProxy;
 use mediasilo\project\Project;
+use mediasilo\quicklink\Configuration;
+use mediasilo\quicklink\QuickLink;
+use mediasilo\quicklink\QuickLinkProxy;
 
 class MediaSiloAPI
 {
     private $webClient;
     private $favoriteProxy;
     private $projectProxy;
+    private $quicklinkProxy;
 
     public function __construct($username, $password, $host)
     {
         $this->webClient = new WebClient($username, $password, $host);
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
+        $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
     }
 
     public function me()
@@ -116,6 +121,15 @@ class MediaSiloAPI
     public function getFavoriteProjects()
     {
         return $this->favoriteProxy->getFavoriteProjects();
+    }
+
+    public function createQuickLink($title, $description, array $assetIds, Configuration $configuration) {
+        $quickLink = new QuickLink($assetIds, $configuration, $description, array(), $title);
+        $this->quicklinkProxy->createQuickLink($quickLink);
+    }
+
+    public function getQuickLink($id) {
+        return $this->quicklinkProxy->getQuickLink($id);
     }
 
     public function getUser($userId)
