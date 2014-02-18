@@ -11,15 +11,17 @@ class Asset implements Serializable {
     public $description;
     public $filename;
     public $dateCreated;
+    public $projectId;
     public $acl;
 
-    function __construct($id, $title, $description, $filename, $dateCreated)
+    function __construct($id, $title, $description, $filename, $dateCreated, $projectId)
     {
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
         $this->filename = $filename;
         $this->dateCreated = $dateCreated;
+        $this->projectId = $projectId;
     }
 
     function toJson() {
