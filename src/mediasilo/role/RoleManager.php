@@ -1,26 +1,6 @@
 <?php
 
-namespace mediasilo;
-
-require 'vendor/autoload.php';
-
-if (!function_exists('curl_init')) {
-    throw new Exception('We need cURL for the API to work. Have a look here: http://us3.php.net/curl');
-}
-
-if (!function_exists('json_decode')) {
-    throw new Exception('We need json_decode for the API to work. If you\'re running a linux distro install this package: php-pecl-json');
-}
-
-use mediasilo\http\MediaSiloResourcePaths;
-use mediasilo\project\ProjectProxy;
-use mediasilo\http\WebClient;
-use mediasilo\favorite\FavoriteProxy;
-use mediasilo\project\Project;
-use mediasilo\quicklink\Configuration;
-use mediasilo\quicklink\QuickLink;
-use mediasilo\quicklink\QuickLinkProxy;
-use mediasilo\asset\AssetProxy;
+namespace mediasilo\role;
 
 class MediaSiloAPI {
     private $webClient;

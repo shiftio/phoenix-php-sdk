@@ -1,6 +1,6 @@
 <?php
 
-namespace mediasilo\model\role;
+namespace mediasilo\role;
 
 class Role {
 

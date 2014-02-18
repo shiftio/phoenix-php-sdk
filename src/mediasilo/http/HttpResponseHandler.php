@@ -5,11 +5,16 @@ namespace mediasilo\http;
 use mediasilo\http\exception\RateLimitException;
 use mediasilo\http\exception\ValidationException;
 use mediasilo\http\exception\NotFoundException;
+use mediasilo\http\exception\ConnectionException;
 
 class HttpResponseHandler {
     public function handle($response, $responseCode) {
         if(!$responseCode >= 200 && $responseCode <= 206) {
 
+        }
+
+        if($response == false) {
+            throw new ConnectionException("There was a problem connecting to the MediaSilo API", json_decode($response));
         }
 
         if($responseCode == 429) {
