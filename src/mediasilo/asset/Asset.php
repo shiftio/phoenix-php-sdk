@@ -30,7 +30,11 @@ class Asset implements Serializable {
 
     public static function fromJson($json) {
     	$mixed = json_decode($json);
-        return new Asset($mixed->id, $mixed->title, $mixed->description, $mixed->filename, $mixed->dateCreated);
+        return new Asset($mixed->id, $mixed->title, $mixed->description, $mixed->filename, $mixed->dateCreated, $mixed->projectId);
+    }
+
+    public static function fromStdClass($stdClass) {
+        return new Asset($stdClass->id, $stdClass->title, $stdClass->description, $stdClass->filename, $stdClass->dateCreated, $stdClass->projectId);
     }
 
 }

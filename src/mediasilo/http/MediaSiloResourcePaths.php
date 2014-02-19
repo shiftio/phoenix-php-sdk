@@ -27,5 +27,7 @@ class MediaSiloResourcePaths
     const QUICKLINK = "/quicklinks";
     const SHARE = "/share";
     const ASSETS = "/assets";
-
+    const PROJECT_ASSETS = "/projects/%s/assets";
+    const FOLDER_ASSETS = "/folders/%s/assets";
+    const USER_PROJECT_ROLES = "/me/projects/%s/roles";
 }

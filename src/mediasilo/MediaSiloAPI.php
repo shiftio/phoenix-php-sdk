@@ -126,6 +126,26 @@ class MediaSiloAPI {
         return $this->assetProxy->getAsset($id, $acl);
     }
 
+    /**
+     * Gets assets in the given project
+     * @param $projectId
+     * @param $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @return Array(Asset)
+     */
+    public function getAssetsByProject($projectId, $acl = false) {
+        return $this->assetProxy->getAssetsByProjectId($projectId, $acl);
+    }
+
+    /**
+     * Gets assets in the given folder
+     * @param $folderId
+     * @param $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @return Array(Asset)
+     */
+    public function getAssetsByFolder($folderId, $acl = false) {
+        return $this->assetProxy->getAssetsByFolderId($folderId, $acl);
+    }
+
 
 
     public function createQuickLink($title, $description, array $assetIds, Configuration $configuration) {
