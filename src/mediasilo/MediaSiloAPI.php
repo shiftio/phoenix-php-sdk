@@ -2,8 +2,6 @@
 
 namespace mediasilo;
 
-require 'vendor/autoload.php';
-
 if (!function_exists('curl_init')) {
     throw new Exception('We need cURL for the API to work. Have a look here: http://us3.php.net/curl');
 }
@@ -123,14 +121,42 @@ class MediaSiloAPI
         return $this->favoriteProxy->getFavoriteProjects();
     }
 
-    public function createQuickLink($title, $description, array $assetIds, Configuration $configuration) {
-        $quickLink = new QuickLink($assetIds, $configuration, $description, array(), $title);
-        $this->quicklinkProxy->createQuickLink($quickLink);
+    // Quicklinks //
+
+    /**
+     * Persists a QuickLink in MediaSilo with the provided quicklink object
+     * NOTE! This does not send it, only creates it.
+     * @param Quicklink $quicklink
+     */
+    public function createQuickLink(Quicklink $quicklink) {
+        $this->quicklinkProxy->createQuickLink($quicklink);
     }
 
+    /**
+     * Fetches a quicklink based on UUID
+     * @param String $id
+     * @returns Quicklink
+     */
     public function getQuickLink($id) {
         return $this->quicklinkProxy->getQuickLink($id);
     }
+
+    /**
+     * Fetches a list of Quicklinks
+     * @returns String
+     */
+    public function getQuickLinks() {
+        return $this->quicklinkProxy->getQuicklinks();
+    }
+
+    /**
+     * Persists updates to a quicklink object
+     * @param Quicklink $quicklink
+     */
+    public function updateQuickLink($quicklink) {
+        $this->quicklinkProxy->updateQuicklink($quicklink);
+    }
+
 
     public function getUser($userId)
     {
