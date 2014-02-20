@@ -31,4 +31,5 @@ class MediaSiloResourcePaths
     const FOLDER_ASSETS = "/folders/%s/assets";
     const USER_PROJECT_ROLES = "/me/projects/%s/roles";
     const CHANNELS = "/channels";
+    const TRANSCRIPTS = "/transcripts";
 }

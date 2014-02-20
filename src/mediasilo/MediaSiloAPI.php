@@ -23,6 +23,7 @@ use mediasilo\quicklink\QuickLinkProxy;
 use mediasilo\asset\AssetProxy;
 use mediasilo\channel\ChannelProxy;
 use mediasilo\channel\Channel;
+use mediasilo\transcript\TranscriptProxy;
 
 class MediaSiloAPI {
     private $webClient;
@@ -31,6 +32,7 @@ class MediaSiloAPI {
     private $quicklinkProxy;
     private $assetProxy;
     private $channelProxy;
+    private $transcriptProxy;
 
     public function __construct($username, $password, $host) {
         $this->webClient = new WebClient($username, $password, $host);
@@ -39,6 +41,7 @@ class MediaSiloAPI {
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
+        $this->transcriptProxy = new TranscriptProxy($this->webClient);
     }
 
     public function me() {
@@ -219,6 +222,17 @@ class MediaSiloAPI {
         $this->channelProxy->deleteChannel($channelId);
     }
 
+
+    // Transcript //
+
+    /**
+     * Gets the transcript for the given asset
+     * @param $assetId
+     * @return Transcript
+     */
+    public function getTranscript($assetId) {
+        return $this->transcriptProxy->getTranscript($assetId);
+    }
 
 
 
