@@ -24,6 +24,7 @@ use mediasilo\asset\AssetProxy;
 use mediasilo\channel\ChannelProxy;
 use mediasilo\channel\Channel;
 use mediasilo\transcript\TranscriptProxy;
+use mediasilo\transcript\TranscriptServiceProxy;
 
 class MediaSiloAPI {
     private $webClient;
@@ -33,6 +34,7 @@ class MediaSiloAPI {
     private $assetProxy;
     private $channelProxy;
     private $transcriptProxy;
+    private $transcriptServiceProxy;
 
     public function __construct($username, $password, $host) {
         $this->webClient = new WebClient($username, $password, $host);
@@ -42,6 +44,7 @@ class MediaSiloAPI {
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
+        $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);
     }
 
     public function me() {
@@ -233,6 +236,18 @@ class MediaSiloAPI {
     public function getTranscript($assetId) {
         return $this->transcriptProxy->getTranscript($assetId);
     }
+
+
+    // Transcript Service //
+
+    /**
+     * Gets all transcript services available for this user
+     * @return array(TranscriptService)
+     */
+    public function getTranscriptServices() {
+        return $this->transcriptServiceProxy->getTranscriptServices();
+    }
+
 
 
 
