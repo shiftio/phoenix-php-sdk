@@ -21,12 +21,16 @@ use mediasilo\quicklink\Configuration;
 use mediasilo\quicklink\QuickLink;
 use mediasilo\quicklink\QuickLinkProxy;
 use mediasilo\asset\AssetProxy;
+use mediasilo\channel\ChannelProxy;
+use mediasilo\channel\Channel;
 
 class MediaSiloAPI {
     private $webClient;
     private $favoriteProxy;
     private $projectProxy;
     private $quicklinkProxy;
+    private $assetProxy;
+    private $channelProxy;
 
     public function __construct($username, $password, $host) {
         $this->webClient = new WebClient($username, $password, $host);
@@ -34,11 +38,13 @@ class MediaSiloAPI {
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
         $this->assetProxy = new AssetProxy($this->webClient);
+        $this->channelProxy = new ChannelProxy($this->webClient);
     }
 
     public function me() {
         return json_decode($this->webClient->get(MediaSiloResourcePaths::ME));
     }
+
 
     // Projects //
 
@@ -88,6 +94,7 @@ class MediaSiloAPI {
         return $this->projectProxy->getUsersProjects($userId);
     }
 
+
     // Favorites //
 
     /**
@@ -113,6 +120,7 @@ class MediaSiloAPI {
     public function getFavoriteProjects() {
         return $this->favoriteProxy->getFavoriteProjects();
     }
+
 
     // Asset //
 
@@ -145,6 +153,73 @@ class MediaSiloAPI {
     public function getAssetsByFolder($folderId, $acl = false) {
         return $this->assetProxy->getAssetsByFolderId($folderId, $acl);
     }
+
+
+    // Channel //
+
+    /**
+     * Gets the channel for the given Id
+     * @param $id
+     * @return Channel
+     */
+    public function getChannel($id) {
+        return $this->channelProxy->getChannel($id);
+    }
+
+    /**
+     * Gets all channels user has access to
+     * @return Array(Channel)
+     */
+    public function getChannels() {
+        return $this->channelProxy->getChannels();
+    }
+
+    /**
+     * Creates a new channel
+     * @param $name, 
+     * @param $autoPlay
+     * @param $height
+     * @param $width
+     * @param $playback
+     * @param $public
+     * @param $streatching
+     * @param array $assets
+     */
+    public function createChannel($name, $autoPlay, $height, $width, $playback, $public, $streatching, array $assets) {
+        $channel = new Channel(null, $name, null, $autoPlay, $height, $width, $playback, $public, $stretching, null, $assets);
+        $this->channelProxy->createChannel($channel);
+
+        return $channel;
+    }
+
+    /**
+     * Updates a channel with the given Id
+     * @param $id, 
+     * @param $name, 
+     * @param $autoPlay
+     * @param $height
+     * @param $width
+     * @param $playback
+     * @param $public
+     * @param $streatching
+     * @param array $assets
+     */
+    public function updateChannel($id, $name, $autoPlay, $height, $width, $playback, $public, $streatching, array $assets) {
+        $channel = new Channel($id, $name, null, $autoPlay, $height, $width, $playback, $public, $stretching, null, $assets);
+        $this->channelProxy->updateChannel($channel);
+
+        return $channel;
+    }
+
+    /**
+     * Deletes the given channel
+     * @param $channelId
+     */
+    public function deleteChannel($channelId) {
+        $this->channelProxy->deleteChannel($channelId);
+    }
+
+
 
 
 
