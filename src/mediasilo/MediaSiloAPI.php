@@ -126,10 +126,16 @@ class MediaSiloAPI
     /**
      * Persists a QuickLink in MediaSilo with the provided quicklink object
      * NOTE! This does not send it, only creates it.
-     * @param Quicklink $quicklink
+     * @param string $title,
+     * @param string $description
+     * @param array $assetIds
+     * @param quicklink\Configuration $configuration
+     * @return Quicklink
      */
-    public function createQuickLink(Quicklink $quicklink) {
-        $this->quicklinkProxy->createQuickLink($quicklink);
+    public function createQuickLink($title, $description = "", array $assetIds = array(), Configuration $configuration = null) {
+        $quickLink = new QuickLink($assetIds, $configuration, $description, array(), $title);
+        $this->quicklinkProxy->createQuickLink($quickLink);
+        return $quickLink;
     }
 
     /**
