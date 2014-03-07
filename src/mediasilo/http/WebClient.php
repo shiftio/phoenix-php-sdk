@@ -2,7 +2,6 @@
 
 namespace mediasilo\http;
 
-use mediasilo\config\Config;
 use mediasilo\config\Meta;
 use mediasilo\http\HttpResponseHandler;
 
@@ -20,7 +19,10 @@ class WebClient {
 
     private $httpResponseHandler;
 
-    public function __construct($username, $password, $host, $session) {
+    private $baseUrl;
+
+    public function __construct($username, $password, $host, $session, $baseUrl) {
+        $this->baseUrl = $baseUrl;
         if ($session == null) {
             $this->username = $username;
             $this->password = $password;
@@ -41,7 +43,7 @@ class WebClient {
         curl_setopt_array($curl, array(
             CURLOPT_HTTPHEADER => $this->getRequestHeaders(),
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => (rtrim(CONFIG::MEDIASILO_API_BASE_URL, "/")."/".rtrim(ltrim($path, "/"))),
+            CURLOPT_URL => (rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))),
             CURLOPT_USERAGENT => $this->host.":".$this->username." PHP SDK Version ".META::MEDIASILO_SDK_VERSION
         ));
 
@@ -61,7 +63,7 @@ class WebClient {
             CURLOPT_POST => 1,
             CURLOPT_POSTFIELDS => $payload,
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => (rtrim(CONFIG::MEDIASILO_API_BASE_URL, "/")."/".rtrim(ltrim($path, "/"))),
+            CURLOPT_URL => (rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))),
             CURLOPT_USERAGENT => $this->host.":".$this->username." PHP SDK Version ".META::MEDIASILO_SDK_VERSION
         ));
 
@@ -88,7 +90,7 @@ class WebClient {
             CURLOPT_INFILE => $fp,
             CURLOPT_INFILESIZE, strlen($payload),
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => (rtrim(CONFIG::MEDIASILO_API_BASE_URL, "/")."/".rtrim(ltrim($path, "/"))),
+            CURLOPT_URL => (rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))),
             CURLOPT_USERAGENT => $this->host.":".$this->username." PHP SDK Version ".META::MEDIASILO_SDK_VERSION
         ));
 
@@ -106,7 +108,7 @@ class WebClient {
             CURLOPT_HTTPHEADER => $this->getRequestHeaders(),
             CURLOPT_CUSTOMREQUEST => "DELETE",
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => (rtrim(CONFIG::MEDIASILO_API_BASE_URL, "/")."/".rtrim(ltrim($path, "/"))),
+            CURLOPT_URL => (rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))),
             CURLOPT_USERAGENT => $this->host.":".$this->username." PHP SDK Version ".META::MEDIASILO_SDK_VERSION
         ));
 
