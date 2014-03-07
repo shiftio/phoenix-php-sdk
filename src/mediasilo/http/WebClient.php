@@ -14,12 +14,23 @@ class WebClient {
 
     private $host;
 
+    private $useSession;
+
+    private $sessionKey;
+
     private $httpResponseHandler;
 
-    public function __construct($username, $password, $host) {
-        $this->username = $username;
-        $this->password = $password;
-        $this->host = $host;
+    public function __construct($username, $password, $host, $session) {
+        if ($session == null) {
+            $this->username = $username;
+            $this->password = $password;
+            $this->host = $host;
+            $this->useSession = false;
+        } else {
+            $this->host = $host;
+            $this->sessionKey = $session;
+            $this->useSession = true;
+        }
 
         $this->httpResponseHandler = new HttpResponseHandler();
     }
@@ -111,10 +122,14 @@ class WebClient {
     private function getRequestHeaders() {
         $headers = array("Content-Type: application/json; charset=utf-8","Accept:application/json");
         $hostHeader = "MediaSiloHostContext:".$this->host;
-        $authHeader = "Authorization: Basic ".base64_encode($this->username.":".$this->password);
-
         array_push($headers, $hostHeader);
-        array_push($headers, $authHeader);
+        if ($this->useSession) {
+            $sessionHeader = "MediaSiloSessionKey:".$this->sessionKey;
+            array_push($headers, $sessionHeader);
+        } else {
+            $authHeader = "Authorization: Basic ".base64_encode($this->username.":".$this->password);
+            array_push($headers, $authHeader);
+        }
 
         return $headers;
     }
