@@ -28,6 +28,22 @@ class QuickLink implements Serializable {
         $this->title = $title;
     }
 
+    /**
+     * @param string $id UUID for quicklink
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return string UUID
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
     function toJson() {
         return json_encode($this);
     }
