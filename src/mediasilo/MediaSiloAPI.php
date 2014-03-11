@@ -2,8 +2,6 @@
 
 namespace mediasilo;
 
-require 'vendor/autoload.php';
-
 if (!function_exists('curl_init')) {
     throw new Exception('We need cURL for the API to work. Have a look here: http://us3.php.net/curl');
 }
@@ -20,6 +18,7 @@ use mediasilo\project\Project;
 use mediasilo\quicklink\Configuration;
 use mediasilo\quicklink\QuickLink;
 use mediasilo\quicklink\QuickLinkProxy;
+use mediasilo\quicklink\Setting;
 
 class MediaSiloAPI
 {
@@ -123,14 +122,77 @@ class MediaSiloAPI
         return $this->favoriteProxy->getFavoriteProjects();
     }
 
-    public function createQuickLink($title, $description, array $assetIds, Configuration $configuration) {
+    // Quicklinks //
+
+    /**
+     * Persists a QuickLink in MediaSilo
+     * NOTE! This does not send it, only creates it.
+     * @param string $title Title for the Quicklink
+     * @param string $description Description for the Quicklink
+     * @param array $assetIds Array of Asset ID to be included in quicklink
+     * @param array $settings Key/Value associative array of settings
+     * @return Quicklink Hydrated model of created quicklink
+     */
+    public function createQuickLink($title, $description = "", array $assetIds = array(), array $settings = array()) {
+        $newSettings = array();
+        foreach($settings as $key => $value) {
+            array_push($newSettings, new Setting((string)$key, (string)$value));
+        }
+        $configuration = new Configuration(null, $newSettings);
+
         $quickLink = new QuickLink($assetIds, $configuration, $description, array(), $title);
         $this->quicklinkProxy->createQuickLink($quickLink);
+        return $quickLink;
     }
 
+    /**
+     * Fetches a quicklink based on UUID
+     * @param String $id
+     * @returns Quicklink
+     */
     public function getQuickLink($id) {
         return $this->quicklinkProxy->getQuickLink($id);
     }
+
+    /**
+     * Fetches a list of Quicklinks
+     * @returns Quicklink[] Array of Quicklink Objects
+     */
+    public function getQuickLinks() {
+        return $this->quicklinkProxy->getQuicklinks();
+    }
+
+    /**
+     * Updates a QuickLink in MediaSilo
+     * @param string $id UUID of quicklink to update
+     * @param string $title Title for the Quicklink
+     * @param string $description Description for the Quicklink
+     * @param array $assetIds Array of Asset ID to be included in quicklink
+     * @param array $settings Key/Value associative array of settings
+     */
+    public function updateQuickLink($id, $title = null, $description = null, array $assetIds = null, array $settings = null) {
+        $assets = null;
+        $configuration = null;
+
+        if (is_array($settings)) {
+            $newSettings = array();
+            foreach($settings as $key => $value) {
+                array_push($newSettings, new Setting((string)$key, (string)$value));
+            }
+            $configuration = new Configuration(null, $newSettings);
+        } else {
+            $configuration = new Configuration(null, null);
+        }
+
+        if (is_array($assetIds)) {
+            $assets = $assetIds;
+        }
+
+        $quickLink = new QuickLink($assets, $configuration, $description, array(), $title);
+        $quickLink->setId($id);
+        $this->quicklinkProxy->updateQuicklink($quickLink);
+    }
+
 
     public function getUser($userId)
     {
