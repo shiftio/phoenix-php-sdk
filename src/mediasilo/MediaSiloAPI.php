@@ -18,6 +18,8 @@ use mediasilo\project\Project;
 use mediasilo\quicklink\Configuration;
 use mediasilo\quicklink\QuickLink;
 use mediasilo\quicklink\QuickLinkProxy;
+use mediasilo\quicklink\QuickLinkCommentProxy;
+use mediasilo\comment\Comment;
 use mediasilo\asset\AssetProxy;
 use mediasilo\channel\ChannelProxy;
 use mediasilo\channel\Channel;
@@ -30,6 +32,7 @@ class MediaSiloAPI {
     private $favoriteProxy;
     private $projectProxy;
     private $quicklinkProxy;
+    private $quicklinkCommentProxy;
     private $assetProxy;
     private $channelProxy;
     private $transcriptProxy;
@@ -41,6 +44,7 @@ class MediaSiloAPI {
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
+        $this->quicklinkCommentProxy = new QuickLinkCommentProxy($this->webClient);
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
@@ -318,6 +322,20 @@ class MediaSiloAPI {
         $this->quicklinkProxy->updateQuicklink($quickLink);
     }
 
+    public function commentOnQuickLinkAsset($quicklinkId, $assetId, $commentBody, $inResponseTo = null, $startTimeCode = null, $endTimeCode = null, $user = null) {
+        $comment = new Comment($assetId, $inResponseTo, $quicklinkId, $commentBody);
+        $comment->startTimeCode = $startTimeCode;
+        $comment->endTimeCode = $endTimeCode;
+        $comment->user = $user;
+
+        $this->quicklinkCommentProxy->createComment($comment);
+
+        return $comment->id;
+    }
+
+    public function getQuickLinkAssetComments($assetId, $quickLinkId) {
+        return $this->quicklinkCommentProxy->getComments($assetId, $quickLinkId);
+    }
 
     public function getUser($userId)
     {
