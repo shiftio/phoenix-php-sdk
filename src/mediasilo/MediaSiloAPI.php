@@ -27,9 +27,9 @@ class MediaSiloAPI
     private $projectProxy;
     private $quicklinkProxy;
 
-    public function __construct($username, $password, $host)
+    public function __construct($username, $password, $host, $session = null, $baseUrl = "phoenix.mediasilo.com/v3")
     {
-        $this->webClient = new WebClient($username, $password, $host);
+        $this->webClient = new WebClient($username, $password, $host, $session, $baseUrl);
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
