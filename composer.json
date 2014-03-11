@@ -7,6 +7,26 @@
 
     },
     "require" : {
-        "monolog/monolog": "1.0.*"
-    }
+        "phpclasses/oauth-api": ">=1.0.8",
+        "oauth-php-read-only" : "*"
+    },
+    "repositories": [
+            {
+                "type": "composer",
+                "url": "http:\/\/www.phpclasses.org\/"
+            },
+            {
+                "packagist": false
+            },
+            {
+                "type": "vcs",
+                "url": "http://oauth-php.googlecode.com/svn/",
+                "trunk-path": "trunk",
+                "branches-path": "branches",
+                "tags-path": "tags"
+            }
+    ]
+
+
+
 }
