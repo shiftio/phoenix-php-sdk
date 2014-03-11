@@ -69,6 +69,8 @@ class WebClient {
 
         $result = curl_exec($curl);
 
+        $this->httpResponseHandler->handle($result, curl_getinfo($curl, CURLINFO_HTTP_CODE));
+
         curl_close($curl);
 
         return $result;
