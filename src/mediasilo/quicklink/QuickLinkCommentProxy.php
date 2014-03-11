@@ -15,8 +15,8 @@ class QuickLinkCommentProxy {
     }
 
     /**
-     * Creates a brand spankin new project
-     * @param Project $project
+     * Creates a new comment
+     * @param Comment $comment
      */
     public function createComment(Comment $comment)
     {
@@ -25,9 +25,9 @@ class QuickLinkCommentProxy {
     }
 
     /**
-     * Gets an exiting project given a project Id
+     * Gets an exiting comment given a comment id
      * @param $id
-     * @return Project
+     * @return Comment
      */
     public function getComment($id)
     {
@@ -35,9 +35,10 @@ class QuickLinkCommentProxy {
     }
 
     /**
-     * Gets an exiting project given a project Id
-     * @param $id
-     * @return Project
+     * Gets comments for a given asset within a specific context. In this case within the context of a quicklink.
+     * @param $at The id of what was commented at
+     * @param $context The scope of the comment
+     * @return Comments
      */
     public function getComments($at, $context)
     {
@@ -45,9 +46,8 @@ class QuickLinkCommentProxy {
     }
 
     /**
-     * Updates an existing project. Use this if you want to change the name or description of a project.
-     * You won't be able to change the project owner here, though.
-     * @param Project $project
+     * Updates an existing comment. Use this if you want to change the body of the comment.
+     * @param Comment $comment
      */
     public function updateComment(Comment $comment)
     {
@@ -55,9 +55,8 @@ class QuickLinkCommentProxy {
     }
 
     /**
-     * Sayonara project
+     * Sayonara comment
      * @param $id
-     * @return mixed
      */
     public function deleteComment($id) {
         return $this->webClient->delete(MediaSiloResourcePaths::QUICK_LINK_COMMENTS . "/" . $id);
