@@ -28,6 +28,22 @@ class QuickLink implements Serializable {
         $this->title = $title;
     }
 
+    /**
+     * @param string $id UUID for quicklink
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return string UUID
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
     function toJson() {
         return json_encode($this);
     }
@@ -41,7 +57,7 @@ class QuickLink implements Serializable {
         $configuration = Configuration::fromStdClass($stdClass->configuration);
 
         $shares = array();
-        if($stdClass->shares != null) {
+        if(isset($stdClass->shares) && $stdClass->shares != null) {
             foreach($stdClass->shares as $share) {
                 array_push($shares, Share::fromStdClass($share));
             }

@@ -27,6 +27,8 @@ Install the SDK's dependencies:
     
 #### Usage
 
+    use mediasilo\MediaSiloApi;
+    
     // Set your credentials
     $username = "PoohBear";
     $password = "T!gger!sPushy";

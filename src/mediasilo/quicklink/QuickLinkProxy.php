@@ -15,18 +15,39 @@ class QuickLinkProxy {
     }
 
     /**
+     * Create
      * @param QuickLink $quickLink
      */
     public function createQuickLink(QuickLink $quickLink)
     {
         $result = json_decode($this->webClient->post(MediaSiloResourcePaths::QUICKLINK, $quickLink->toJson()));
         $quickLink->id = $result->id;
-
-        var_dump($quickLink);
     }
 
+    /**
+     * Read One
+     * @param String $id
+     * @returns Quicklink
+     */
     public function getQuickLink($id) {
         $result = $this->webClient->get(MediaSiloResourcePaths::QUICKLINK."/".$id);
         return QuickLink::fromJson($result);
+    }
+
+    /**
+     * Read Many
+     * @returns String
+     */
+    public function getQuicklinks() {
+        $result = $this->webClient->get(MediaSiloResourcePaths::QUICKLINK);
+        return json_decode($result);
+    }
+
+    /**
+     * Update
+     * @param QuickLink $quickLink
+     */
+    public function updateQuicklink(QuickLink $quickLink) {
+        $this->webClient->put(MediaSiloResourcePaths::QUICKLINK, $quickLink->toJson());
     }
 }
