@@ -24,5 +24,7 @@ class MediaSiloResourcePaths
     const USER_TAGS = "/users/%s/tags";
     const USERS = "users";
     const USER_PREFERENCES = "/users/%s/preferences";
+    const QUICKLINK = "/quicklinks";
+    const SHARE = "/share";
 
 }

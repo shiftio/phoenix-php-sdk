@@ -1,0 +1,5 @@
+<testsuites>
+    <testsuite name="full sdk">
+        <directory>tests</directory>
+    </testsuite>
+</testsuites>
