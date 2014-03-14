@@ -2,7 +2,6 @@
 
 namespace mediasilo\http;
 
-use mediasilo\config\Config;
 use mediasilo\config\Meta;
 use mediasilo\http\HttpResponseHandler;
 
@@ -14,12 +13,26 @@ class WebClient {
 
     private $host;
 
+    private $useSession;
+
+    private $sessionKey;
+
     private $httpResponseHandler;
 
-    public function __construct($username, $password, $host) {
-        $this->username = $username;
-        $this->password = $password;
-        $this->host = $host;
+    private $baseUrl;
+
+    public function __construct($username, $password, $host, $session, $baseUrl) {
+        $this->baseUrl = $baseUrl;
+        if ($session == null) {
+            $this->username = $username;
+            $this->password = $password;
+            $this->host = $host;
+            $this->useSession = false;
+        } else {
+            $this->host = $host;
+            $this->sessionKey = $session;
+            $this->useSession = true;
+        }
 
         $this->httpResponseHandler = new HttpResponseHandler();
     }
@@ -30,7 +43,7 @@ class WebClient {
         curl_setopt_array($curl, array(
             CURLOPT_HTTPHEADER => $this->getRequestHeaders(),
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => (rtrim(CONFIG::MEDIASILO_API_BASE_URL, "/")."/".rtrim(ltrim($path, "/"))),
+            CURLOPT_URL => (rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))),
             CURLOPT_USERAGENT => $this->host.":".$this->username." PHP SDK Version ".META::MEDIASILO_SDK_VERSION
         ));
 
@@ -50,11 +63,13 @@ class WebClient {
             CURLOPT_POST => 1,
             CURLOPT_POSTFIELDS => $payload,
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => (rtrim(CONFIG::MEDIASILO_API_BASE_URL, "/")."/".rtrim(ltrim($path, "/"))),
+            CURLOPT_URL => (rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))),
             CURLOPT_USERAGENT => $this->host.":".$this->username." PHP SDK Version ".META::MEDIASILO_SDK_VERSION
         ));
 
         $result = curl_exec($curl);
+
+        $this->httpResponseHandler->handle($result, curl_getinfo($curl, CURLINFO_HTTP_CODE));
 
         curl_close($curl);
 
@@ -77,7 +92,7 @@ class WebClient {
             CURLOPT_INFILE => $fp,
             CURLOPT_INFILESIZE, strlen($payload),
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => (rtrim(CONFIG::MEDIASILO_API_BASE_URL, "/")."/".rtrim(ltrim($path, "/"))),
+            CURLOPT_URL => (rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))),
             CURLOPT_USERAGENT => $this->host.":".$this->username." PHP SDK Version ".META::MEDIASILO_SDK_VERSION
         ));
 
@@ -95,7 +110,7 @@ class WebClient {
             CURLOPT_HTTPHEADER => $this->getRequestHeaders(),
             CURLOPT_CUSTOMREQUEST => "DELETE",
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => (rtrim(CONFIG::MEDIASILO_API_BASE_URL, "/")."/".rtrim(ltrim($path, "/"))),
+            CURLOPT_URL => (rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))),
             CURLOPT_USERAGENT => $this->host.":".$this->username." PHP SDK Version ".META::MEDIASILO_SDK_VERSION
         ));
 
@@ -111,10 +126,14 @@ class WebClient {
     private function getRequestHeaders() {
         $headers = array("Content-Type: application/json; charset=utf-8","Accept:application/json");
         $hostHeader = "MediaSiloHostContext:".$this->host;
-        $authHeader = "Authorization: Basic ".base64_encode($this->username.":".$this->password);
-
         array_push($headers, $hostHeader);
-        array_push($headers, $authHeader);
+        if ($this->useSession) {
+            $sessionHeader = "MediaSiloSessionKey:".$this->sessionKey;
+            array_push($headers, $sessionHeader);
+        } else {
+            $authHeader = "Authorization: Basic ".base64_encode($this->username.":".$this->password);
+            array_push($headers, $authHeader);
+        }
 
         return $headers;
     }
