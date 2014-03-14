@@ -30,4 +30,27 @@ class RoleManager {
         }
     }
 
+    /**
+     * Returns an account level role for the given account ID. Users
+     * @param $accounttId
+     * @return Role;
+     */
+    public function getUserAccountLevelRole($accountId) {
+        if(isset($roles[$accountId])) {
+            return $roles[$accountId];
+        } else {
+            $roles = json_decode($this->webClient->get('/me'))->roles;
+
+            for ($i = 0; $i < count($roles); $i++) {
+                if ($roles[$i]->context == $accountId) {
+                    $role = new Role($roles[$i]->context, $roles[$i]->description, $roles[$i]->displayName, $roles[$i]->id, $roles[$i]->permissionGroups);
+                    break;
+                }
+            }
+
+            $roles[$accountId] = $role;
+
+            return $role;
+        }
+    }
 }

@@ -24,6 +24,8 @@ use mediasilo\channel\Channel;
 use mediasilo\transcript\TranscriptProxy;
 use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
+use mediasilo\me\MeProxy;
+use mediasilo\me\Me;
 
 class MediaSiloAPI {
     private $webClient;
@@ -34,6 +36,7 @@ class MediaSiloAPI {
     private $channelProxy;
     private $transcriptProxy;
     private $transcriptServiceProxy;
+    private $meProxy;
 
     public function __construct($username, $password, $host, $session = null, $baseUrl = "phoenix.mediasilo.com/v3")
     {
@@ -45,6 +48,7 @@ class MediaSiloAPI {
         $this->channelProxy = new ChannelProxy($this->webClient);
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
         $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);
+        $this->meProxy = new MeProxy($this->webClient);
     }
 
     public function me() {
@@ -145,8 +149,8 @@ class MediaSiloAPI {
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
      * @return Array(Asset)
      */
-    public function getAssetsByProject($projectId, $acl = false) {
-        return $this->assetProxy->getAssetsByProjectId($projectId, $acl);
+    public function getAssetsByProject($projectId, $acl = false, $accountId) {
+        return $this->assetProxy->getAssetsByProjectId($projectId, $acl, $accountId);
     }
 
     /**
@@ -432,6 +436,11 @@ class MediaSiloAPI {
     public function getQuickLinkComments($quickLinkId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId);
+        return json_decode($this->webClient->get($resourcePath));
+    }
+
+    public function getMe() {
+        $resourcePath = sprintf(MediaSiloResourcePaths::ME);
         return json_decode($this->webClient->get($resourcePath));
     }
 

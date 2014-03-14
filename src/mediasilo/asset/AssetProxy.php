@@ -37,9 +37,9 @@ class AssetProxy {
      * @param $ids
      * @return Array(Asset)
      */
-    public function getAssetsByProjectId($projectId, $acl = false) {
+    public function getAssetsByProjectId($projectId, $acl = false, $accountId) {
         $assets = array();
-        
+
         $result = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS,$projectId)));
         $assetsResults = $result->results;
 
@@ -47,7 +47,7 @@ class AssetProxy {
             foreach($assetsResults as $assetsResult) {
                 $asset = Asset::fromStdClass($assetsResult);
                 if($acl == true) {
-                    $this->attachAclToAsset($asset);
+                    $this->attachAclToAsset($asset, $accountId);
                 }
                 array_push($assets, $asset);
             }
@@ -63,7 +63,7 @@ class AssetProxy {
      */
     public function getAssetsByFolderId($folderId, $acl = false) {
         $assets = array();
-        
+
         $result = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS,$folderId)));
         $assetsResults = $result->results;
 
@@ -71,7 +71,7 @@ class AssetProxy {
             foreach($assetsResults as $assetsResult) {
                 $asset = Asset::fromStdClass($assetsResult);
                 if($acl == true) {
-                    $this->attachAclToAsset($asset);
+                    $this->attachAclToAsset($asset, $accountId);
                 }
                 array_push($assets, $asset);
             }
@@ -80,11 +80,15 @@ class AssetProxy {
         return $assets;
     }
 
-    private function attachAclToAsset(&$asset) {
+    private function attachAclToAsset(&$asset, &$accountId) {
         try {
             $role = $this->roleManager->getUserRoleForProject($asset->projectId);
             $asset->acl = $role->getPermissionGroups();
-        } catch(NotFoundException $nfe) {}
+        } catch(NotFoundException $nfe) {
+            // If there is no role for a project, default to account level role
+            $role = $this->roleManager->getUserAccountLevelRole($accountId);
+            $asset->acl = $role->getPermissionGroups();
+        }
     }
 
 }

@@ -24,18 +24,56 @@ Check to see that composer has been installed:
 Install the SDK's dependencies:
 
     php composer.phar install
-    
+
+#### Development
+
+To use a development copy of this SDK in a project, setup your composer.json as follows, where ```dev-{branch-name}`` include the branch name and ```{project-path}``` is the path to your project.
+
+```
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url" : "{project-path}/phoenix-php-sdk"
+        }
+    ],
+    "require": {
+        "guzzle/guzzle"            : "~3.7",
+        "mediasilo/phoenix-php-sdk": "dev-{branch-name}"
+    }
+}
+```
+
 #### Usage
 
-    use mediasilo\MediaSiloApi;
-    
-    // Set your credentials
-    $username = "PoohBear";
-    $password = "T!gger!sPushy";
-    $host = "100acreforest";
-    
-    // Instantiate client
-    $mediasiloapi = new MediaSiloAPI($username, $password, $host);
-    
-    // Start making some calls
-    $me = $mediasiloapi->me();
+```
+use mediasilo\MediaSiloApi;
+
+// Set your credentials
+$username = "PoohBear";
+$password = "T!gger!sPushy";
+$host = "100acreforest";
+
+// Instantiate client
+$mediasiloapi = new MediaSiloAPI($username, $password, $host);
+
+// Start making some calls
+$me = $mediasiloapi->me();
+```
+
+It is also possible to use the SDK given a session key and API base endpoint:
+
+```
+use mediasilo\MediaSiloApi;
+
+// Set your credentials
+$sessionKey = 'xxx';
+$host = 'xxx';
+$baseUrl = 'phoenix.mediasilo.com/v3';
+
+// Instantiate client
+$mediasiloapi = new MediaSiloAPI(null, null, $host, $sessionKey, $baseUrl);
+
+// Start making some calls
+$me = $mediasiloapi->me();
+```
