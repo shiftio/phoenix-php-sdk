@@ -37,10 +37,16 @@ class AssetProxy {
      * @param $ids
      * @return Array(Asset)
      */
-    public function getAssetsByProjectId($projectId, $acl = false, $accountId) {
+    public function getAssetsByProjectId($projectId, $acl = false) {
         $assets = array();
 
-        $result = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS,$projectId)));
+        if ($acl) {
+            // TODO: This should be coming from API
+            //$accountId = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME)))->accountUUID;
+            $accountId = '369490902XFYX';
+        }
+
+        $result = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS, $projectId)));
         $assetsResults = $result->results;
 
         if(!empty($assetsResults)) {
@@ -81,14 +87,8 @@ class AssetProxy {
     }
 
     private function attachAclToAsset(&$asset, &$accountId) {
-        try {
-            $role = $this->roleManager->getUserRoleForProject($asset->projectId);
-            $asset->acl = $role->getPermissionGroups();
-        } catch(NotFoundException $nfe) {
-            // If there is no role for a project, default to account level role
-            $role = $this->roleManager->getUserAccountLevelRole($accountId);
-            $asset->acl = $role->getPermissionGroups();
-        }
+        $role = $this->roleManager->getUserRoleForProject($asset->projectId, $accountId);
+        $asset->acl = $role->getPermissionGroups();
     }
 
 }

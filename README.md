@@ -55,10 +55,10 @@ $password = "T!gger!sPushy";
 $host = "100acreforest";
 
 // Instantiate client
-$mediasiloapi = new MediaSiloAPI($username, $password, $host);
+$mediaSiloAPI = new MediaSiloAPI($username, $password, $host);
 
 // Start making some calls
-$me = $mediasiloapi->me();
+$me = $mediaSiloAPI->me();
 ```
 
 It is also possible to use the SDK given a session key and API base endpoint:
@@ -72,8 +72,35 @@ $host = 'xxx';
 $baseUrl = 'phoenix.mediasilo.com/v3';
 
 // Instantiate client
-$mediasiloapi = new MediaSiloAPI(null, null, $host, $sessionKey, $baseUrl);
+$mediaSiloAPI = new MediaSiloAPI(null, null, $host, $sessionKey, $baseUrl);
 
 // Start making some calls
-$me = $mediasiloapi->me();
+$me = $mediaSiloAPI->me();
+```
+
+##### Exception Handling
+
+```
+use mediasilo\http\exception;
+use mediasilo\MediaSiloApi;
+
+try {
+    $mediaSiloAPI = new MediaSiloAPI(null, null, $host, $sessionKey, $baseUrl);
+    
+    $projectId = 'xxx';
+
+    $assets = $mediaSiloAPI->getAssetsByProject($projectId);
+} catch (NotFoundException $e) {
+    // Resource wasn't found exception
+} catch (RateLimitException $e) {
+    // Too many API requests exception
+} catch (ConnectionException $e) {
+    // Connection issues
+} catch (NotAuthorizedException $e) {
+    // Permission authorization exception
+} catch (ValidationException $e) {
+    // Unfit POST/PUT data exception
+} catch (Exception $e) {
+
+}
 ```

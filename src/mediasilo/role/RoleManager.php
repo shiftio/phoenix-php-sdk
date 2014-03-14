@@ -6,12 +6,14 @@ use mediasilo\http\WebClient;
 use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\role\Role;
 
-class RoleManager {
-    
+class RoleManager
+{
+
     private $roles;
     private $webClient;
 
-    public function __construct(WebClient $webClient) {
+    public function __construct(WebClient $webClient)
+    {
         $this->webClient = $webClient;
     }
 
@@ -20,12 +22,20 @@ class RoleManager {
      * @param $projectId
      * @return Role;
      */
-    public function getUserRoleForProject($projectId) {
-        if(isset($roles[$projectId])) {
+    public function getUserRoleForProject($projectId,$accountId)
+    {
+        if (isset($roles[$projectId])) {
             return $roles[$projectId];
         } else {
-            $role = Role::fromJson($this->webClient->get(sprintf(MediaSiloResourcePaths::USER_PROJECT_ROLES, $projectId)));
-            $roles[$projectId] = $role;
+            $json = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::USER_PROJECT_ROLES, $projectId)));
+
+            if (count($json->results)) {
+                $role = Role::fromJson(json_encode($json->results[0]));
+                $roles[$projectId] = $role;
+            } else {
+                $role = $this->getUserAccountLevelRole($accountId);
+            }
+
             return $role;
         }
     }
@@ -35,8 +45,9 @@ class RoleManager {
      * @param $accounttId
      * @return Role;
      */
-    public function getUserAccountLevelRole($accountId) {
-        if(isset($roles[$accountId])) {
+    public function getUserAccountLevelRole($accountId)
+    {
+        if (isset($roles[$accountId])) {
             return $roles[$accountId];
         } else {
             $roles = json_decode($this->webClient->get('/me'))->roles;
