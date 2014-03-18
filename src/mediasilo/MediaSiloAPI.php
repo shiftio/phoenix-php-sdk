@@ -140,6 +140,16 @@ class MediaSiloAPI {
     }
 
     /**
+     * Gets a list of assets from an array of asset Ids.
+     * @param Array $ids
+     * @param Boolean $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @return Array(Asset)
+     */
+    public function getAssetsByIds($ids, $acl = false) {
+        return $this->assetProxy->getAssetByIds($ids, $acl);
+    }
+
+    /**
      * Gets assets in the given project
      * @param $projectId
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
