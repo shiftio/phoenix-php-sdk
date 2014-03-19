@@ -1,10 +1,9 @@
 <?php
 
-namespace mediasilo\quicklink;
+namespace mediasilo\share;
 
 use mediasilo\http\WebClient;
 use mediasilo\http\MediaSiloResourcePaths;
-use mediasilo\project\Project;
 
 class ShareProxy {
 
