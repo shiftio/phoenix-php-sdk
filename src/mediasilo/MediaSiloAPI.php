@@ -190,7 +190,7 @@ class MediaSiloAPI {
      * @param $streatching
      * @param array $assets
      */
-    public function createChannel($name, $autoPlay, $height, $width, $playback, $public, $streatching, array $assets) {
+    public function createChannel($name, $autoPlay, $height, $width, $playback, $public, $stretching, array $assets) {
         $channel = new Channel(null, $name, null, $autoPlay, $height, $width, $playback, $public, $stretching, null, $assets);
         $this->channelProxy->createChannel($channel);
 
@@ -209,7 +209,7 @@ class MediaSiloAPI {
      * @param $streatching
      * @param array $assets
      */
-    public function updateChannel($id, $name, $autoPlay, $height, $width, $playback, $public, $streatching, array $assets) {
+    public function updateChannel($id, $name, $autoPlay, $height, $width, $playback, $public, $stretching, array $assets) {
         $channel = new Channel($id, $name, null, $autoPlay, $height, $width, $playback, $public, $stretching, null, $assets);
         $this->channelProxy->updateChannel($channel);
 
