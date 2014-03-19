@@ -326,7 +326,6 @@ class MediaSiloAPI {
 
     /**
      * Shares a QuickLink
-     * NOTE! This does not send it, only creates it.
      * @param string $quicklinkId ID of the quicklink you want to share
      * @param string $subject Subject for the email
      * @param string $message Body for the email
