@@ -21,6 +21,9 @@ use mediasilo\quicklink\QuickLinkProxy;
 use mediasilo\asset\AssetProxy;
 use mediasilo\channel\ChannelProxy;
 use mediasilo\channel\Channel;
+use mediasilo\share\email\EmailRecipient;
+use mediasilo\share\email\EmailShare;
+use mediasilo\share\Share;
 use mediasilo\transcript\TranscriptProxy;
 use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
@@ -30,6 +33,7 @@ class MediaSiloAPI {
     private $favoriteProxy;
     private $projectProxy;
     private $quicklinkProxy;
+    private $shareProxy;
     private $assetProxy;
     private $channelProxy;
     private $transcriptProxy;
@@ -41,6 +45,7 @@ class MediaSiloAPI {
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
+        $this->shareProxy = new ShareProxy($this->webClient);
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
@@ -318,6 +323,25 @@ class MediaSiloAPI {
         $this->quicklinkProxy->updateQuicklink($quickLink);
     }
 
+    /**
+     * Shares a QuickLink
+     * NOTE! This does not send it, only creates it.
+     * @param string $quicklinkId ID of the quicklink you want to share
+     * @param string $subject Subject for the email
+     * @param string $message Body for the email
+     * @param array $emailAddresses Email addresses (strings) of email recipients
+     * @return Share object
+     */
+    public function shareQuickLink($quicklinkId, $subject = "", $message = "", array $emailAddresses = array()) {
+        $emailRecipients = array();
+        foreach($emailAddresses as $email) {
+            array_push($emailRecipients, new EmailRecipient($email, null));
+        }
+        $emailShare = new EmailShare($emailRecipients, $message, $subject);
+        $share = new Share($emailShare, null, $quicklinkId);
+        $this->shareProxy->createShare($share);
+        return $share;
+    }
 
     public function getUser($userId)
     {
