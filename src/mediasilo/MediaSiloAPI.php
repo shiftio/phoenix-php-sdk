@@ -71,7 +71,6 @@ class MediaSiloAPI {
     public static function createFromApplicationConsumer($consumerKey, $consumerSecret, $baseUrl = "phoenix.mediasilo.com/v3") {
         $instance = new self();
         $instance->webClient = new TwoLeggedOauthClient($consumerKey, $consumerSecret, $baseUrl);
-        var_dump($instance);
         $instance->init();
 
         return $instance;
