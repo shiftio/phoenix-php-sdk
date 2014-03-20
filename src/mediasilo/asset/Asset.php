@@ -9,10 +9,10 @@ class Asset implements Serializable {
     public $id;
     public $title;
     public $description;
-    public $filename;
+    public $fileName;
     public $dateCreated;
     public $dateModified;
-    public $folderid;
+    public $folderId;
     public $projectId;
     public $transcriptStatus;
     public $approvalStatus;
@@ -21,7 +21,7 @@ class Asset implements Serializable {
     public $type;
     public $progress;
     public $myRating;
-    public $avergeRating;
+    public $averageRating;
     public $private;
     public $external;
     public $tags;
@@ -29,22 +29,22 @@ class Asset implements Serializable {
     public $acl;
 
 
-    function __construct($id, 
-                         $title, 
-                         $description, 
-                         $filename, 
+    function __construct($id,
+                         $title,
+                         $description,
+                         $fileName,
                          $dateCreated,
-                         $dateModified, 
-                         $folderid, 
+                         $dateModified,
+                         $folderId,
                          $projectId,
-                         $transcriptstatus,
-                         $approvalstatus,
-                         $uploadedby,
-                         $archivestatus,
+                         $transcriptStatus,
+                         $approvalStatus,
+                         $uploadedBy,
+                         $archiveStatus,
                          $type,
                          $progress,
-                         $myrating,
-                         $avergerating,
+                         $myRating,
+                         $averageRating,
                          $private,
                          $external,
                          $tags,
@@ -53,19 +53,19 @@ class Asset implements Serializable {
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
-        $this->filename = $filename;
+        $this->fileName = $fileName;
         $this->dateCreated = $dateCreated;
         $this->dateModified = $dateModified;
-        $this->folderid = $folderid;
+        $this->folderId = $folderId;
         $this->projectId = $projectId;
-        $this->transcriptstatus = $transcriptstatus;
-        $this->approvalstatus = $approvalstatus;
-        $this->uploadedby = $uploadedby;
-        $this->archivestatus = $archivestatus;
+        $this->transcriptStatus = $transcriptStatus;
+        $this->approvalStatus = $approvalStatus;
+        $this->uploadedBy = $uploadedBy;
+        $this->archiveStatus = $archiveStatus;
         $this->type = $type;
         $this->progress = $progress;
-        $this->myrating = $myrating;
-        $this->avergerating = $avergerating;
+        $this->myRating = $myRating;
+        $this->averageRating = $averageRating;
         $this->private = $private;
         $this->external = $external;
         $this->tags = $tags;
@@ -77,50 +77,50 @@ class Asset implements Serializable {
     }
 
     public static function fromJson($json) {
-    	$mixed = json_decode($json);
+        $mixed = json_decode($json);
         return new Asset($mixed->id,
-                         $mixed->title,
-                         $mixed->description,
-                         $mixed->filename,
-                         $mixed->dateCreated,
-                         $mixed->dateModified,
-                         $mixed->folderid,
-                         $mixed->projectId,
-                         $mixed->transcriptStatus,
-                         $mixed->approvalstatus,
-                         $mixed->uploadedBy,
-                         $mixed->archiveStatus,
-                         $mixed->type,
-                         $mixed->progress,
-                         $mixed->myRating,
-                         $mixed->avergeRating,
-                         $mixed->private,
-                         $mixed->external,
-                         $mixed->tags,
-                         $mixed->derivatives);
+            $mixed->title,
+            $mixed->description,
+            $mixed->fileName,
+            $mixed->dateCreated,
+            $mixed->dateModified,
+            $mixed->folderId,
+            $mixed->projectId,
+            $mixed->transcriptStatus,
+            $mixed->approvalStatus,
+            $mixed->uploadedBy,
+            $mixed->archiveStatus,
+            $mixed->type,
+            $mixed->progress,
+            $mixed->myRating,
+            $mixed->averageRating,
+            $mixed->private,
+            $mixed->external,
+            $mixed->tags,
+            $mixed->derivatives);
     }
 
     public static function fromStdClass($stdClass) {
         return new Asset($stdClass->id,
-                         $stdClass->title,
-                         $stdClass->description,
-                         $stdClass->filename,
-                         $stdClass->dateCreated,
-                         $stdClass->dateModified,
-                         $stdClass->folderid,
-                         $stdClass->projectId,
-                         $stdClass->transcriptStatus,
-                         $stdClass->approvalstatus,
-                         $stdClass->uploadedBy,
-                         $stdClass->archiveStatus,
-                         $stdClass->type,
-                         $stdClass->progress,
-                         $stdClass->myRating,
-                         $stdClass->avergeRating,
-                         $stdClass->private,
-                         $stdClass->external,
-                         $stdClass->tags,
-                         $stdClass->derivatives);
+            $stdClass->title,
+            $stdClass->description,
+            $stdClass->fileName,
+            $stdClass->dateCreated,
+            $stdClass->dateModified,
+            $stdClass->folderId,
+            $stdClass->projectId,
+            $stdClass->transcriptStatus,
+            $stdClass->approvalStatus,
+            $stdClass->uploadedBy,
+            $stdClass->archiveStatus,
+            $stdClass->type,
+            $stdClass->progress,
+            $stdClass->myRating,
+            $stdClass->averageRating,
+            $stdClass->private,
+            $stdClass->external,
+            $stdClass->tags,
+            $stdClass->derivatives);
     }
 
 }

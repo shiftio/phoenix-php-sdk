@@ -168,6 +168,16 @@ class MediaSiloAPI {
     }
 
     /**
+     * Gets a list of assets from an array of asset Ids.
+     * @param Array $ids
+     * @param Boolean $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @return Array(Asset)
+     */
+    public function getAssetsByIds($ids, $acl = false) {
+        return $this->assetProxy->getAssetByIds($ids, $acl);
+    }
+
+    /**
      * Gets assets in the given project
      * @param $projectId
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
@@ -457,9 +467,13 @@ class MediaSiloAPI {
         return json_decode($this->webClient->get($resourcePath));
     }
 
-    public function getQuickLinkComments($quickLinkId)
+    public function getQuickLinkComments($quickLinkId, $assetId = null)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId);
+
+        if (!is_null($assetId)) {
+            $resourcePath .= sprintf("?context=%s&at=%s", $quickLinkId, $assetId);
+        }
         return json_decode($this->webClient->get($resourcePath));
     }
 
