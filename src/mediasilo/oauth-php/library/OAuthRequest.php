@@ -159,7 +159,7 @@ class OAuthRequest
 		$sig[]	= $this->method;
 		$sig[]	= $this->getRequestUrl();
 		$sig[]	= $this->getNormalizedParams();
-		
+		echo implode('&', array_map(array($this, 'urlencode'), $sig));
 		return implode('&', array_map(array($this, 'urlencode'), $sig));
 	}
 	

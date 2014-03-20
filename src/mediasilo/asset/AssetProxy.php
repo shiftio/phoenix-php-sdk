@@ -13,7 +13,7 @@ class AssetProxy {
     private $webClient;
     private $roleManager;
 
-    public function __construct(WebClient $webClient) {
+    public function __construct($webClient) {
         $this->webClient = $webClient;
         $this->roleManager = new RoleManager($this->webClient);
     }

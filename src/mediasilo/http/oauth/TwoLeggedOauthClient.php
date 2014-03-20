@@ -10,10 +10,12 @@ class TwoLeggedOauthClient {
 
 	private $consumerKey;
 	private $consumerSecret;
+	private $baseUrl;
 
-	function __construct($consumerKey, $consumerSecret) {
+	function __construct($consumerKey, $consumerSecret, $baseUrl = "phoenix.mediasilo.com/v3") {
 		$this->consumerKey = $consumerKey;
 		$this->consumerSecret = $consumerSecret;
+		$this->baseUrl = $baseUrl;
 	}
 
 	public function getAccessToken($username, $password, $hostname) {
@@ -26,7 +28,7 @@ class TwoLeggedOauthClient {
 		try
 		{
 	        // Obtain a request object for the request we want to make
-	        $request = new OAuthRequester(CONFIG::MEDIASILO_API_BASE_URL."/", $method, $params);
+	        $request = new OAuthRequester($baseUrl."/", $method, $params);
 
 	        // Sign the request, perform a curl request and return the results, 
 	        // throws OAuthException2 exception on an error
@@ -52,14 +54,64 @@ class TwoLeggedOauthClient {
 		$method = "GET";
 
         // Obtain a request object for the request we want to make
-        $request = new OAuthRequester((rtrim(CONFIG::MEDIASILO_API_BASE_URL, "/")."/".rtrim(ltrim($path, "/"))), $method, $params);
+        $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, $params);
 
         // Sign the request, perform a curl request and return the results, 
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
         $result = $request->doRequest();
-echo $result['body']; 
+		echo $result['body']; 
         return $result['body'];
 	}
 
+	public function post($path, $payload) {
+		$options = array( 'consumer_key' => $this->consumerKey, 'consumer_secret' => $this->consumerSecret );
+		OAuthStore::instance("2Leg", $options );
+
+		$method = "POST";
+
+        // Obtain a request object for the request we want to make
+        $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, null, $payload);
+
+        // Sign the request, perform a curl request and return the results, 
+        // throws OAuthException2 exception on an error
+        // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
+        $result = $request->doRequest();
+		echo $result['body'];
+        return $result['body'];
+	}
+
+	public function put($path, $payload) {
+		$options = array( 'consumer_key' => $this->consumerKey, 'consumer_secret' => $this->consumerSecret );
+		OAuthStore::instance("2Leg", $options );
+
+		$method = "PUT";
+
+        // Obtain a request object for the request we want to make
+        $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, null, $payload);
+
+        // Sign the request, perform a curl request and return the results, 
+        // throws OAuthException2 exception on an error
+        // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
+        $result = $request->doRequest();
+		echo $result['body']; 
+        return $result['body'];
+	}
+
+	public function delete($path) {
+		$options = array( 'consumer_key' => $this->consumerKey, 'consumer_secret' => $this->consumerSecret );
+		OAuthStore::instance("2Leg", $options );
+
+		$method = "DELETE";
+
+        // Obtain a request object for the request we want to make
+        $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, $params);
+
+        // Sign the request, perform a curl request and return the results, 
+        // throws OAuthException2 exception on an error
+        // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
+        $result = $request->doRequest();
+		echo $result['body']; 
+        return $result['body'];
+	}
 }
