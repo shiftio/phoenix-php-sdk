@@ -13,14 +13,15 @@ class AssetProxy {
     private $webClient;
     private $roleManager;
 
-    public function __construct(WebClient $webClient) {
+    public function __construct($webClient) {
         $this->webClient = $webClient;
         $this->roleManager = new RoleManager($this->webClient);
     }
 
     /**
      * Gets an exiting asset given an asset Id
-     * @param $id
+     * @param String $id
+     * @param Bool $acl
      * @return Asset
      */
     public function getAsset($id, $acl = false) {
@@ -33,13 +34,38 @@ class AssetProxy {
     }
 
     /**
+     * Gets an exiting asset given an asset Id
+     * @param Array $ids - Array of Asset IDs to fetch
+     * @param Bool $acl - True to include acl hash on asset object
+     * @return Array(Asset)
+     */
+    public function getAssetByIds(array $ids, $acl = false) {
+
+        $assets = array();
+        $idList = implode(',', $ids);
+        $results = json_decode($this->webClient->get(sprintf("%s?ids=%s",MediaSiloResourcePaths::ASSETS,$idList)));
+
+        if(!empty($results)) {
+            foreach($results as $assetsResult) {
+                $asset = Asset::fromStdClass($assetsResult);
+                if($acl == true) {
+                    $this->attachAclToAsset($asset);
+                }
+                array_push($assets, $asset);
+            }
+        }
+        return $assets;
+    }
+
+    /**
      * Gets multiple assets given asset Ids
-     * @param $ids
+     * @param String $projectId
+     * @param Bool $acl - True to include acl hash on asset object
      * @return Array(Asset)
      */
     public function getAssetsByProjectId($projectId, $acl = false) {
         $assets = array();
-        
+
         $result = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS,$projectId)));
         $assetsResults = $result->results;
 
@@ -58,12 +84,13 @@ class AssetProxy {
 
     /**
      * Gets multiple assets given asset Ids
-     * @param $ids
+     * @param String $folderId
+     * @param Bool $acl
      * @return Array(Asset)
      */
     public function getAssetsByFolderId($folderId, $acl = false) {
         $assets = array();
-        
+
         $result = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS,$folderId)));
         $assetsResults = $result->results;
 

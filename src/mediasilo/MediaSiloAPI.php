@@ -20,12 +20,14 @@ use mediasilo\quicklink\QuickLink;
 use mediasilo\quicklink\QuickLinkProxy;
 use mediasilo\quicklink\QuickLinkCommentProxy;
 use mediasilo\comment\Comment;
-use mediasilo\asset\AssetProxy;
-use mediasilo\channel\ChannelProxy;
-use mediasilo\channel\Channel;
+use mediasilo\share\Share;
+use mediasilo\share\ShareProxy;
+use mediasilo\share\email\EmailRecipient;
+use mediasilo\share\email\EmailShare;
 use mediasilo\transcript\TranscriptProxy;
 use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
+use mediasilo\http\oauth\TwoLeggedOauthClient;
 
 class MediaSiloAPI {
     private $webClient;
@@ -33,28 +35,57 @@ class MediaSiloAPI {
     private $projectProxy;
     private $quicklinkProxy;
     private $quicklinkCommentProxy;
+    private $shareProxy;
     private $assetProxy;
     private $channelProxy;
     private $transcriptProxy;
     private $transcriptServiceProxy;
 
-    public function __construct($username, $password, $host, $session = null, $baseUrl = "phoenix.mediasilo.com/v3")
-    {
-        $this->webClient = new WebClient($username, $password, $host, $session, $baseUrl);
+    public function __construct() {}
+
+    private function init() {
+        $this->proxyInit();
+    }
+
+    private function proxyInit() {
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
         $this->quicklinkCommentProxy = new QuickLinkCommentProxy($this->webClient);
+        $this->shareProxy = new ShareProxy($this->webClient);
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
-        $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);
+        $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);        
+    }
+
+    public static function createFromHostCredentials($username, $password, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
+        $instance = new self();
+        $instance->webClient = WebClient::createFromHostCredentials($username, $password, $host, $baseUrl); 
+        $instance->init();
+        
+        return $instance;
+    }
+
+    public static function createFromSession($session, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
+        $instance = new self();
+        $instance->webClient = WebClient::createFromSession($session, $host, $baseUrl);
+        $instance->init();
+        
+        return $instance; 
+    }
+
+    public static function createFromApplicationConsumer($consumerKey, $consumerSecret, $baseUrl = "phoenix.mediasilo.com/v3") {
+        $instance = new self();
+        $instance->webClient = new TwoLeggedOauthClient($consumerKey, $consumerSecret, $baseUrl);
+        $instance->init();
+
+        return $instance;
     }
 
     public function me() {
         return json_decode($this->webClient->get(MediaSiloResourcePaths::ME));
     }
-
 
     // Projects //
 
@@ -144,6 +175,16 @@ class MediaSiloAPI {
     }
 
     /**
+     * Gets a list of assets from an array of asset Ids.
+     * @param Array $ids
+     * @param Boolean $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @return Array(Asset)
+     */
+    public function getAssetsByIds($ids, $acl = false) {
+        return $this->assetProxy->getAssetByIds($ids, $acl);
+    }
+
+    /**
      * Gets assets in the given project
      * @param $projectId
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
@@ -194,7 +235,7 @@ class MediaSiloAPI {
      * @param $streatching
      * @param array $assets
      */
-    public function createChannel($name, $autoPlay, $height, $width, $playback, $public, $streatching, array $assets) {
+    public function createChannel($name, $autoPlay, $height, $width, $playback, $public, $stretching, array $assets) {
         $channel = new Channel(null, $name, null, $autoPlay, $height, $width, $playback, $public, $stretching, null, $assets);
         $this->channelProxy->createChannel($channel);
 
@@ -213,7 +254,7 @@ class MediaSiloAPI {
      * @param $streatching
      * @param array $assets
      */
-    public function updateChannel($id, $name, $autoPlay, $height, $width, $playback, $public, $streatching, array $assets) {
+    public function updateChannel($id, $name, $autoPlay, $height, $width, $playback, $public, $stretching, array $assets) {
         $channel = new Channel($id, $name, null, $autoPlay, $height, $width, $playback, $public, $stretching, null, $assets);
         $this->channelProxy->updateChannel($channel);
 
@@ -322,7 +363,7 @@ class MediaSiloAPI {
         $this->quicklinkProxy->updateQuicklink($quickLink);
     }
 
-    public function commentOnQuickLinkAsset($quicklinkId, $assetId, $commentBody, $inResponseTo = null, $startTimeCode = null, $endTimeCode = null, $user = null) {
+        public function commentOnQuickLinkAsset($quicklinkId, $assetId, $commentBody, $inResponseTo = null, $startTimeCode = null, $endTimeCode = null, $user = null) {
         $comment = new Comment($assetId, $inResponseTo, $quicklinkId, $commentBody);
         $comment->startTimeCode = $startTimeCode;
         $comment->endTimeCode = $endTimeCode;
@@ -335,6 +376,24 @@ class MediaSiloAPI {
 
     public function getQuickLinkAssetComments($assetId, $quickLinkId) {
         return $this->quicklinkCommentProxy->getComments($assetId, $quickLinkId);
+    }
+    /**
+     * Shares a QuickLink
+     * @param string $quicklinkId ID of the quicklink you want to share
+     * @param string $subject Subject for the email
+     * @param string $message Body for the email
+     * @param array $emailAddresses Email addresses (strings) of email recipients
+     * @return Share object
+     */
+    public function shareQuickLink($quicklinkId, $subject = "", $message = "", array $emailAddresses = array()) {
+        $emailRecipients = array();
+        foreach($emailAddresses as $email) {
+            array_push($emailRecipients, new EmailRecipient($email, null));
+        }
+        $emailShare = new EmailShare($emailRecipients, $message, $subject);
+        $share = new Share($emailShare, null, $quicklinkId);
+        $this->shareProxy->createShare($share);
+        return $share;
     }
 
     public function getUser($userId)
@@ -447,9 +506,13 @@ class MediaSiloAPI {
         return json_decode($this->webClient->get($resourcePath));
     }
 
-    public function getQuickLinkComments($quickLinkId)
+    public function getQuickLinkComments($quickLinkId, $assetId = null)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId);
+
+        if (!is_null($assetId)) {
+            $resourcePath .= sprintf("?context=%s&at=%s", $quickLinkId, $assetId);
+        }
         return json_decode($this->webClient->get($resourcePath));
     }
 

@@ -22,7 +22,7 @@ class Share implements Serializable {
 
     public function toJson()
     {
-        // TODO: Implement toJson() method.
+        return json_encode($this);
     }
 
     public static function fromJson($json)

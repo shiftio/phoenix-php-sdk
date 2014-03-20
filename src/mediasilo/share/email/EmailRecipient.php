@@ -4,11 +4,11 @@ namespace mediasilo\share\email;
 
 class EmailRecipient {
     public $userId;
-    public $emailAddress;
+    public $email;
 
-    function __construct($emailAddress, $userId)
+    function __construct($email, $userId)
     {
-        $this->emailAddress = $emailAddress;
+        $this->email = $email;
         $this->userId = $userId;
     }
 
