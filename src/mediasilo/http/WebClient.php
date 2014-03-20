@@ -35,6 +35,8 @@ class WebClient {
         $instance->password = $password;
         $instance->host = $host;
         $instance->useSession = false;
+
+        return $instance;
     }
 
     public static function createFromSession($session, $host, $baseUrl) {
@@ -42,6 +44,8 @@ class WebClient {
         $this->host = $host;
         $this->sessionKey = $session;
         $this->useSession = true;
+
+        return $instance;
     }
 
     public function get($path) {
