@@ -10,7 +10,7 @@ class ChannelProxy {
 
     private $webClient;
 
-    public function __construct(WebClient $webClient) {
+    public function __construct($webClient) {
         $this->webClient = $webClient;
     }
 

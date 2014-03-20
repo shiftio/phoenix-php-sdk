@@ -24,6 +24,7 @@ use mediasilo\channel\Channel;
 use mediasilo\transcript\TranscriptProxy;
 use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
+use mediasilo\http\oauth\TwoLeggedOauthClient;
 
 class MediaSiloAPI {
     private $webClient;
@@ -35,22 +36,49 @@ class MediaSiloAPI {
     private $transcriptProxy;
     private $transcriptServiceProxy;
 
-    public function __construct($username, $password, $host, $session = null, $baseUrl = "phoenix.mediasilo.com/v3")
-    {
-        $this->webClient = new WebClient($username, $password, $host, $session, $baseUrl);
+    public function __construct() {}
+
+    private function init() {
+        $this->proxyInit();
+    }
+
+    private function proxyInit() {
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
-        $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);
+        $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);        
+    }
+
+    public static function createFromHostCredentials($username, $password, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
+        $instance = new self();
+        $instance->webClient = WebClient::createFromHostCredentials($username, $password, $host, $baseUrl); 
+        $instance->init();
+        
+        return $instance;
+    }
+
+    public static function createFromSession($session, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
+        $instance = new self();
+        $instance->webClient = WebClient::createFromSession($session, $host, $baseUrl);
+        $instance->init();
+        
+        return $instance; 
+    }
+
+    public static function createFromApplicationConsumer($consumerKey, $consumerSecret, $baseUrl = "phoenix.mediasilo.com/v3") {
+        $instance = new self();
+        $instance->webClient = new TwoLeggedOauthClient($consumerKey, $consumerSecret, $baseUrl);
+        $instance->init();
+
+        return $instance;
     }
 
     public function me() {
         return json_decode($this->webClient->get(MediaSiloResourcePaths::ME));
     }
-
 
     // Projects //
 
