@@ -439,9 +439,13 @@ class MediaSiloAPI {
         return json_decode($this->webClient->get($resourcePath));
     }
 
-    public function getQuickLinkComments($quickLinkId)
+    public function getQuickLinkComments($quickLinkId, $assetId = null)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId);
+
+        if (!is_null($assetId)) {
+            $resourcePath .= sprintf("?context=%s&at=%s", $quickLinkId, $assetId);
+        }
         return json_decode($this->webClient->get($resourcePath));
     }
 
