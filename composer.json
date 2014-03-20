@@ -6,27 +6,20 @@
         }
 
     },
-    "require" : {
-        "phpclasses/oauth-api": ">=1.0.8",
-        "oauth-php-read-only" : "*"
-    },
     "repositories": [
-            {
-                "type": "composer",
-                "url": "http:\/\/www.phpclasses.org\/"
-            },
-            {
-                "packagist": false
-            },
-            {
-                "type": "vcs",
-                "url": "http://oauth-php.googlecode.com/svn/",
-                "trunk-path": "trunk",
-                "branches-path": "branches",
-                "tags-path": "tags"
-            }
-    ]
-
-
-
+        {
+            "type": "vcs",
+            "url": "https://github.com/mdelano/oauth-php"
+        }
+    ],
+    "require" : {
+        "monolog/monolog": "1.0.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*"
+    },
+    "require" : {
+        "mdelano/oauth-php": "0.0.7"
+    }
 }
+
