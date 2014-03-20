@@ -1,8 +1,8 @@
 <?php
 
-namespace mediasilo\model;
+namespace mediasilo\user;
 
-use mediasilo\model\Address;
+use mediasilo\user\Address;
 
 class User {
     private $id;

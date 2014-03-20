@@ -1,6 +1,6 @@
 <?php
 
-namespace mediasilo\model;
+namespace mediasilo\user;
 
 class Address {
 
