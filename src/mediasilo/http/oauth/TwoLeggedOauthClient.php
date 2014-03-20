@@ -35,11 +35,9 @@ class TwoLeggedOauthClient {
 	        // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
 	        $result = $request->doRequest();
 	        
-	        echo $result;
-	        echo "\n";
 	        $response = $result['body'];
-	        echo $response;
-	        echo "\n";
+
+	        return $response;
 		}
 		catch(OAuthException2 $e)
 		{
@@ -60,7 +58,6 @@ class TwoLeggedOauthClient {
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
         $result = $request->doRequest();
-		echo $result['body']; 
         return $result['body'];
 	}
 
@@ -77,7 +74,6 @@ class TwoLeggedOauthClient {
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
         $result = $request->doRequest();
-		echo $result['body'];
         return $result['body'];
 	}
 
@@ -94,7 +90,6 @@ class TwoLeggedOauthClient {
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
         $result = $request->doRequest();
-		echo $result['body']; 
         return $result['body'];
 	}
 
@@ -111,7 +106,6 @@ class TwoLeggedOauthClient {
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
         $result = $request->doRequest();
-		echo $result['body']; 
         return $result['body'];
 	}
 }
