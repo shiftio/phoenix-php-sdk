@@ -22,6 +22,7 @@ class Me implements Serializable
     public $sso;
     public $ssoId;
     public $roles;
+    public $accountId;
 
     function __construct($id,
                          $numericId,
@@ -37,7 +38,8 @@ class Me implements Serializable
                          $status,
                          $sso,
                          $ssoId,
-                         $roles
+                         $roles,
+                         $accountId
     )
     {
         $this->id = $id;
@@ -55,6 +57,7 @@ class Me implements Serializable
         $this->sso = $sso;
         $this->ssoId = $ssoId;
         $this->roles = $roles;
+        $this->accountId = $accountId;
     }
 
     function toJson()
@@ -81,7 +84,8 @@ class Me implements Serializable
             $mixed->status,
             $mixed->sso,
             $mixed->ssoId,
-            $mixed->roles
+            $mixed->roles,
+            $mixed->accountId
         );
     }
 
@@ -102,8 +106,8 @@ class Me implements Serializable
             $stdClass->status,
             $stdClass->sso,
             $stdClass->ssoId,
-            $stdClass->roles
+            $stdClass->roles,
+            $stdClass->accountId
         );
     }
-
 }

@@ -41,9 +41,9 @@ class WebClient {
 
     public static function createFromSession($session, $host, $baseUrl) {
         $instance = WebClient::init($baseUrl);
-        $this->host = $host;
-        $this->sessionKey = $session;
-        $this->useSession = true;
+        $instance->host = $host;
+        $instance->sessionKey = $session;
+        $instance->useSession = true;
 
         return $instance;
     }

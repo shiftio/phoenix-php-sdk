@@ -38,7 +38,6 @@ To use a development copy of this SDK in a project, setup your composer.json as 
         }
     ],
     "require": {
-        "guzzle/guzzle"            : "~3.7",
         "mediasilo/phoenix-php-sdk": "dev-{branch-name}"
     }
 }
@@ -55,7 +54,7 @@ $password = "T!gger!sPushy";
 $host = "100acreforest";
 
 // Instantiate client
-$mediaSiloAPI = new MediaSiloAPI($username, $password, $host);
+$mediaSiloAPI = MediaSiloAPI::createFromHostCredentials($username, $password, $host);
 
 // Start making some calls
 $me = $mediaSiloAPI->me();
@@ -72,7 +71,7 @@ $host = 'xxx';
 $baseUrl = 'phoenix.mediasilo.com/v3';
 
 // Instantiate client
-$mediaSiloAPI = new MediaSiloAPI(null, null, $host, $sessionKey, $baseUrl);
+$mediaSiloAPI = MediaSiloAPI::createFromSession($sessionKey, $host, $baseUrl)
 
 // Start making some calls
 $me = $mediaSiloAPI->me();

@@ -30,7 +30,6 @@ use mediasilo\share\email\EmailShare;
 use mediasilo\transcript\TranscriptProxy;
 use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
-use mediasilo\me\MeProxy;
 use mediasilo\me\Me;
 use mediasilo\http\oauth\TwoLeggedOauthClient;
 
@@ -46,7 +45,6 @@ class MediaSiloAPI
     private $channelProxy;
     private $transcriptProxy;
     private $transcriptServiceProxy;
-    private $meProxy;
 
     public function __construct() {}
 
@@ -64,7 +62,6 @@ class MediaSiloAPI
         $this->channelProxy = new ChannelProxy($this->webClient);
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
         $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);
-        $this->meProxy = new MeProxy($this->webClient);
     }
 
     public static function createFromHostCredentials($username, $password, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
@@ -93,6 +90,7 @@ class MediaSiloAPI
 
     public function me()
     {
+
         return json_decode($this->webClient->get(MediaSiloResourcePaths::ME));
     }
 
@@ -543,12 +541,6 @@ class MediaSiloAPI
         if (!is_null($assetId)) {
             $resourcePath .= sprintf("?context=%s&at=%s", $quickLinkId, $assetId);
         }
-        return json_decode($this->webClient->get($resourcePath));
-    }
-
-    public function getMe()
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::ME);
         return json_decode($this->webClient->get($resourcePath));
     }
 

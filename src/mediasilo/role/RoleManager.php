@@ -2,6 +2,7 @@
 
 namespace mediasilo\role;
 
+use mediasilo\http\exception\NotFoundException;
 use mediasilo\http\WebClient;
 use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\role\Role;
@@ -26,14 +27,15 @@ class RoleManager
         if (isset($roles[$projectId])) {
             return $roles[$projectId];
         } else {
-            $json = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::USER_PROJECT_ROLES, $projectId)));
+            $roles = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::USER_PROJECT_ROLES, $projectId)));
 
-            if (count($json->results)) {
-                $role = Role::fromJson(json_encode($json->results[0]));
-                $roles[$projectId] = $role;
-            } else {
+            if (count($roles) < 1) {
                 $role = $this->getUserAccountLevelRole($accountId);
+            } else {
+                $role = Role::fromJson(json_encode($roles[0]));
             }
+
+            $roles[$projectId] = $role;
 
             return $role;
         }
