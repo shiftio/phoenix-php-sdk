@@ -4,7 +4,8 @@ namespace mediasilo\asset;
 
 use mediasilo\model\Serializable;
 
-class Asset implements Serializable {
+class Asset implements Serializable
+{
 
     public $id;
     public $title;
@@ -27,6 +28,7 @@ class Asset implements Serializable {
     public $tags;
     public $derivatives;
     public $acl;
+    public $commentCount;
 
 
     function __construct($id,
@@ -48,7 +50,9 @@ class Asset implements Serializable {
                          $private,
                          $external,
                          $tags,
-                         $derivatives)
+                         $derivatives,
+                         $commentCount
+    )
     {
         $this->id = $id;
         $this->title = $title;
@@ -70,13 +74,16 @@ class Asset implements Serializable {
         $this->external = $external;
         $this->tags = $tags;
         $this->derivatives = $derivatives;
+        $this->commentCount = $commentCount;
     }
 
-    function toJson() {
+    function toJson()
+    {
         return json_encode($this);
     }
 
-    public static function fromJson($json) {
+    public static function fromJson($json)
+    {
         $mixed = json_decode($json);
         return new Asset($mixed->id,
             $mixed->title,
@@ -97,10 +104,17 @@ class Asset implements Serializable {
             $mixed->private,
             $mixed->external,
             $mixed->tags,
-            $mixed->derivatives);
+            $mixed->derivatives,
+            $mixed->commentCount
+        );
     }
 
-    public static function fromStdClass($stdClass) {
+    public static function fromStdClass($stdClass)
+    {
+        if (empty($stdClass->transcriptStatus)) {
+            $stdClass->transcriptStatus = 'N/A';
+        }
+
         return new Asset($stdClass->id,
             $stdClass->title,
             $stdClass->description,
@@ -120,7 +134,9 @@ class Asset implements Serializable {
             $stdClass->private,
             $stdClass->external,
             $stdClass->tags,
-            $stdClass->derivatives);
+            $stdClass->derivatives,
+            $stdClass->commentCount
+        );
     }
-
 }
+

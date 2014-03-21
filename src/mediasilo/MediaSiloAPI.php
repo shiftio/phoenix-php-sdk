@@ -30,9 +30,11 @@ use mediasilo\share\email\EmailShare;
 use mediasilo\transcript\TranscriptProxy;
 use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
+use mediasilo\me\Me;
 use mediasilo\http\oauth\TwoLeggedOauthClient;
 
-class MediaSiloAPI {
+class MediaSiloAPI
+{
     private $webClient;
     private $favoriteProxy;
     private $projectProxy;
@@ -59,7 +61,7 @@ class MediaSiloAPI {
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
-        $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);        
+        $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);
     }
 
     public static function createFromHostCredentials($username, $password, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
@@ -86,7 +88,9 @@ class MediaSiloAPI {
         return $instance;
     }
 
-    public function me() {
+    public function me()
+    {
+
         return json_decode($this->webClient->get(MediaSiloResourcePaths::ME));
     }
 
@@ -96,7 +100,8 @@ class MediaSiloAPI {
      * Creates a new project. The project in MediaSilo of the given project model.
      * @param Project $project
      */
-    public function createProject(Project $project) {
+    public function createProject(Project $project)
+    {
         $this->projectProxy->createProject($project);
     }
 
@@ -105,7 +110,8 @@ class MediaSiloAPI {
      * @param $id
      * @return Project
      */
-    public function getProject($id) {
+    public function getProject($id)
+    {
         return $this->projectProxy->getProject($id);
     }
 
@@ -113,7 +119,8 @@ class MediaSiloAPI {
      * Updates an existing project. ID must be a valid project Id.
      * @param Project $project
      */
-    public function updateProject(Project $project) {
+    public function updateProject(Project $project)
+    {
         $this->projectProxy->updateProject($project);
     }
 
@@ -121,7 +128,8 @@ class MediaSiloAPI {
      * Deletes an existing project from a given project Id.
      * @param $id
      */
-    public function deleteProject($id) {
+    public function deleteProject($id)
+    {
         $this->projectProxy->deleteProject($id);
     }
 
@@ -130,11 +138,13 @@ class MediaSiloAPI {
      * @param $projectId
      * @return mixed
      */
-    public function cloneProject($projectId) {
+    public function cloneProject($projectId)
+    {
         return $this->projectProxy->cloneProject($projectId);
     }
 
-    public function getUsersProjects($userId) {
+    public function getUsersProjects($userId)
+    {
         return $this->projectProxy->getUsersProjects($userId);
     }
 
@@ -145,7 +155,8 @@ class MediaSiloAPI {
      * Set a given project as one of your favorites
      * @param $projectId
      */
-    public function favorProject($projectId) {
+    public function favorProject($projectId)
+    {
         $this->favoriteProxy->favorProject($projectId);
     }
 
@@ -153,7 +164,8 @@ class MediaSiloAPI {
      * Remove a given project from you list of favorites
      * @param $projectId
      */
-    public function unfavor($projectId) {
+    public function unfavor($projectId)
+    {
         $this->favoriteProxy->unfavor($projectId);
     }
 
@@ -161,7 +173,8 @@ class MediaSiloAPI {
      * Get all of your favorite projects
      * @return array
      */
-    public function getFavoriteProjects() {
+    public function getFavoriteProjects()
+    {
         return $this->favoriteProxy->getFavoriteProjects();
     }
 
@@ -173,7 +186,8 @@ class MediaSiloAPI {
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
      * @return Asset
      */
-    public function getAsset($id, $acl = false) {
+    public function getAsset($id, $acl = false)
+    {
         return $this->assetProxy->getAsset($id, $acl);
     }
 
@@ -193,7 +207,8 @@ class MediaSiloAPI {
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
      * @return Array(Asset)
      */
-    public function getAssetsByProject($projectId, $acl = false) {
+    public function getAssetsByProject($projectId, $acl = false)
+    {
         return $this->assetProxy->getAssetsByProjectId($projectId, $acl);
     }
 
@@ -203,7 +218,8 @@ class MediaSiloAPI {
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
      * @return Array(Asset)
      */
-    public function getAssetsByFolder($folderId, $acl = false) {
+    public function getAssetsByFolder($folderId, $acl = false)
+    {
         return $this->assetProxy->getAssetsByFolderId($folderId, $acl);
     }
 
@@ -215,7 +231,8 @@ class MediaSiloAPI {
      * @param $id
      * @return Channel
      */
-    public function getChannel($id) {
+    public function getChannel($id)
+    {
         return $this->channelProxy->getChannel($id);
     }
 
@@ -223,19 +240,20 @@ class MediaSiloAPI {
      * Gets all channels user has access to
      * @return Array(Channel)
      */
-    public function getChannels() {
+    public function getChannels()
+    {
         return $this->channelProxy->getChannels();
     }
 
     /**
      * Creates a new channel
-     * @param $name, 
+     * @param $name,
      * @param $autoPlay
      * @param $height
      * @param $width
      * @param $playback
      * @param $public
-     * @param $streatching
+     * @param $stretching
      * @param array $assets
      */
     public function createChannel($name, $autoPlay, $height, $width, $playback, $public, $stretching, array $assets) {
@@ -247,8 +265,8 @@ class MediaSiloAPI {
 
     /**
      * Updates a channel with the given Id
-     * @param $id, 
-     * @param $name, 
+     * @param $id,
+     * @param $name,
      * @param $autoPlay
      * @param $height
      * @param $width
@@ -268,7 +286,8 @@ class MediaSiloAPI {
      * Deletes the given channel
      * @param $channelId
      */
-    public function deleteChannel($channelId) {
+    public function deleteChannel($channelId)
+    {
         $this->channelProxy->deleteChannel($channelId);
     }
 
@@ -280,7 +299,8 @@ class MediaSiloAPI {
      * @param $assetId
      * @return Transcript
      */
-    public function getTranscript($assetId) {
+    public function getTranscript($assetId)
+    {
         return $this->transcriptProxy->getTranscript($assetId);
     }
 
@@ -291,7 +311,8 @@ class MediaSiloAPI {
      * Gets all transcript services available for this user
      * @return array(TranscriptService)
      */
-    public function getTranscriptServices() {
+    public function getTranscriptServices()
+    {
         return $this->transcriptServiceProxy->getTranscriptServices();
     }
 
@@ -306,13 +327,14 @@ class MediaSiloAPI {
      * @param array $settings Key/Value associative array of settings
      * @return Quicklink Hydrated model of created quicklink
      */
-    public function createQuickLink($title, $description = "", array $assetIds = array(), array $settings = array()) {
+    public function createQuickLink($title, $description = "", array $assetIds = array(), array $settings = array())
+    {
         $newSettings = array();
-        foreach($settings as $key => $value) {
+        foreach ($settings as $key => $value) {
             array_push($newSettings, new Setting((string)$key, (string)$value));
         }
         $configuration = new Configuration(null, $newSettings);
-        
+
         $quickLink = new QuickLink($assetIds, $configuration, $description, array(), $title);
         $this->quicklinkProxy->createQuickLink($quickLink);
         return $quickLink;
@@ -323,7 +345,8 @@ class MediaSiloAPI {
      * @param String $id
      * @returns Quicklink
      */
-    public function getQuickLink($id) {
+    public function getQuickLink($id)
+    {
         return $this->quicklinkProxy->getQuickLink($id);
     }
 
@@ -331,7 +354,8 @@ class MediaSiloAPI {
      * Fetches a list of Quicklinks
      * @returns Quicklink[] Array of Quicklink Objects
      */
-    public function getQuickLinks() {
+    public function getQuickLinks()
+    {
         return $this->quicklinkProxy->getQuicklinks();
     }
 
@@ -343,13 +367,14 @@ class MediaSiloAPI {
      * @param array $assetIds Array of Asset ID to be included in quicklink
      * @param array $settings Key/Value associative array of settings
      */
-    public function updateQuickLink($id, $title = null, $description = null, array $assetIds = null, array $settings = null) {
+    public function updateQuickLink($id, $title = null, $description = null, array $assetIds = null, array $settings = null)
+    {
         $assets = null;
         $configuration = null;
 
         if (is_array($settings)) {
             $newSettings = array();
-            foreach($settings as $key => $value) {
+            foreach ($settings as $key => $value) {
                 array_push($newSettings, new Setting((string)$key, (string)$value));
             }
             $configuration = new Configuration(null, $newSettings);

@@ -25,9 +25,14 @@ class AssetProxy {
      * @return Asset
      */
     public function getAsset($id, $acl = false) {
+        if ($acl) {
+            $accountId = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME)))->accountId;
+        }
+
         $asset = Asset::fromJson($this->webClient->get(MediaSiloResourcePaths::ASSETS . "/" . $id));
+
         if($acl == true) {
-            $this->attachAclToAsset($asset);
+            $this->attachAclToAsset($asset, $accountId);
         }
 
         return $asset;
@@ -40,16 +45,19 @@ class AssetProxy {
      * @return Array(Asset)
      */
     public function getAssetByIds(array $ids, $acl = false) {
-
         $assets = array();
         $idList = implode(',', $ids);
         $results = json_decode($this->webClient->get(sprintf("%s?ids=%s",MediaSiloResourcePaths::ASSETS,$idList)));
+
+        if ($acl) {
+            $accountId = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME)))->accountId;
+        }
 
         if(!empty($results)) {
             foreach($results as $assetsResult) {
                 $asset = Asset::fromStdClass($assetsResult);
                 if($acl == true) {
-                    $this->attachAclToAsset($asset);
+                    $this->attachAclToAsset($asset, $accountId);
                 }
                 array_push($assets, $asset);
             }
@@ -66,18 +74,23 @@ class AssetProxy {
     public function getAssetsByProjectId($projectId, $acl = false) {
         $assets = array();
 
-        $result = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS,$projectId)));
-        $assetsResults = $result->results;
+        if ($acl) {
+            $accountId = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME)))->accountId;
+        }
+
+        $assetsResults = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS, $projectId)));
 
         if(!empty($assetsResults)) {
-            foreach($assetsResults as $assetsResult) {
-                $asset = Asset::fromStdClass($assetsResult);
+            foreach($assetsResults as $assetResult) {
+                $asset = Asset::fromStdClass($assetResult);
                 if($acl == true) {
-                    $this->attachAclToAsset($asset);
+                    $this->attachAclToAsset($asset, $accountId);
                 }
                 array_push($assets, $asset);
             }
         }
+
+
 
         return $assets;
     }
@@ -91,6 +104,10 @@ class AssetProxy {
     public function getAssetsByFolderId($folderId, $acl = false) {
         $assets = array();
 
+        if ($acl) {
+            $accountId = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME)))->accountId;
+        }
+
         $result = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS,$folderId)));
         $assetsResults = $result->results;
 
@@ -98,7 +115,7 @@ class AssetProxy {
             foreach($assetsResults as $assetsResult) {
                 $asset = Asset::fromStdClass($assetsResult);
                 if($acl == true) {
-                    $this->attachAclToAsset($asset);
+                    $this->attachAclToAsset($asset, $accountId);
                 }
                 array_push($assets, $asset);
             }
@@ -107,11 +124,9 @@ class AssetProxy {
         return $assets;
     }
 
-    private function attachAclToAsset(&$asset) {
-        try {
-            $role = $this->roleManager->getUserRoleForProject($asset->projectId);
-            $asset->acl = $role->getPermissionGroups();
-        } catch(NotFoundException $nfe) {}
+    private function attachAclToAsset(&$asset, &$accountId) {
+        $role = $this->roleManager->getUserRoleForProject($asset->projectId, $accountId);
+        $asset->acl = $role->getPermissionGroups();
     }
 
 }
