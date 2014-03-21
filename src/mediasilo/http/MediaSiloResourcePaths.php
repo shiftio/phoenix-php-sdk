@@ -5,6 +5,7 @@ namespace mediasilo\http;
 class MediaSiloResourcePaths
 {
 
+    const ACCESS_TOKEN = "/";
     const ME = "/me";
     const PROJECTS = "/projects";
     const PROJECT_FOLDERS = "/projects/%s/folders";

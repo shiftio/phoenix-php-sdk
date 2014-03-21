@@ -8,46 +8,65 @@ use \OAuthRequester;
 
 class TwoLeggedOauthClient {
 
-	private $consumerKey;
-	private $consumerSecret;
-	private $baseUrl;
+	public $consumerKey;
+	public $consumerSecret;
+	public $baseUrl;
+	public $options;
+	public $oauthWorkflow = '2Leg';
 
-	function __construct($consumerKey, $consumerSecret, $baseUrl = "phoenix.mediasilo.com/v3") {
+	function __construct($consumerKey, $consumerSecret) {
 		$this->consumerKey = $consumerKey;
 		$this->consumerSecret = $consumerSecret;
-		$this->baseUrl = $baseUrl;
 	}
 
-	public function getAccessToken($username, $password, $hostname) {
-		$options = array( 'consumer_key' => $this->consumerKey, 'consumer_secret' => $this->consumerSecret );
-		OAuthStore::instance("2Leg", $options );
+	public static function create2LegClient($consumerKey, $consumerSecret, $baseUrl = "phoenix.mediasilo.com/v3") {
+		$instance = new self($consumerKey, $consumerSecret);
+		$instance->consumerKey = $consumerKey;
+		$instance->consumerSecret = $consumerSecret;
+		$instance->baseUrl = $baseUrl;
+		$instance->options = array( 'consumer_key' => $consumerKey, 'consumer_secret' => $consumerSecret);
+		OAuthStore::instance($instance->oauthWorkflow, $instance->options, true);
 
+		return $instance;
+	}
+
+	public static function create2LegProxyCredsClient($consumerKey, $consumerSecret, $accessToken, $baseUrl = "phoenix.mediasilo.com/v3") {
+		$instance = new self($consumerKey, $consumerSecret);
+		$instance->setOauthWorkflow('2LegProxyCreds');
+		$instance->consumerKey = $consumerKey;
+		$instance->consumerSecret = $consumerSecret;
+		$instance->baseUrl = $baseUrl;
+		$instance->options = array( 'consumer_key' => $consumerKey, 'consumer_secret' => $consumerSecret, 'access_token' => $accessToken);
+
+		OAuthStore::instance($instance->oauthWorkflow, $instance->options, true);
+
+		return $instance;
+	}
+
+	public function addOption($key, $val) {
+		$this->options[$key] = $val;
+	}
+
+	public function setOauthWorkflow($oauthWorkflow) {
+		$this->oauthWorkflow = $oauthWorkflow;
+	}
+
+	public function getAccessToken($params) {
+		$path = "/";
 		$method = "GET";
-		$params = array('username' => $username, 'password'=>$password, 'hostname' => $hostname, 'grant_type' => 'password');
 
-		try
-		{
-	        // Obtain a request object for the request we want to make
-	        $request = new OAuthRequester($baseUrl."/", $method, $params);
+        // Obtain a request object for the request we want to make
+        $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, $params);
 
-	        // Sign the request, perform a curl request and return the results, 
-	        // throws OAuthException2 exception on an error
-	        // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
-	        $result = $request->doRequest();
-	        
-	        $response = $result['body'];
-
-	        return $response;
-		}
-		catch(OAuthException2 $e)
-		{
-
-		}
+        // Sign the request, perform a curl request and return the results, 
+        // throws OAuthException2 exception on an error
+        // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
+        $result = $request->doRequest();
+        return $result['body'];
 	}
 
 	public function get($path, $params = array()) {
-		$options = array( 'consumer_key' => $this->consumerKey, 'consumer_secret' => $this->consumerSecret );
-		OAuthStore::instance("2Leg", $options );
+		OAuthStore::instance($this->oauthWorkflow, $this->options, true);
 
 		$method = "GET";
 
@@ -62,9 +81,6 @@ class TwoLeggedOauthClient {
 	}
 
 	public function post($path, $payload) {
-		$options = array( 'consumer_key' => $this->consumerKey, 'consumer_secret' => $this->consumerSecret );
-		OAuthStore::instance("2Leg", $options );
-
 		$method = "POST";
 
         // Obtain a request object for the request we want to make
@@ -78,9 +94,6 @@ class TwoLeggedOauthClient {
 	}
 
 	public function put($path, $payload) {
-		$options = array( 'consumer_key' => $this->consumerKey, 'consumer_secret' => $this->consumerSecret );
-		OAuthStore::instance("2Leg", $options );
-
 		$method = "PUT";
 
         // Obtain a request object for the request we want to make
@@ -94,9 +107,6 @@ class TwoLeggedOauthClient {
 	}
 
 	public function delete($path) {
-		$options = array( 'consumer_key' => $this->consumerKey, 'consumer_secret' => $this->consumerSecret );
-		OAuthStore::instance("2Leg", $options );
-
 		$method = "DELETE";
 
         // Obtain a request object for the request we want to make

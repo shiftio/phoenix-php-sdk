@@ -45,6 +45,9 @@ class MediaSiloAPI
     private $channelProxy;
     private $transcriptProxy;
     private $transcriptServiceProxy;
+    private $consumerKey;
+    private $consumerSecret;
+    private $baseUrl;
 
     public function __construct() {}
 
@@ -82,15 +85,47 @@ class MediaSiloAPI
 
     public static function createFromApplicationConsumer($consumerKey, $consumerSecret, $baseUrl = "phoenix.mediasilo.com/v3") {
         $instance = new self();
-        $instance->webClient = new TwoLeggedOauthClient($consumerKey, $consumerSecret, $baseUrl);
+        $instance->consumerKey = $consumerKey;
+        $instance->consumerSecret = $consumerSecret;
+        $instance->baseUrl = $baseUrl;
+        $instance->webClient = TwoLeggedOauthClient::create2LegClient($consumerKey, $consumerSecret, $baseUrl);
         $instance->init();
 
         return $instance;
     }
 
+<<<<<<< HEAD
+    public function getAccessToken($username, $password, $hostname) {
+        $params = array('username' => $username, 'password'=>$password, 'hostname' => $hostname, 'grant_type' => 'password');
+        $response = json_decode($this->webClient->getAccessToken($params));
+        $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $response->id, $this->baseUrl);
+        $this->proxyInit();
+
+        return $response->id;
+    }
+
+    public function setAccessToken($accessToken) {
+        if(!isset($this->consumerKey)) {
+            throw new OAuthException("There is no consumer credentials set for the API instance. An access token cannot be used without consumer credentials.");
+        }
+        $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $accessToken, $this->baseUrl);
+    }
+
+    public function unsetAccessToken() {
+        if(!isset($this->consumerKey)) {
+            throw new OAuthException("There is no consumer credentials set for the API instance. An access token cannot be used without consumer credentials.");
+        }
+        $instance->webClient = TwoLeggedOauthClient::create2LegClient($consumerKey, $consumerSecret, $baseUrl);    
+    }
+
+    public function me() {
+||||||| merged common ancestors
+    public function me() {
+=======
     public function me()
     {
 
+>>>>>>> 49fb64c7e425014d522e27ee4b4caed76ded74f1
         return json_decode($this->webClient->get(MediaSiloResourcePaths::ME));
     }
 

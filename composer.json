@@ -19,7 +19,7 @@
         "phpunit/phpunit": "3.7.*"
     },
     "require" : {
-        "mdelano/oauth-php": "0.0.7"
+        "mdelano/oauth-php": "0.0.10"
     }
 }
 
