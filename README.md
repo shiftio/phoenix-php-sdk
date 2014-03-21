@@ -24,18 +24,82 @@ Check to see that composer has been installed:
 Install the SDK's dependencies:
 
     php composer.phar install
-    
+
+#### Development
+
+To use a development copy of this SDK in a project, setup your composer.json as follows, where ```dev-{branch-name}`` include the branch name and ```{project-path}``` is the path to your project.
+
+```
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url" : "{project-path}/phoenix-php-sdk"
+        }
+    ],
+    "require": {
+        "mediasilo/phoenix-php-sdk": "dev-{branch-name}"
+    }
+}
+```
+
 #### Usage
 
-    use mediasilo\MediaSiloApi;
+```
+use mediasilo\MediaSiloApi;
+
+// Set your credentials
+$username = "PoohBear";
+$password = "T!gger!sPushy";
+$host = "100acreforest";
+
+// Instantiate client
+$mediaSiloAPI = MediaSiloAPI::createFromHostCredentials($username, $password, $host);
+
+// Start making some calls
+$me = $mediaSiloAPI->me();
+```
+
+It is also possible to use the SDK given a session key and API base endpoint:
+
+```
+use mediasilo\MediaSiloApi;
+
+// Set your credentials
+$sessionKey = 'xxx';
+$host = 'xxx';
+$baseUrl = 'phoenix.mediasilo.com/v3';
+
+// Instantiate client
+$mediaSiloAPI = MediaSiloAPI::createFromSession($sessionKey, $host, $baseUrl)
+
+// Start making some calls
+$me = $mediaSiloAPI->me();
+```
+
+##### Exception Handling
+
+```
+use mediasilo\http\exception;
+use mediasilo\MediaSiloApi;
+
+try {
+    $mediaSiloAPI = new MediaSiloAPI(null, null, $host, $sessionKey, $baseUrl);
     
-    // Set your credentials
-    $username = "PoohBear";
-    $password = "T!gger!sPushy";
-    $host = "100acreforest";
-    
-    // Instantiate client
-    $mediasiloapi = new MediaSiloAPI($username, $password, $host);
-    
-    // Start making some calls
-    $me = $mediasiloapi->me();
+    $projectId = 'xxx';
+
+    $assets = $mediaSiloAPI->getAssetsByProject($projectId);
+} catch (NotFoundException $e) {
+    // Resource wasn't found exception
+} catch (RateLimitException $e) {
+    // Too many API requests exception
+} catch (ConnectionException $e) {
+    // Connection issues
+} catch (NotAuthorizedException $e) {
+    // Permission authorization exception
+} catch (ValidationException $e) {
+    // Unfit POST/PUT data exception
+} catch (Exception $e) {
+
+}
+```

@@ -2,7 +2,8 @@
 
 namespace mediasilo\role;
 
-class Role {
+class Role
+{
 
     private $id;
     private $displayName;
@@ -69,11 +70,13 @@ class Role {
         return $this->permissionGroups;
     }
 
-    public function toJson() {
+    public function toJson()
+    {
         return json_encode($this);
     }
 
-    public static function fromJson($json) {
+    public static function fromJson($json)
+    {
         $mixed = json_decode($json);
         return new Role($mixed->context, $mixed->description, $mixed->displayName, $mixed->id, $mixed->permissionGroups);
     }
