@@ -21,20 +21,31 @@ class WebClient {
 
     private $baseUrl;
 
-    public function __construct($username, $password, $host, $session, $baseUrl) {
-        $this->baseUrl = $baseUrl;
-        if ($session == null) {
-            $this->username = $username;
-            $this->password = $password;
-            $this->host = $host;
-            $this->useSession = false;
-        } else {
-            $this->host = $host;
-            $this->sessionKey = $session;
-            $this->useSession = true;
-        }
+    public static function init($baseUrl) {
+        $instance = new self();
+        $instance->baseUrl = $baseUrl;
+        $instance->httpResponseHandler = new HttpResponseHandler();
 
-        $this->httpResponseHandler = new HttpResponseHandler();
+        return $instance;
+    }
+
+    public static function createFromHostCredentials($username, $password, $host, $baseUrl) {
+        $instance = WebClient::init($baseUrl);
+        $instance->username = $username;
+        $instance->password = $password;
+        $instance->host = $host;
+        $instance->useSession = false;
+
+        return $instance;
+    }
+
+    public static function createFromSession($session, $host, $baseUrl) {
+        $instance = WebClient::init($baseUrl);
+        $this->host = $host;
+        $this->sessionKey = $session;
+        $this->useSession = true;
+
+        return $instance;
     }
 
     public function get($path) {

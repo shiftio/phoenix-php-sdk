@@ -39,7 +39,7 @@ class Asset implements Serializable
                          $dateModified,
                          $folderId,
                          $projectId,
-                         $transcriptStatus = 'N/A',
+                         $transcriptStatus,
                          $approvalStatus,
                          $uploadedBy,
                          $archiveStatus,
@@ -91,7 +91,7 @@ class Asset implements Serializable
             $mixed->fileName,
             $mixed->dateCreated,
             $mixed->dateModified,
-            $mixed->folderid,
+            $mixed->folderId,
             $mixed->projectId,
             $mixed->transcriptStatus,
             $mixed->approvalStatus,
@@ -138,5 +138,5 @@ class Asset implements Serializable
             $stdClass->commentCount
         );
     }
-
 }
+
