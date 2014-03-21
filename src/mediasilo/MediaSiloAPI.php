@@ -94,7 +94,6 @@ class MediaSiloAPI
         return $instance;
     }
 
-<<<<<<< HEAD
     public function getAccessToken($username, $password, $hostname) {
         $params = array('username' => $username, 'password'=>$password, 'hostname' => $hostname, 'grant_type' => 'password');
         $response = json_decode($this->webClient->getAccessToken($params));
@@ -118,14 +117,8 @@ class MediaSiloAPI
         $instance->webClient = TwoLeggedOauthClient::create2LegClient($consumerKey, $consumerSecret, $baseUrl);    
     }
 
-    public function me() {
-||||||| merged common ancestors
-    public function me() {
-=======
     public function me()
     {
-
->>>>>>> 49fb64c7e425014d522e27ee4b4caed76ded74f1
         return json_decode($this->webClient->get(MediaSiloResourcePaths::ME));
     }
 
