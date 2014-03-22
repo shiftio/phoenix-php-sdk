@@ -13,7 +13,8 @@ class RoleManager
     private $roles;
     private $webClient;
 
-    public function __construct($webClient) {
+    public function __construct($webClient)
+    {
         $this->webClient = $webClient;
     }
 
@@ -22,20 +23,20 @@ class RoleManager
      * @param $projectId
      * @return Role;
      */
-    public function getUserRoleForProject($projectId,$accountId)
+    public function getUserRoleForProject($projectId, $accountId)
     {
-        if (isset($roles[$projectId])) {
-            return $roles[$projectId];
+        if (isset($this->roles[$projectId])) {
+            return $this->roles[$projectId];
         } else {
-            $roles = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::USER_PROJECT_ROLES, $projectId)));
+            $rolesResult = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::USER_PROJECT_ROLES, $projectId)));
 
-            if (count($roles) < 1) {
+            if (count($rolesResult) < 1) {
                 $role = $this->getUserAccountLevelRole($accountId);
             } else {
-                $role = Role::fromJson(json_encode($roles[0]));
+                $role = Role::fromJson(json_encode($rolesResult[0]));
             }
 
-            $roles[$projectId] = $role;
+            $this->roles[$projectId] = $role;
 
             return $role;
         }
@@ -48,19 +49,23 @@ class RoleManager
      */
     public function getUserAccountLevelRole($accountId)
     {
-        if (isset($roles[$accountId])) {
-            return $roles[$accountId];
+        if (isset($this->roles[$accountId])) {
+            return $this->roles[$accountId];
         } else {
-            $roles = json_decode($this->webClient->get('/me'))->roles;
+            $rolesResult = json_decode($this->webClient->get('/me'))->roles;
 
-            for ($i = 0; $i < count($roles); $i++) {
-                if ($roles[$i]->context == $accountId) {
-                    $role = new Role($roles[$i]->context, $roles[$i]->description, $roles[$i]->displayName, $roles[$i]->id, $roles[$i]->permissionGroups);
+            for ($i = 0; $i < count($rolesResult); $i++) {
+                if ($rolesResult[$i]->context == $accountId) {
+                    $role = new Role($rolesResult[$i]->context,
+                        $rolesResult[$i]->description,
+                        $rolesResult[$i]->displayName,
+                        $rolesResult[$i]->id,
+                        $rolesResult[$i]->permissionGroups);
                     break;
                 }
             }
 
-            $roles[$accountId] = $role;
+            $this->roles[$accountId] = $role;
 
             return $role;
         }
