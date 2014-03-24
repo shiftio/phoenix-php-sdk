@@ -2,7 +2,7 @@
 
 namespace mediasilo\http\oauth;
 
-use mediasilo\config\Config;
+use mediasilo\http\exception\NotFoundException;
 use \OAuthStore;
 use \OAuthRequester;
 use \OAuthHttpException;
