@@ -30,8 +30,8 @@ use mediasilo\share\email\EmailShare;
 use mediasilo\transcript\TranscriptProxy;
 use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
-use mediasilo\me\Me;
 use mediasilo\http\oauth\TwoLeggedOauthClient;
+use mediasilo\http\oauth\OAuthException;
 
 class MediaSiloAPI
 {
@@ -114,7 +114,7 @@ class MediaSiloAPI
         if(!isset($this->consumerKey)) {
             throw new OAuthException("There is no consumer credentials set for the API instance. An access token cannot be used without consumer credentials.");
         }
-        $instance->webClient = TwoLeggedOauthClient::create2LegClient($consumerKey, $consumerSecret, $baseUrl);    
+        $this->webClient = TwoLeggedOauthClient::create2LegClient($this->consumerKey, $this->consumerSecret, $this->baseUrl);
     }
 
     public function me()
