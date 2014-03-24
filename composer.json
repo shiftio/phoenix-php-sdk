@@ -13,13 +13,11 @@
         }
     ],
     "require" : {
-        "monolog/monolog": "1.0.*"
+        "monolog/monolog": "1.0.*",
+        "mdelano/oauth-php": "0.0.12"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*"
-    },
-    "require" : {
-        "mdelano/oauth-php": "0.0.10"
     }
 }
 

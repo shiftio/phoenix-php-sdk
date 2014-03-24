@@ -5,6 +5,7 @@ namespace mediasilo\http\oauth;
 use mediasilo\config\Config;
 use \OAuthStore;
 use \OAuthRequester;
+use \OAuthHttpException;
 
 class TwoLeggedOauthClient {
 
@@ -52,17 +53,21 @@ class TwoLeggedOauthClient {
 	}
 
 	public function getAccessToken($params) {
-		$path = "/";
-		$method = "GET";
+        $path = "/";
+        $method = "GET";
 
         // Obtain a request object for the request we want to make
         $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, $params);
 
-        // Sign the request, perform a curl request and return the results, 
+        // Sign the request, perform a curl request and return the results,
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
-        $result = $request->doRequest();
-        return $result['body'];
+        try {
+            $result = $request->doRequest();
+            return $result['body'];
+        } catch (OAuthHttpException $e) {
+            throw new NotFoundException($e->getMessage(), null);
+        }
 	}
 
 	public function get($path, $params = array()) {
@@ -76,8 +81,12 @@ class TwoLeggedOauthClient {
         // Sign the request, perform a curl request and return the results, 
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
-        $result = $request->doRequest();
-        return $result['body'];
+        try {
+            $result = $request->doRequest();
+            return $result['body'];
+        } catch (OAuthHttpException $e) {
+            throw new NotFoundException($e->getMessage(), null);
+        }
 	}
 
 	public function post($path, $payload) {
@@ -89,8 +98,12 @@ class TwoLeggedOauthClient {
         // Sign the request, perform a curl request and return the results, 
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
-        $result = $request->doRequest();
-        return $result['body'];
+        try {
+            $result = $request->doRequest();
+            return $result['body'];
+        } catch (OAuthHttpException $e) {
+            throw new NotFoundException($e->getMessage(), null);
+        }
 	}
 
 	public function put($path, $payload) {
@@ -102,8 +115,12 @@ class TwoLeggedOauthClient {
         // Sign the request, perform a curl request and return the results, 
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
-        $result = $request->doRequest();
-        return $result['body'];
+        try {
+            $result = $request->doRequest();
+            return $result['body'];
+        } catch (OAuthHttpException $e) {
+            throw new NotFoundException($e->getMessage(), null);
+        }
 	}
 
 	public function delete($path) {
@@ -115,7 +132,11 @@ class TwoLeggedOauthClient {
         // Sign the request, perform a curl request and return the results, 
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
-        $result = $request->doRequest();
-        return $result['body'];
+        try {
+            $result = $request->doRequest();
+            return $result['body'];
+        } catch (OAuthHttpException $e) {
+            throw new NotFoundException($e->getMessage(), null);
+        }
 	}
 }
