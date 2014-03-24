@@ -90,8 +90,6 @@ class AssetProxy {
             }
         }
 
-
-
         return $assets;
     }
 
@@ -108,15 +106,16 @@ class AssetProxy {
             $accountId = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME)))->accountId;
         }
 
-        $result = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS,$folderId)));
-        $assetsResults = $result->results;
+        $assetResults = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS,$folderId)));
 
-        if(!empty($assetsResults)) {
-            foreach($assetsResults as $assetsResult) {
-                $asset = Asset::fromStdClass($assetsResult);
-                if($acl == true) {
+        if(!empty($assetResults)) {
+            foreach($assetResults as $assetResult) {
+                $asset = Asset::fromStdClass($assetResult);
+
+                if ($acl == true) {
                     $this->attachAclToAsset($asset, $accountId);
                 }
+
                 array_push($assets, $asset);
             }
         }
