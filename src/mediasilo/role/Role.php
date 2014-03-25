@@ -11,7 +11,7 @@ class Role
     private $context;
     private $permissionGroups;
 
-    function __construct($context, $description, $displayName, $id, array $permissionGroups)
+    function __construct($context = '', $description = '', $displayName = '', $id = '', array $permissionGroups = array())
     {
         $this->context = $context;
         $this->description = $description;
