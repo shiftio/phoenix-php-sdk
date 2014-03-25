@@ -387,6 +387,10 @@ class MediaSiloAPI
         return $this->quicklinkProxy->getQuicklinks();
     }
 
+    public function getQuickLinksWith($params) {
+        return $this->quicklinkProxy->getQuicklinksWith($params);
+    }
+
     /**
      * Updates a QuickLink in MediaSilo
      * @param string $id UUID of quicklink to update
@@ -435,6 +439,7 @@ class MediaSiloAPI
     }
     /**
      * Shares a QuickLink
+     * NOTE! This does not send it, only creates it.
      * @param string $quicklinkId ID of the quicklink you want to share
      * @param string $subject Subject for the email
      * @param string $message Body for the email
