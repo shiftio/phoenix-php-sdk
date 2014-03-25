@@ -28,15 +28,18 @@ class RoleManager
         if (isset($this->roles[$projectId])) {
             return $this->roles[$projectId];
         } else {
-            $rolesResult = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::USER_PROJECT_ROLES, $projectId)));
+            $roleResults = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME, $projectId)))->roles;
 
-            if (count($rolesResult) < 1) {
-                $role = $this->getUserAccountLevelRole($accountId);
-            } else {
-                $role = Role::fromJson(json_encode($rolesResult[0]));
+            for ($i = 0; $i < count($roleResults); $i++) {
+                if ($roleResults[$i]->context == $projectId) {
+                    $role = $this->roles[$projectId] = Role::fromJson(json_encode($roleResults[$i]));
+                    break;
+                }
             }
 
-            $this->roles[$projectId] = $role;
+            if (empty($this->roles[$projectId])) {
+                $role = $this->getUserAccountLevelRole($accountId);
+            }
 
             return $role;
         }
