@@ -387,6 +387,10 @@ class MediaSiloAPI
         return $this->quicklinkProxy->getQuicklinks();
     }
 
+    public function getQuickLinksWith($params) {
+        return $this->quicklinkProxy->getQuicklinksWith($params);
+    }
+
     /**
      * Updates a QuickLink in MediaSilo
      * @param string $id UUID of quicklink to update

@@ -43,6 +43,11 @@ class QuickLinkProxy {
         return json_decode($result);
     }
 
+    public function getQuicklinksWith($params) {
+        $result = $this->webClient->get(MediaSiloResourcePaths::QUICKLINK."?".$params);
+        return json_decode($result);
+    }
+
     /**
      * Update
      * @param QuickLink $quickLink
