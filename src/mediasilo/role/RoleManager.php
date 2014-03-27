@@ -12,10 +12,12 @@ class RoleManager
 
     private $roles;
     private $webClient;
+    private $accountId;
 
     public function __construct($webClient)
     {
         $this->webClient = $webClient;
+        $this->accountId = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME)))->accountId;
     }
 
     /**
@@ -23,23 +25,35 @@ class RoleManager
      * @param $projectId
      * @return Role;
      */
-    public function getUserRoleForProject($projectId, $accountId)
+    public function getUserRoleForAsset($asset)
     {
-        if (isset($this->roles[$projectId])) {
-            return $this->roles[$projectId];
-        } else {
-            $rolesResult = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::USER_PROJECT_ROLES, $projectId)));
+        if (empty($this->roles[$asset->projectId])) {
+            $roleResults = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME, $asset->projectId)))->roles;
 
-            if (count($rolesResult) < 1) {
-                $role = $this->getUserAccountLevelRole($accountId);
-            } else {
-                $role = Role::fromJson(json_encode($rolesResult[0]));
+            for ($i = 0; $i < count($roleResults); $i++) {
+                if ($roleResults[$i]->context == $asset->projectId) {
+                    $this->roles[$asset->projectId] = Role::fromJson(json_encode($roleResults[$i]));
+                    $role = $this->roles[$asset->projectId];
+                    break;
+                }
             }
-
-            $this->roles[$projectId] = $role;
-
-            return $role;
+        } else {
+            $role = $this->roles[$asset->projectId];
         }
+
+        if (empty($role)) {
+            if (empty($this->roles[$this->accountId])) {
+                $role = $this->getUserAccountLevelRole($this->accountId);
+            } else {
+                $role = $this->roles[$this->accountId];
+            }
+        }
+
+        if (empty($role)) {
+            $role = new Role();
+        }
+
+        return $role;
     }
 
     /**
