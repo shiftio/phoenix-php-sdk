@@ -456,6 +456,16 @@ class MediaSiloAPI
         return $share;
     }
 
+    /**
+    * For a quick link that has already been shared, this will return those shares 
+    * allowing you to see when and to who the quicklink was shared
+    *
+    * @param string $quicklinkId The quicklink for which you'd like to retrieve shares
+    */
+    public function getQuicklinkShares($quicklinkId) {
+        return $this->shareProxy->getShares($quicklinkId);
+    }
+
     public function getUser($userId)
     {
         return json_decode($this->webClient->get(MediaSiloResourcePaths::USERS . "/" . $userId));
