@@ -16,6 +16,7 @@ class QuickLink implements Serializable {
     public $ownerId;
     public $created;
     public $modified;
+    public $expires;
 
     function __construct($assetIds, Configuration $configuration, $description, array $shares, $title)
     {
@@ -68,6 +69,7 @@ class QuickLink implements Serializable {
         $quickLink->ownerId = isset($stdClass->ownerId) ? $stdClass->ownerId : null;
         $quickLink->modified = isset($stdClass->modified) ? $stdClass->modified : null;
         $quickLink->created = isset($stdClass->created) ? $stdClass->created : null;
+        $quickLink->expires = isset($stdClass->expires) ? $stdClass->expires : null;
 
         return $quickLink;
     }
