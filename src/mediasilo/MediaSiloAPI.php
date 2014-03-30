@@ -32,6 +32,7 @@ use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
 use mediasilo\http\oauth\TwoLeggedOauthClient;
 use mediasilo\http\oauth\OAuthException;
+use mediasilo\quicklink\analytics\QuickLinkAnalyticsProxy;
 
 class MediaSiloAPI
 {
@@ -40,6 +41,7 @@ class MediaSiloAPI
     private $projectProxy;
     private $quicklinkProxy;
     private $quicklinkCommentProxy;
+    private $quicklinkAnalyticsProxy;
     private $shareProxy;
     private $assetProxy;
     private $channelProxy;
@@ -65,6 +67,7 @@ class MediaSiloAPI
         $this->channelProxy = new ChannelProxy($this->webClient);
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
         $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);
+        $this->quicklinkAnalyticsProxy = new QuickLinkAnalyticsProxy($this->webClient);
     }
 
     public static function createFromHostCredentials($username, $password, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
@@ -373,22 +376,22 @@ class MediaSiloAPI
      * @param String $id
      * @returns Quicklink
      */
-    public function getQuickLink($id)
+    public function getQuickLink($id, $includeAnalytics = false)
     {
-        return $this->quicklinkProxy->getQuickLink($id);
+        return $this->quicklinkProxy->getQuickLink($id, $includeAnalytics);
     }
 
     /**
      * Fetches a list of Quicklinks
      * @returns Quicklink[] Array of Quicklink Objects
      */
-    public function getQuickLinks()
+    public function getQuickLinks($includeAnalytics = false)
     {
-        return $this->quicklinkProxy->getQuicklinks();
+        return $this->quicklinkProxy->getQuicklinks($includeAnalytics);
     }
 
-    public function getQuickLinksWith($params) {
-        return $this->quicklinkProxy->getQuicklinksWith($params);
+    public function getQuickLinksWith($params, $includeAnalytics = false) {
+        return $this->quicklinkProxy->getQuicklinksWith($params, $includeAnalytics);
     }
 
     /**
@@ -464,6 +467,11 @@ class MediaSiloAPI
     */
     public function getQuicklinkShares($quicklinkId) {
         return $this->shareProxy->getShares($quicklinkId);
+    }
+
+    public function getQuicklinkAggregateEvents($quicklinkIds) {
+        $quickLinkEvents = $this->quicklinkAnalyticsProxy->getQuicklinkAggregateEvents($quicklinkIds);
+        return $quickLinkEvents;
     }
 
     public function getUser($userId)

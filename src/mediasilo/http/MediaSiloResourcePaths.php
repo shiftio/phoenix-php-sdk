@@ -1,5 +1,6 @@
 <?php
 
+
 namespace mediasilo\http;
 
 class MediaSiloResourcePaths
@@ -34,4 +35,5 @@ class MediaSiloResourcePaths
     const CHANNELS = "/channels";
     const TRANSCRIPTS = "/transcripts";
     const TRANSCRIPT_SERVICES = "/transcripts/services";
+    const ANALYTICS = "/analytics";
 }

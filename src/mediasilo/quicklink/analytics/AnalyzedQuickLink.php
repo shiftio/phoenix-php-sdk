@@ -1,54 +1,29 @@
 <?php
 
-namespace mediasilo\quicklink;
+namespace mediasilo\quicklink\analytics;
 
-use mediasilo\config\Config;
-use mediasilo\model\Serializable;
+use mediasilo\quicklink\QuickLink;
+use mediasilo\quicklink\Configuration;
 use mediasilo\share\Share;
 
-class QuickLink implements Serializable {
-    public $id;
-    public $title;
-    public $description;
-    public $assetIds;
-    public $configuration;
-    public $shares;
-    public $ownerId;
-    public $created;
-    public $modified;
+class AnalyzedQuickLink extends QuickLink {
 
-    function __construct($assetIds, Configuration $configuration, $description, array $shares, $title)
-    {
+	private $totalEvents;
+	private $events;
+
+	public function __construct($assetIds, Configuration $configuration, $description, array $shares, $title) {
         $this->assetIds = $assetIds;
         $this->configuration = $configuration;
         $this->description = $description;
         $this->shares = $shares;
         $this->title = $title;
-    }
-
-    /**
-     * @param string $id UUID for quicklink
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
-     * @return string UUID
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    function toJson() {
-        return json_encode($this);
-    }
+        $this->totalEvents = 0;
+        $this->events = array();
+	}
 
     public static function fromJson($json) {
         $mixed = json_decode($json);
-        return QuickLink::fromStdClass($mixed);
+        return AnalyzedQuickLink::fromStdClass($mixed);
     }
 
     public static function fromStdClass($stdClass) {
@@ -61,7 +36,7 @@ class QuickLink implements Serializable {
             }
         }
 
-        $quickLink = new QuickLink($stdClass->assetIds, $configuration, $stdClass->description, $shares, $stdClass->title);
+        $quickLink = new AnalyzedQuickLink($stdClass->assetIds, $configuration, $stdClass->description, $shares, $stdClass->title);
         $quickLink->id = isset($stdClass->id) ? $stdClass->id : null;
         $quickLink->title = isset($stdClass->title) ? $stdClass->title : null;
         $quickLink->description = isset($stdClass->description) ? $stdClass->description : null;
@@ -71,5 +46,34 @@ class QuickLink implements Serializable {
 
         return $quickLink;
     }
+
+    public function setEvents($events)
+    {
+        $this->events = $events;
+    }
+
+    public function getEvents()
+    {
+        return $this->events;
+    }
+
+    public function setTotalEvents($totalEvents)
+    {
+        $this->totalEvents = $totalEvents;
+    }
+
+    public function getTotalEvents()
+    {
+        return $this->totalEvents;
+    }
+
+    public function addEvent($analyticsEvent) {
+        if(!isset($this->events)) {
+            $this->events = array();
+        }
+
+        array_push($this->events, $analyticsEvent);
+    }
+
 
 }
