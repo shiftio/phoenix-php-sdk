@@ -402,7 +402,7 @@ class MediaSiloAPI
      * @param array $assetIds Array of Asset ID to be included in quicklink
      * @param array $settings Key/Value associative array of settings
      */
-    public function updateQuickLink($id, $title = null, $description = null, array $assetIds = null, array $settings = null)
+    public function updateQuickLink($id, $title = null, $description = null, array $assetIds = null, array $settings = null, $expires = null)
     {
         $assets = null;
         $configuration = null;
@@ -422,6 +422,7 @@ class MediaSiloAPI
         }
 
         $quickLink = new QuickLink($assets, $configuration, $description, array(), $title);
+        $quickLink->expires = $expires;
         $quickLink->setId($id);
         $this->quicklinkProxy->updateQuicklink($quickLink);
     }

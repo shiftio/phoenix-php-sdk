@@ -37,7 +37,7 @@ class QuickLinkProxy {
     public function getQuickLink($id, $includeAnalytics = false) {
         $result = json_decode($this->webClient->get(MediaSiloResourcePaths::QUICKLINK."/".$id));
 
-        $quicklink;
+        $quicklink = null;
         if($includeAnalytics) {
             $quicklinkAnalytics = $this->getQuicklinkAnalytics(array($id));
             $quicklinkAnalyticsEvents = $this->getQuicklinkAnalyticsEvents($result->id, $quicklinkAnalytics);
@@ -45,7 +45,7 @@ class QuickLinkProxy {
 
         }
         else {
-            $quicklink =  QuickLink::fromJson($result);
+            $quicklink =  QuickLink::fromStdClass($result);
         }
 
         return $quicklink;

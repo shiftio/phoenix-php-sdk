@@ -8,8 +8,8 @@ use mediasilo\share\Share;
 
 class AnalyzedQuickLink extends QuickLink {
 
-	private $totalEvents;
-	private $events;
+	public $totalEvents;
+	public $events;
 
 	public function __construct($assetIds, Configuration $configuration, $description, array $shares, $title) {
         $this->assetIds = $assetIds;
