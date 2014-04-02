@@ -122,7 +122,8 @@ class MediaSiloAPI
 
     public function me()
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::ME)->getBody());
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ME);
+        return json_decode($clientResponse->getBody());
     }
 
     // Projects //
@@ -392,11 +393,7 @@ class MediaSiloAPI
      */
     public function getQuickLinks($params = null, $includeAnalytics = false)
     {
-        if (!is_null($params)) {
-            return $this->quicklinkProxy->getQuicklinks($params, $includeAnalytics);
-        } else {
-            return $this->quicklinkProxy->getQuicklinks(null, $includeAnalytics);
-        }
+        return $this->quicklinkProxy->getQuicklinks($params, $includeAnalytics);
     }
 
     /**
