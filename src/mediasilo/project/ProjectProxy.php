@@ -36,6 +36,15 @@ class ProjectProxy {
     }
 
     /**
+     * @return Array[Project]
+     */
+    public function getProjects()
+    {
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::PROJECTS);
+        return json_decode($clientResponse->getBody());
+    }
+
+    /**
      * Updates an existing project. Use this if you want to change the name or description of a project.
      * You won't be able to change the project owner here, though.
      * @param Project $project

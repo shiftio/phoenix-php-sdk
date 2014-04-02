@@ -148,6 +148,14 @@ class MediaSiloAPI
     }
 
     /**
+     * Gets a list of Projects
+     * @return Array[Project]
+     */
+    public function getProjects() {
+        return $this->projectProxy->getProjects();
+    }
+
+    /**
      * Updates an existing project. ID must be a valid project Id.
      * @param Project $project
      */
