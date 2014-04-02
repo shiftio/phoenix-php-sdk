@@ -16,22 +16,23 @@ class ChannelProxy {
 
     /**
      * Gets an exiting asset given an asset Id
-     * @param $id
-     * @return Asset
+     * @param $channelId
+     * @return Channel
      */
     public function getChannel($channelId) {
-        return Channel::fromJson($this->webClient->get(MediaSiloResourcePaths::CHANNELS . "/" . $channelId));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::CHANNELS . "/" . $channelId);
+        return Channel::fromJson($clientResponse->getBody());
     }
 
     /**
      * Gets multiple assets given asset Ids
-     * @param $ids
-     * @return Array(Asset)
+     * @return Array(Channel)
     */ 
     public function getChannels() {
         $channels = array();
-        
-        $result = json_decode($this->webClient->get(MediaSiloResourcePaths::CHANNELS));
+
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::CHANNELS);
+        $result = json_decode($clientResponse->getBody());
         $channelResults = $result->results;
 
         if(!empty($channelResults)) {

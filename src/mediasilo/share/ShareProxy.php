@@ -17,8 +17,7 @@ class ShareProxy {
      * Create
      * @param Share $share
      */
-    public function createShare(Share $share)
-    {
+    public function createShare(Share $share) {
         $result = json_decode($this->webClient->post(MediaSiloResourcePaths::SHARE, $share->toJson()));
         $share->id = $result->id;
     }
@@ -26,12 +25,10 @@ class ShareProxy {
     /**
     * Get
     * @param string $targetObjectId the identifier of the object that was shared
+    * @return Share
     */
     public function getShares($targetObjectId) {
-        $foo = $this->webClient->get(MediaSiloResourcePaths::SHARE."?targetObjectId=".$targetObjectId);
-
-        $result = json_decode($this->webClient->get(MediaSiloResourcePaths::SHARE."?targetObjectId=".$targetObjectId));
-
-        return $result;
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::SHARE."?targetObjectId=".$targetObjectId);
+        return json_decode($clientResponse->getBody());
     }
 }

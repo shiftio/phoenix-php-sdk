@@ -25,7 +25,8 @@ class AssetProxy {
      * @return Asset
      */
     public function getAsset($id, $acl = false) {
-        $asset = Asset::fromJson($this->webClient->get(MediaSiloResourcePaths::ASSETS . "/" . $id));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ASSETS . "/" . $id);
+        $asset = Asset::fromJson($clientResponse->getBody());
 
         if($acl == true) {
             $this->attachAclToAsset($asset);
@@ -43,7 +44,8 @@ class AssetProxy {
     public function getAssetByIds(array $ids, $acl = false) {
         $assets = array();
         $idList = implode(',', $ids);
-        $results = json_decode($this->webClient->get(sprintf("%s?ids=%s",MediaSiloResourcePaths::ASSETS,$idList)));
+        $clientResponse = $this->webClient->get(sprintf("%s?ids=%s",MediaSiloResourcePaths::ASSETS,$idList));
+        $results = json_decode($clientResponse->getBody());
 
         if(!empty($results)) {
             foreach($results as $assetsResult) {
@@ -66,7 +68,8 @@ class AssetProxy {
     public function getAssetsByProjectId($projectId, $acl = false) {
         $assets = array();
 
-        $assetsResults = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS, $projectId)));
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS, $projectId));
+        $assetsResults = json_decode($clientResponse->getBody($clientResponse));
 
         if(!empty($assetsResults)) {
             foreach($assetsResults as $assetResult) {
@@ -90,7 +93,8 @@ class AssetProxy {
     public function getAssetsByFolderId($folderId, $acl = false) {
         $assets = array();
 
-        $assetResults = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS,$folderId)));
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS,$folderId));
+        $assetResults = json_decode($clientResponse->getBody($clientResponse));
 
         if(!empty($assetResults)) {
             foreach($assetResults as $assetResult) {

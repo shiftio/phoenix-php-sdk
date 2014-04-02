@@ -20,8 +20,9 @@ class TranscriptServiceProxy {
      */
     public function getTranscriptServices() {
         $transcriptServices = array();
-        
-        $transcriptResults = json_decode($this->webClient->get(MediaSiloResourcePaths::TRANSCRIPT_SERVICES));
+
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::TRANSCRIPT_SERVICES);
+        $transcriptResults = json_decode($clientResponse->getBody());
 
         if(!empty($transcriptResults)) {
             foreach($transcriptResults as $transcriptService) {

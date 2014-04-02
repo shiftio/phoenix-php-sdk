@@ -31,7 +31,8 @@ class ProjectProxy {
      */
     public function getProject($id)
     {
-        return Project::fromJson($this->webClient->get(MediaSiloResourcePaths::PROJECTS . "/" . $id));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::PROJECTS . "/" . $id);
+        return Project::fromJson($clientResponse->getBody());
     }
 
     /**
@@ -73,6 +74,7 @@ class ProjectProxy {
     public function getUsersProjects($userId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::USERS_PROJECTS, $userId);
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 }

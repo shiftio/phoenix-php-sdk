@@ -17,18 +17,21 @@ class RoleManager
     public function __construct($webClient)
     {
         $this->webClient = $webClient;
-        $this->accountId = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME)))->accountId;
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::ME));
+        $this->accountId = json_decode($clientResponse->getBody())->accountId;
     }
 
     /**
      * Returns an array of user roles for the given projects
-     * @param $projectId
+     * @param $asset
      * @return Role;
      */
     public function getUserRoleForAsset($asset)
     {
         if (empty($this->roles[$asset->projectId])) {
-            $roleResults = json_decode($this->webClient->get(sprintf(MediaSiloResourcePaths::ME, $asset->projectId)))->roles;
+            $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::ME, $asset->projectId));
+            var_dump($clientResponse);
+            $roleResults = json_decode($clientResponse->getBody())->roles;
 
             for ($i = 0; $i < count($roleResults); $i++) {
                 if ($roleResults[$i]->context == $asset->projectId) {
@@ -58,7 +61,7 @@ class RoleManager
 
     /**
      * Returns an account level role for the given account ID. Users
-     * @param $accounttId
+     * @param $accountId
      * @return Role;
      */
     public function getUserAccountLevelRole($accountId)
@@ -66,7 +69,8 @@ class RoleManager
         if (isset($this->roles[$accountId])) {
             return $this->roles[$accountId];
         } else {
-            $rolesResult = json_decode($this->webClient->get('/me'))->roles;
+            $clientResponse = $this->webClient->get('/me');
+            $rolesResult = json_decode($clientResponse->getBody())->roles;
 
             for ($i = 0; $i < count($rolesResult); $i++) {
                 if ($rolesResult[$i]->context == $accountId) {
