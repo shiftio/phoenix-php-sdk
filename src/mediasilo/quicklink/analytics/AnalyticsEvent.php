@@ -3,9 +3,9 @@
 namespace mediasilo\quicklink\analytics;
 
 class AnalyticsEvent {
-	private $eventName;
-	private $totalCount;
-	private $totalUniqueVisitors;
+	public $eventName;
+	public $totalCount;
+	public $totalUniqueVisitors;
 
     function __construct($eventName, $totalCount, $totalUniqueVisitors)
     {
