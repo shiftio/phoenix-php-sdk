@@ -16,11 +16,12 @@ class TranscriptProxy {
 
     /**
      * Gets an exiting asset given an asset Id
-     * @param $id
-     * @return Asset
+     * @param $assetId
+     * @return Transcript
      */
     public function getTranscript($assetId) {
-        return Transcript::fromJson($this->webClient->get(MediaSiloResourcePaths::TRANSCRIPTS . "/" . $assetId));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::TRANSCRIPTS . "/" . $assetId);
+        return Transcript::fromJson($clientResponse->getBody());
     }
 
 }

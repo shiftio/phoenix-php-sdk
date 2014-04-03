@@ -122,7 +122,8 @@ class MediaSiloAPI
 
     public function me()
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::ME));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ME);
+        return json_decode($clientResponse->getBody());
     }
 
     // Projects //
@@ -144,6 +145,14 @@ class MediaSiloAPI
     public function getProject($id)
     {
         return $this->projectProxy->getProject($id);
+    }
+
+    /**
+     * Gets a list of Projects
+     * @return Array[Project]
+     */
+    public function getProjects() {
+        return $this->projectProxy->getProjects();
     }
 
     /**
@@ -286,6 +295,7 @@ class MediaSiloAPI
      * @param $public
      * @param $stretching
      * @param array $assets
+     * @return Channel
      */
     public function createChannel($name, $autoPlay, $height, $width, $playback, $public, $stretching, array $assets) {
         $channel = new Channel(null, $name, null, $autoPlay, $height, $width, $playback, $public, $stretching, null, $assets);
@@ -303,8 +313,9 @@ class MediaSiloAPI
      * @param $width
      * @param $playback
      * @param $public
-     * @param $streatching
+     * @param $stretching
      * @param array $assets
+     * @return Channel
      */
     public function updateChannel($id, $name, $autoPlay, $height, $width, $playback, $public, $stretching, array $assets) {
         $channel = new Channel($id, $name, null, $autoPlay, $height, $width, $playback, $public, $stretching, null, $assets);
@@ -340,7 +351,7 @@ class MediaSiloAPI
 
     /**
      * Gets all transcript services available for this user
-     * @return array(TranscriptService)
+     * @return Array(TranscriptService)
      */
     public function getTranscriptServices()
     {
@@ -374,6 +385,7 @@ class MediaSiloAPI
     /**
      * Fetches a quicklink based on UUID
      * @param String $id
+     * @param Bool - true to embed analytics
      * @returns Quicklink
      */
     public function getQuickLink($id, $includeAnalytics = false)
@@ -383,24 +395,38 @@ class MediaSiloAPI
 
     /**
      * Fetches a list of Quicklinks
+     * @param String - query params to be included with the request
+     * @param Bool - true to embed analytics
      * @returns Quicklink[] Array of Quicklink Objects
      */
-    public function getQuickLinks($includeAnalytics = false)
+    public function getQuickLinks($params = null, $includeAnalytics = false)
     {
-        return $this->quicklinkProxy->getQuicklinks($includeAnalytics);
+        return $this->quicklinkProxy->getQuicklinks($params, $includeAnalytics);
     }
 
-    public function getQuickLinksWith($params, $includeAnalytics = false) {
-        return $this->quicklinkProxy->getQuicklinksWith($params, $includeAnalytics);
+    /**
+     * Fetches a list of Quicklinks wrapped in a pagination object
+     * @param $params
+     * @param bool $includeAnalytics
+     * @return mixed
+     */
+    public function getQuicklinksPaginated($params, $includeAnalytics = false) {
+        if (!is_null($params)) {
+            return $this->quicklinkProxy->getQuicklinks($params, $includeAnalytics, true);
+        } else {
+            return $this->quicklinkProxy->getQuicklinks(null, $includeAnalytics, true);
+        }
     }
 
     /**
      * Updates a QuickLink in MediaSilo
-     * @param string $id UUID of quicklink to update
-     * @param string $title Title for the Quicklink
-     * @param string $description Description for the Quicklink
-     * @param array $assetIds Array of Asset ID to be included in quicklink
-     * @param array $settings Key/Value associative array of settings
+     * @param String $id UUID of quicklink to update
+     * @param String $title Title for the Quicklink
+     * @param String $description Description for the Quicklink
+     * @param Array $assetIds Array of Asset ID to be included in quicklink
+     * @param Array $settings Key/Value associative array of settings
+     * @param String $expires timestamp
+     * @return Void
      */
     public function updateQuickLink($id, $title = null, $description = null, array $assetIds = null, array $settings = null, $expires = null)
     {
@@ -427,6 +453,17 @@ class MediaSiloAPI
         $this->quicklinkProxy->updateQuicklink($quickLink);
     }
 
+    /**
+     * Creates a Comment on an Asset in a Quicklink
+     * @param String $quicklinkId
+     * @param String $assetId
+     * @param String $commentBody
+     * @param String $inResponseTo
+     * @param String $startTimeCode
+     * @param String $endTimeCode
+     * @param String $user
+     * @return String
+     */
     public function commentOnQuickLinkAsset($quicklinkId, $assetId, $commentBody, $inResponseTo = null, $startTimeCode = null, $endTimeCode = null, $user = null) {
         $comment = new Comment($assetId, $inResponseTo, $quicklinkId, $commentBody);
         $comment->startTimeCode = $startTimeCode;
@@ -438,9 +475,16 @@ class MediaSiloAPI
         return $comment->id;
     }
 
+    /**
+     * Get Comments on an Asset in a particular Quicklink
+     * @param $assetId
+     * @param $quickLinkId
+     * @return mixed
+     */
     public function getQuickLinkAssetComments($assetId, $quickLinkId) {
         return $this->quicklinkCommentProxy->getComments($assetId, $quickLinkId);
     }
+
     /**
      * Shares a QuickLink
      * @param string $quicklinkId ID of the quicklink you want to share
@@ -470,121 +514,251 @@ class MediaSiloAPI
         return $this->shareProxy->getShares($quicklinkId);
     }
 
+    /**
+     * Gets events on a quicklink
+     * @param String $quicklinkIds
+     * @return Array
+     */
     public function getQuicklinkAggregateEvents($quicklinkIds) {
         $quickLinkEvents = $this->quicklinkAnalyticsProxy->getQuicklinkAggregateEvents($quicklinkIds);
         return $quickLinkEvents;
     }
 
+    /**
+     * Gets a User by UUID
+     * @param String $userId
+     * @return Array
+     */
     public function getUser($userId)
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::USERS . "/" . $userId));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::USERS . "/" . $userId);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets a Saved Search by UUID
+     * @param String $id
+     * @return Array
+     */
     public function getSavedSearch($id)
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::SAVED_SEARCHES . "/" . $id));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::SAVED_SEARCHES . "/" . $id);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets a list of  Saved Searches
+     * @return Array
+     */
     public function getSavedSearches()
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::SAVED_SEARCHES));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::SAVED_SEARCHES);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets an Asset's Meta Data entry by Key
+     * @param String $assetId
+     * @param String $key
+     * @return Object
+     */
     public function getAssetMetaDatum($assetId, $key)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_METADATA, $assetId) . "/" . $key;
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets a list of an asset's Meta Data
+     * @param String $assetId
+     * @return Array
+     */
     public function getAssetMetaData($assetId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_METADATA, $assetId);
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets User Preference By User UUID and Preference Key
+     * @param String $userId
+     * @param String $preference
+     * @return Object
+     */
     public function getUserPreference($userId, $preference)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::USER_PREFERENCES, $userId) . "/" . $preference;
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Get List of User Preferences by User UUID
+     * @param String $userId
+     * @return Array[Object]
+     */
     public function getUserPreferences($userId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::USER_PREFERENCES, $userId);
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets a list of User Tags by User UUID
+     * @param String $userId
+     * @return Array[Object]
+     */
     public function getUsersTags($userId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::USER_TAGS, $userId);
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets a User Key/Value Pair By UUID
+     * @param String $id
+     * @return Object
+     */
     public function getUserKeyPair($id)
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::USER_LOOKUPS . "/" . $id));
+        $clientResponse = $this->webClient->get($this->webClient->get(MediaSiloResourcePaths::USER_LOOKUPS . "/" . $id));
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets a list of User Key/Value Pairs
+     * @return Array[Object]
+     */
     public function getUserKeyPairs()
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::USER_LOOKUPS));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::USER_LOOKUPS);
+        return json_decode($clientResponse->getBody());
     }
 
-    public function getDistributionList()
+    /**
+     * Gets a list of Distribution Lists
+     * @return Array[Object]
+     */
+    public function getDistributionLists()
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::DISTRIBUTION_LISTS));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::DISTRIBUTION_LISTS);
+        return json_decode($clientResponse->getBody());
     }
 
-    public function getDistributionLists($id)
+    /**
+     * Gets a Distribution List by UUID
+     * @param String $id
+     * @return Object
+     */
+    public function getDistributionList($id)
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::DISTRIBUTION_LISTS . "/" . $id));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::DISTRIBUTION_LISTS . "/" . $id);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Get Folder By UUID
+     * @param String $id
+     * @return Object
+     */
     public function getFolder($id)
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::FOLDERS . "/" . $id));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::FOLDERS . "/" . $id);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets a list of Folder's Sub-folders
+     * @param String $parentFolderId
+     * @return Array[Object]
+     */
     public function getSubfolders($parentFolderId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::SUB_FOLDERS, $parentFolderId);
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Gets a list of Project's Sub-folders
+     * @param $projectId
+     * @return Array[Object]
+     */
     public function getProjectFolders($projectId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_FOLDERS, $projectId);
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Get a list of a Projects's Users
+     * @param String $projectId
+     * @return Array[Object]
+     */
     public function getProjectUsers($projectId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_USERS, $projectId);
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Get an individual Quicklink Preset by UUID
+     * @param String $settingId
+     * @return Object
+     */
     public function getQuickLinkSetting($settingId)
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::QUICK_LINK_SETTINGS . "/" . $settingId));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::QUICK_LINK_SETTINGS . "/" . $settingId);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Get a list of Quicklink Presets
+     * @return Array[Object]
+     */
     public function getQuickLinkSettings()
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::QUICK_LINK_SETTINGS));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::QUICK_LINK_SETTINGS);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Get a list of Ratings by Asset UUID
+     * @param String $assetId
+     * @return Array[Object]
+     */
     public function getAssetRatings($assetId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_RATINGS, $assetId);
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Get a comment on a Quicklink by Comment ID
+     * @param String $quickLinkId
+     * @param String $commentId
+     * @return Object
+     */
     public function getQuickLinkComment($quickLinkId, $commentId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId) . "/" . $commentId;
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Get a list of comments on an Asset in a Quicklink
+     * @param String $quickLinkId
+     * @param String $assetId (optional)
+     * @return Array[Object]
+     */
     public function getQuickLinkComments($quickLinkId, $assetId = null)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId);
@@ -592,7 +766,8 @@ class MediaSiloAPI
         if (!is_null($assetId)) {
             $resourcePath .= sprintf("?context=%s&at=%s", $quickLinkId, $assetId);
         }
-        return json_decode($this->webClient->get($resourcePath));
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
 }

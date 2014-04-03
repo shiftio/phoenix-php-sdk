@@ -7,6 +7,7 @@ use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\quicklink\analytics\AnalyticsEvent;
 use mediasilo\quicklink\analytics\AnalyzedQuickLink;
 use mediasilo\quicklink\analytics\QuickLinkAnalyticsProxy;
+use stdClass;
 
 class QuickLinkProxy {
 
@@ -35,7 +36,8 @@ class QuickLinkProxy {
      * @returns Quicklink
      */
     public function getQuickLink($id, $includeAnalytics = false) {
-        $result = json_decode($this->webClient->get(MediaSiloResourcePaths::QUICKLINK."/".$id));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::QUICKLINK."/".$id);
+        $result = json_decode($clientResponse->getBody());
 
         $quicklink = null;
         if($includeAnalytics) {
@@ -53,20 +55,29 @@ class QuickLinkProxy {
 
     /**
      * Read Many
-     * @param bool $includeAnalytics if you want to append analytics data to each quicklink result
-     * @returns array of QuickLinks
+     * @param String - Additional query parameters to include
+     * @param Bool - if you want to append analytics data to each quicklink result
+     * @param Bool - true to wrap the response with pagination data
+     * @returns Array[QuickLink]
      */
-    public function getQuicklinks($includeAnalytics = false) {
-        return $this->getQuicklinksWith("", $includeAnalytics);
+    public function getQuicklinks($params = null, $includeAnalytics = false, $wrapPagination = false) {
+        if (is_null($params)) {
+            return $this->getQuicklinksWith("", $includeAnalytics, $wrapPagination);
+        } else {
+            return $this->getQuicklinksWith($params, $includeAnalytics, $wrapPagination);
+        }
     }
 
     /**
      * Read Many
-     * @param bool $includeAnalytics if you want to append analytics data to each quicklink result
-     * @returns array of QuickLinks
+     * @param String - Additional query parameters to include
+     * @param Bool - if you want to append analytics data to each quicklink result
+     * @param Bool - true to wrap the response with pagination data
+     * @returns Array[QuickLink]
      */
-    public function getQuicklinksWith($params, $includeAnalytics = false) {
-        $results = json_decode($this->webClient->get(MediaSiloResourcePaths::QUICKLINK."?".$params));
+    private function getQuicklinksWith($params, $includeAnalytics = false, $wrapPagination = false) {
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::QUICKLINK."?".$params);
+        $results = json_decode($clientResponse->getBody());
 
         $quicklinks = array();
 
@@ -85,7 +96,23 @@ class QuickLinkProxy {
             }
         }
 
-        return $quicklinks;
+        if ($wrapPagination) {
+            $response = new stdClass();
+            $response->paging = new stdClass();
+
+            foreach($clientResponse->getHeaders() as $header) {
+                $parts = explode(":", $header);
+                if ($parts[0] == 'total-results') {
+                    $response->paging->total = intval($parts[1]);
+                }
+            }
+
+            $response->results = $quicklinks;
+            return $response;
+
+        } else {
+            return $quicklinks;
+        }
     }
 
     /**

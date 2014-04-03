@@ -54,6 +54,7 @@ class WebClient {
         curl_setopt_array($curl, array(
             CURLOPT_HTTPHEADER => $this->getRequestHeaders(),
             CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_HEADER => 1,
             CURLOPT_URL => (rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))),
             CURLOPT_USERAGENT => $this->host.":".$this->username." PHP SDK Version ".META::MEDIASILO_SDK_VERSION
         ));
@@ -62,9 +63,14 @@ class WebClient {
 
         $this->httpResponseHandler->handle($result, curl_getinfo($curl, CURLINFO_HTTP_CODE));
 
+        $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
         curl_close($curl);
 
-        return $result;
+        $headers_raw = substr($result, 0, $header_size);
+        $headers = $this->parseResponseHeaders($headers_raw);
+        $body = substr($result, $header_size);
+
+        return new WebClientResponse($body, $headers);;
     }
 
     public function post($path, $payload) {
@@ -149,4 +155,14 @@ class WebClient {
         return $headers;
     }
 
+    private function parseResponseHeaders($headers_raw) {
+        $headers = explode("\r\n", $headers_raw);
+        $returnedHeaders = Array();
+        for ($i=0;$i<count($headers); $i++) {
+            if (strlen($headers[$i]) > 0) {
+                array_push($returnedHeaders, $headers[$i]);
+            }
+        }
+        return $returnedHeaders;
+    }
 }

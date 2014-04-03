@@ -5,7 +5,7 @@ namespace mediasilo\favorite;
 use mediasilo\http\WebClient;
 use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\favorite\Favorite;
-use mediasilo\http\NotFoundException;
+use mediasilo\http\exception\NotFoundException;
 
 class FavoriteProxy {
 
@@ -50,7 +50,8 @@ class FavoriteProxy {
         $favorites = array();
 
         try {
-            $result = json_decode($this->webClient->get(MediaSiloResourcePaths::FAVORITES."?context=PROJECT"));
+            $clientResponse = $this->webClient->get(MediaSiloResourcePaths::FAVORITES."?context=PROJECT");
+            $result = json_decode($clientResponse->getBody());
             $favoriteResults = $result->results;
 
             if(!empty($favoriteResults)) {
@@ -73,7 +74,8 @@ class FavoriteProxy {
      */
     public function getFavorite($id)
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::FAVORITES . "/" . $id));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::FAVORITES . "/" . $id);
+        return json_decode($clientResponse->getBody());
     }
 
     /**
@@ -82,6 +84,7 @@ class FavoriteProxy {
      */
     public function getFavorites()
     {
-        return json_decode($this->webClient->get(MediaSiloResourcePaths::FAVORITES));
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::FAVORITES);
+        return json_decode($clientResponse->getBody());
     }
 }
