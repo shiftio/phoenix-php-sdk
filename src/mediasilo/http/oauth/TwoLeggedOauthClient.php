@@ -3,6 +3,7 @@
 namespace mediasilo\http\oauth;
 
 use mediasilo\http\exception\NotFoundException;
+use mediasilo\http\WebClientResponse;
 use \OAuthStore;
 use \OAuthRequester;
 use \OAuthHttpException;
@@ -83,7 +84,7 @@ class TwoLeggedOauthClient {
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
         try {
             $result = $request->doRequest();
-            return $result['body'];
+            return new WebClientResponse($result['body'], $result['headers']);
         } catch (OAuthHttpException $e) {
             throw new NotFoundException($e->getMessage(), null);
         }

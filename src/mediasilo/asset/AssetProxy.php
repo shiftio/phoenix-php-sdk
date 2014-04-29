@@ -15,7 +15,6 @@ class AssetProxy {
 
     public function __construct($webClient) {
         $this->webClient = $webClient;
-        $this->roleManager = new RoleManager($this->webClient);
     }
 
     /**
@@ -111,8 +110,17 @@ class AssetProxy {
         return $assets;
     }
 
+    private function getRoleManager() {
+        if (isset($this->roleManager)) {
+            return $this->roleManager;
+        } else {
+            $this->roleManager = new RoleManager($this->webClient);
+            return $this->roleManager;
+        }
+    }
+
     private function attachAclToAsset(&$asset) {
-        $role = $this->roleManager->getUserRoleForAsset($asset);
+        $role = $this->getRoleManager()->getUserRoleForAsset($asset);
         $asset->acl = $role->getPermissionGroups();
     }
 

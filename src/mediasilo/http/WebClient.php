@@ -70,7 +70,7 @@ class WebClient {
         $headers = $this->parseResponseHeaders($headers_raw);
         $body = substr($result, $header_size);
 
-        return new WebClientResponse($body, $headers);;
+        return new WebClientResponse($body, $headers);
     }
 
     public function post($path, $payload) {
