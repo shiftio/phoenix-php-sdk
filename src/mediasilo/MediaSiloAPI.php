@@ -19,6 +19,7 @@ use mediasilo\quicklink\Configuration;
 use mediasilo\quicklink\QuickLink;
 use mediasilo\quicklink\QuickLinkProxy;
 use mediasilo\quicklink\QuickLinkCommentProxy;
+use mediasilo\account\AccountPreferencesProxy;
 use mediasilo\asset\AssetProxy;
 use mediasilo\channel\ChannelProxy;
 use mediasilo\channel\Channel;
@@ -47,6 +48,7 @@ class MediaSiloAPI
     private $channelProxy;
     private $transcriptProxy;
     private $transcriptServiceProxy;
+    private $accountPreferencesProxy;
     private $consumerKey;
     private $consumerSecret;
     private $baseUrl;
@@ -68,6 +70,7 @@ class MediaSiloAPI
         $this->transcriptProxy = new TranscriptProxy($this->webClient);
         $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);
         $this->quicklinkAnalyticsProxy = new QuickLinkAnalyticsProxy($this->webClient);
+        $this->accountPreferencesProxy = new AccountPreferencesProxy($this->webClient);
     }
 
     public static function createFromHostCredentials($username, $password, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
@@ -124,6 +127,16 @@ class MediaSiloAPI
     {
         $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ME);
         return json_decode($clientResponse->getBody());
+    }
+
+    // Account //
+
+    public function getMyAccountPreferences() {
+        return $this->accountPreferencesProxy->getPreferences();
+    }
+
+    public function getAccountPreferences($accountId) {
+        return $this->accountPreferencesProxy->getPreferencesByAccountId($accountId);
     }
 
     // Projects //
