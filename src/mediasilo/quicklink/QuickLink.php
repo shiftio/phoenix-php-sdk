@@ -14,6 +14,7 @@ class QuickLink implements Serializable {
     public $configuration;
     public $shares;
     public $ownerId;
+    public $accountId;
     public $created;
     public $modified;
     public $expires;
@@ -67,6 +68,7 @@ class QuickLink implements Serializable {
         $quickLink->title = isset($stdClass->title) ? $stdClass->title : null;
         $quickLink->description = isset($stdClass->description) ? $stdClass->description : null;
         $quickLink->ownerId = isset($stdClass->ownerId) ? $stdClass->ownerId : null;
+        $quickLink->accountId = isset($stdClass->accountId) ? $stdClass->accountId : null;
         $quickLink->modified = isset($stdClass->modified) ? $stdClass->modified : null;
         $quickLink->created = isset($stdClass->created) ? $stdClass->created : null;
         $quickLink->expires = isset($stdClass->expires) ? $stdClass->expires : null;
