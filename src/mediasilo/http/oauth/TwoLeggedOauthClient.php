@@ -2,7 +2,12 @@
 
 namespace mediasilo\http\oauth;
 
+use mediasilo\http\exception\NotAuthenticatedException;
 use mediasilo\http\exception\NotFoundException;
+use mediasilo\http\exception\ConnectionException;
+use mediasilo\http\exception\NotAuthorizedException;
+use mediasilo\http\ratelimit\exception\RateLimitException;
+use mediasilo\http\exception\ValidationException;
 use mediasilo\http\WebClientResponse;
 use \OAuthStore;
 use \OAuthRequester;
@@ -67,7 +72,7 @@ class TwoLeggedOauthClient {
             $result = $request->doRequest();
             return $result['body'];
         } catch (OAuthHttpException $e) {
-            throw new NotFoundException($e->getMessage(), null);
+            $this->parseException($e);
         }
 	}
 
@@ -86,7 +91,7 @@ class TwoLeggedOauthClient {
             $result = $request->doRequest();
             return new WebClientResponse($result['body'], $result['headers']);
         } catch (OAuthHttpException $e) {
-            throw new NotFoundException($e->getMessage(), null);
+            $this->parseException($e);
         }
 	}
 
@@ -103,7 +108,7 @@ class TwoLeggedOauthClient {
             $result = $request->doRequest();
             return $result['body'];
         } catch (OAuthHttpException $e) {
-            throw new NotFoundException($e->getMessage(), null);
+            $this->parseException($e);
         }
 	}
 
@@ -120,7 +125,7 @@ class TwoLeggedOauthClient {
             $result = $request->doRequest();
             return $result['body'];
         } catch (OAuthHttpException $e) {
-            throw new NotFoundException($e->getMessage(), null);
+            $this->parseException($e);
         }
 	}
 
@@ -137,7 +142,32 @@ class TwoLeggedOauthClient {
             $result = $request->doRequest();
             return $result['body'];
         } catch (OAuthHttpException $e) {
-            throw new NotFoundException($e->getMessage(), null);
+            $this->parseException($e);
         }
 	}
+
+    private function parseException($exception) {
+        $message = $exception->getMessage();
+        preg_match('/Request failed with code ([0-9]{3}):/', $message, $matches);
+        $errorCode = $matches[1];
+
+        if($errorCode == 429) {
+            throw new RateLimitException("Your API rate limit has been exceeded", json_decode($message));
+        }
+        if($errorCode == 400) {
+            throw new ValidationException("The request was invalid. Review the error collection to see what the problem was.", json_decode($message));
+        }
+        if($errorCode == 401) {
+            throw new NotAuthenticatedException("You are not authorized to perform this request", json_decode($message));
+        }
+        if($errorCode == 403) {
+            throw new NotAuthorizedException("You are not authorized to perform this request", json_decode($message));
+        }
+        if($errorCode == 404) {
+            throw new NotFoundException("There was no resource matching the request.", json_decode($message));
+        }
+        if($errorCode == 0) {
+            throw new ConnectionException("There was a problem connecting to the MediaSilo API", json_decode($message));
+        }
+    }
 }
