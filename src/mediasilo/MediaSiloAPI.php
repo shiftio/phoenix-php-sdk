@@ -114,6 +114,7 @@ class MediaSiloAPI
             throw new OAuthException("There is no consumer credentials set for the API instance. An access token cannot be used without consumer credentials.");
         }
         $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $accessToken, $this->baseUrl);
+        $this->proxyInit();
     }
 
     public function unsetAccessToken() {
@@ -121,6 +122,7 @@ class MediaSiloAPI
             throw new OAuthException("There is no consumer credentials set for the API instance. An access token cannot be used without consumer credentials.");
         }
         $this->webClient = TwoLeggedOauthClient::create2LegClient($this->consumerKey, $this->consumerSecret, $this->baseUrl);
+        $this->proxyInit();
     }
 
     public function me()
