@@ -2,6 +2,7 @@
 
 namespace mediasilo\http;
 
+use mediasilo\http\exception\NotAuthenticatedException;
 use mediasilo\http\exception\RateLimitException;
 use mediasilo\http\exception\ValidationException;
 use mediasilo\http\exception\NotFoundException;
@@ -20,6 +21,9 @@ class HttpResponseHandler {
             throw new ValidationException("The request was invalid. Review the error collection to see what the problem was.", json_decode($response));
         }
         if($responseCode == 401) {
+            throw new NotAuthenticatedException("You are not authenticated, which is required to perform this request", json_decode($response));
+        }
+        if($responseCode == 403) {
             throw new NotAuthorizedException("You are not authorized to perform this request", json_decode($response));
         }
         if($responseCode == 404) {
