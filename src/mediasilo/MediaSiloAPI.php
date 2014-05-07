@@ -109,6 +109,15 @@ class MediaSiloAPI
         return $response->id;
     }
 
+    public function getAccessTokenBySession($sessionKey, $hostname) {
+        $params = array('session' => $sessionKey, 'hostname' => $hostname, 'grant_type' => 'password');
+        $response = json_decode($this->webClient->getAccessToken($params));
+        $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $response->id, $this->baseUrl);
+        $this->proxyInit();
+
+        return $response->id;
+    }
+
     public function setAccessToken($accessToken) {
         if(!isset($this->consumerKey)) {
             throw new OAuthException("There is no consumer credentials set for the API instance. An access token cannot be used without consumer credentials.");
