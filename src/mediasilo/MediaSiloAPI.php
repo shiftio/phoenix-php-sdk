@@ -794,4 +794,18 @@ class MediaSiloAPI
         return json_decode($clientResponse->getBody());
     }
 
+    /**
+     * Get a list of comments on an Asset in a Quicklink in a specified export format
+     * @param String $quickLinkId
+     * @param String $assetId
+     * @param String $format
+     * @return Array[Object]
+     */
+    public function getQuickLinkCommentsExport($quickLinkId, $assetId, $format="txt")
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_COMMENTS_EXPORT, $quickLinkId, $assetId, $format);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return $clientResponse->getBody();
+    }
+
 }
