@@ -792,4 +792,16 @@ class MediaSiloAPI
         return $clientResponse->getBody();
     }
 
+    /**
+     * Get a list of tracked events specified by the events list and filtered by a query
+     * @param Array $events
+     * @param String $query
+     * @return Array[Object]
+     */
+    public function getAnalytics($events, $query)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::ANALYTICS_SPECIFIC, join(",", $events));
+        $clientResponse = json_decode($this->webClient->post($resourcePath, $query));
+        return $clientResponse;
+    }
 }
