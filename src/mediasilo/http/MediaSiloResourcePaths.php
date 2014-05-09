@@ -37,6 +37,7 @@ class MediaSiloResourcePaths
     const TRANSCRIPTS = "/transcripts";
     const TRANSCRIPT_SERVICES = "/transcripts/services";
     const ANALYTICS = "/analytics";
+    const ANALYTICS_SPECIFIC = "/analytics/%s";
     const MY_ACCOUNT_PREFERENCES = "/account/preferences";
     const ACCOUNT_PREFERENCES = "/account/%s/preferences";
 }
