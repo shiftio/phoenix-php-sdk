@@ -18,7 +18,7 @@ class MediaSiloResourcePaths
     const FAVORITES = "/favorites";
     const USER_LOOKUPS = "/users/keyvaluecollections";
     const ASSET_METADATA = "/assets/%s/metadata";
-    const QUICK_LINK_COMMENTS = "/quicklinks/%s/comments";
+    const QUICK_LINK_COMMENTS = "/quicklinks/%s/assets/%s/comments";
     const QUICKLINK_COMMENTS_EXPORT = "/quicklinks/%s/assets/%s/comments.%s";
     const QUICK_LINK_SETTINGS = "/users/quicklinksettings";
     const ASSET_RATINGS = "/assets/%s/ratings";

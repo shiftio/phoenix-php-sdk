@@ -765,31 +765,15 @@ class MediaSiloAPI
     }
 
     /**
-     * Get a comment on a Quicklink by Comment ID
-     * @param String $quickLinkId
-     * @param String $commentId
-     * @return Object
-     */
-    public function getQuickLinkComment($quickLinkId, $commentId)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId) . "/" . $commentId;
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
      * Get a list of comments on an Asset in a Quicklink
      * @param String $quickLinkId
-     * @param String $assetId (optional)
+     * @param String $assetId
      * @return Array[Object]
      */
-    public function getQuickLinkComments($quickLinkId, $assetId = null)
+    public function getQuickLinkComments($quickLinkId, $assetId)
     {
-        $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId);
+        $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId, $assetId);
 
-        if (!is_null($assetId)) {
-            $resourcePath .= sprintf("?context=%s&at=%s", $quickLinkId, $assetId);
-        }
         $clientResponse = $this->webClient->get($resourcePath);
         return json_decode($clientResponse->getBody());
     }
