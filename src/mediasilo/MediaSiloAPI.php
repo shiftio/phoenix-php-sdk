@@ -41,7 +41,6 @@ class MediaSiloAPI
     private $favoriteProxy;
     private $projectProxy;
     private $quicklinkProxy;
-    private $quicklinkCommentProxy;
     private $quicklinkAnalyticsProxy;
     private $shareProxy;
     private $assetProxy;
@@ -63,7 +62,6 @@ class MediaSiloAPI
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
-        $this->quicklinkCommentProxy = new QuickLinkCommentProxy($this->webClient);
         $this->shareProxy = new ShareProxy($this->webClient);
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
@@ -494,19 +492,9 @@ class MediaSiloAPI
         $comment->endTimeCode = $endTimeCode;
         $comment->user = $user;
 
-        $this->quicklinkCommentProxy->createComment($comment);
-
-        return $comment->id;
-    }
-
-    /**
-     * Get Comments on an Asset in a particular Quicklink
-     * @param $assetId
-     * @param $quickLinkId
-     * @return mixed
-     */
-    public function getQuickLinkAssetComments($assetId, $quickLinkId) {
-        return $this->quicklinkCommentProxy->getComments($assetId, $quickLinkId);
+        $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quicklinkId, $assetId);
+        $result = json_decode($this->webClient->post($resourcePath, $comment->toJson()));
+        return $result->id;
     }
 
     /**
