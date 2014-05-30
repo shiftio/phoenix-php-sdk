@@ -14,7 +14,7 @@
     ],
     "require" : {
         "monolog/monolog": "1.0.*",
-        "mdelano/oauth-php": "0.0.12"
+        "mdelano/oauth-php": "0.0.13"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*"
