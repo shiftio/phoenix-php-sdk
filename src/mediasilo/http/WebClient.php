@@ -64,13 +64,14 @@ class WebClient {
         $this->httpResponseHandler->handle($result, curl_getinfo($curl, CURLINFO_HTTP_CODE));
 
         $header_size = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $http_status_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
         $headers_raw = substr($result, 0, $header_size);
         $headers = $this->parseResponseHeaders($headers_raw);
         $body = substr($result, $header_size);
 
-        return new WebClientResponse($body, $headers);
+        return new WebClientResponse($body, $headers, $http_status_code);
     }
 
     public function post($path, $payload) {

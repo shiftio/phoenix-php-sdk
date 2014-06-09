@@ -21,16 +21,14 @@ class TwoLeggedOauthClient {
 	public $options;
 	public $oauthWorkflow = '2Leg';
 
-	function __construct($consumerKey, $consumerSecret) {
+	function __construct($consumerKey, $consumerSecret, $baseUrl) {
 		$this->consumerKey = $consumerKey;
 		$this->consumerSecret = $consumerSecret;
+        $this->baseUrl = $baseUrl;
 	}
 
 	public static function create2LegClient($consumerKey, $consumerSecret, $baseUrl = "phoenix.mediasilo.com/v3") {
-		$instance = new self($consumerKey, $consumerSecret);
-		$instance->consumerKey = $consumerKey;
-		$instance->consumerSecret = $consumerSecret;
-		$instance->baseUrl = $baseUrl;
+		$instance = new self($consumerKey, $consumerSecret, $baseUrl);
 		$instance->options = array( 'consumer_key' => $consumerKey, 'consumer_secret' => $consumerSecret);
 		OAuthStore::instance($instance->oauthWorkflow, $instance->options, true);
 
@@ -38,12 +36,12 @@ class TwoLeggedOauthClient {
 	}
 
 	public static function create2LegProxyCredsClient($consumerKey, $consumerSecret, $accessToken, $baseUrl = "phoenix.mediasilo.com/v3") {
-		$instance = new self($consumerKey, $consumerSecret);
+		$instance = new self($consumerKey, $consumerSecret, $baseUrl);
 		$instance->setOauthWorkflow('2LegProxyCreds');
-		$instance->consumerKey = $consumerKey;
-		$instance->consumerSecret = $consumerSecret;
-		$instance->baseUrl = $baseUrl;
-		$instance->options = array( 'consumer_key' => $consumerKey, 'consumer_secret' => $consumerSecret, 'access_token' => $accessToken);
+		$instance->options = array(
+			'consumer_key' => $consumerKey,
+			'consumer_secret' => $consumerSecret,
+			'access_token' => $accessToken);
 
 		OAuthStore::instance($instance->oauthWorkflow, $instance->options, true);
 
@@ -61,8 +59,6 @@ class TwoLeggedOauthClient {
 	public function getAccessToken($params) {
         $path = "/";
         $method = "GET";
-
-        // Obtain a request object for the request we want to make
         $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, $params);
 
         // Sign the request, perform a curl request and return the results,
@@ -89,7 +85,7 @@ class TwoLeggedOauthClient {
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
         try {
             $result = $request->doRequest();
-            return new WebClientResponse($result['body'], $result['headers']);
+            return new WebClientResponse($result['body'], $result['headers'], $result['code']);
         } catch (OAuthHttpException $e) {
             $this->parseException($e);
         }

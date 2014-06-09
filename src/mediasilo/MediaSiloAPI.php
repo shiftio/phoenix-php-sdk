@@ -10,6 +10,7 @@ if (!function_exists('json_decode')) {
     throw new \Exception('We need json_decode for the API to work. If you\'re running a linux distro install this package: php-pecl-json');
 }
 
+use mediasilo\http\exception\NotFoundException;
 use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\project\ProjectProxy;
 use mediasilo\http\WebClient;
@@ -34,6 +35,10 @@ use mediasilo\quicklink\Setting;
 use mediasilo\http\oauth\TwoLeggedOauthClient;
 use mediasilo\http\oauth\OAuthException;
 use mediasilo\quicklink\analytics\QuickLinkAnalyticsProxy;
+use mediasilo\user\UserProxy;
+use mediasilo\user\User;
+use mediasilo\user\PasswordReset;
+use mediasilo\user\PasswordResetRequest;
 
 class MediaSiloAPI
 {
@@ -48,6 +53,7 @@ class MediaSiloAPI
     private $transcriptProxy;
     private $transcriptServiceProxy;
     private $accountPreferencesProxy;
+    private $userProxy;
     private $consumerKey;
     private $consumerSecret;
     private $baseUrl;
@@ -69,6 +75,7 @@ class MediaSiloAPI
         $this->transcriptServiceProxy = new TranscriptServiceProxy($this->webClient);
         $this->quicklinkAnalyticsProxy = new QuickLinkAnalyticsProxy($this->webClient);
         $this->accountPreferencesProxy = new AccountPreferencesProxy($this->webClient);
+        $this->userProxy = new UserProxy($this->webClient);
     }
 
     public static function createFromHostCredentials($username, $password, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
@@ -543,8 +550,42 @@ class MediaSiloAPI
      */
     public function getUser($userId)
     {
-        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::USERS . "/" . $userId);
-        return json_decode($clientResponse->getBody());
+        return $this->userProxy->getUser($userId);
+    }
+
+    /**
+     * Persists Updates to a User Object
+     * @param User $user
+     */
+    public function updateUser(User $user) {
+        $this->userProxy->updateUser($user);
+    }
+
+    /**
+     * Updates a User profile based on update-able parameters
+     * @param $userId
+     * @param null $firstName
+     * @param null $lastName
+     * @param null $username
+     * @param null $email
+     * @param null $password
+     * @param null $address
+     * @param null $phone
+     * @param null $mobile
+     * @param null $company
+     * @param null $status
+     * @param null $defaultRowTemplateId
+     */
+    public function updateUserProfile($userId, $firstName = null, $lastName = null, $username = null, $email = null, $password = null,
+                               $address = null, $phone = null, $mobile = null, $company = null, $status = null, $defaultRowTemplateId = null)
+    {
+        $user = new User($address,$company,$defaultRowTemplateId, $email,$firstName, $userId, $lastName, $mobile, null, $phone, null, null, null, $status, $username, null);
+
+        if (!is_null($password)) {
+            $user->setPassword($password);
+        }
+
+        $this->userProxy->updateUser($user);
     }
 
     /**
@@ -791,5 +832,45 @@ class MediaSiloAPI
         $resourcePath = sprintf(MediaSiloResourcePaths::ANALYTICS_SPECIFIC, join(",", $events));
         $clientResponse = json_decode($this->webClient->post($resourcePath, $query));
         return $clientResponse;
+    }
+
+    /**
+     * Performs a Password Reset Request (sends password reset link with token to user's email)
+     * @requires System Permission
+     * @param $hostname
+     * @param $username
+     * @param $redirectUri
+     */
+    public function initiatePasswordReset($hostname, $username, $redirectUri) {
+        $request = new PasswordResetRequest($hostname, $username, $redirectUri);
+        $this->webClient->post(MediaSiloResourcePaths::PASSWORD_RESET, $request->toJson());
+    }
+
+    /**
+     * Validates a Password Reset Request token is still valid
+     * @requires System Permission
+     * @param $token
+     * @return bool
+     */
+    public function resetTokenIsValid($token) {
+        $resourcePath = sprintf("%s/%s", MediaSiloResourcePaths::PASSWORD_RESET, $token);
+        try {
+            $clientResponse = $this->webClient->get($resourcePath);
+            return $clientResponse->getCode() == 200;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Performs a password update for a user associated with a valid token
+     * * @requires System Permission
+     * @param $token
+     * @param $password
+     * @return mixed
+     */
+    public function processPasswordReset($token, $password) {
+        $request = new PasswordReset($token, $password);
+        return json_decode($this->webClient->put(MediaSiloResourcePaths::PASSWORD_RESET, $request->toJson()));
     }
 }

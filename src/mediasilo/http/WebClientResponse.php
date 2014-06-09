@@ -4,13 +4,15 @@ namespace mediasilo\http;
 
 class WebClientResponse {
 
+    private $code;
     private $headers;
     private $body;
 
-    function __construct($body, $headers)
+    function __construct($body, $headers, $code = null)
     {
         $this->body = $body;
         $this->headers = $headers;
+        $this->code = $code;
     }
 
     /**
@@ -43,5 +45,21 @@ class WebClientResponse {
     public function getHeaders()
     {
         return $this->headers;
+    }
+
+    /**
+     * @param null $code
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+    }
+
+    /**
+     * @return null
+     */
+    public function getCode()
+    {
+        return $this->code;
     }
 }

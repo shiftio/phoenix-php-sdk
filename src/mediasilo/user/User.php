@@ -16,11 +16,13 @@ class User {
     private $phone;
     private $mobile;
     private $address;
+    private $accountId;
     private $status;
     private $sso;
     private $ssoId;
     private $roles;
     private $tags;
+    private $password;
 
     function __construct(Address $address, $company, $defaultRoleTemplateId, $email, $firstName, $id, $lastName, $mobile, $numericId, $phone, array $roles, $sso, $ssoId, $status, $userName, $tags)
     {
@@ -172,6 +174,16 @@ class User {
         return $this->ssoId;
     }
 
+    public function setAccountId($accountId)
+    {
+        $this->accountId = $accountId;
+    }
+
+    public function getAccountId()
+    {
+        return $this->accountId;
+    }
+
     public function setStatus($status)
     {
         $this->status = $status;
@@ -192,5 +204,53 @@ class User {
         return $this->userName;
     }
 
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
 
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    public function setTags($tags)
+    {
+        $this->tags = $tags;
+    }
+
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    public static function fromJson($json) {
+        $mixed = json_decode($json);
+        return new User($mixed->address, $mixed->company, $mixed->defaultRoleTemplateId, $mixed->email, $mixed->firstName,
+            $mixed->id, $mixed->lastName, $mixed->mobile, $mixed->numericId, $mixed->phone, $mixed->roles, $mixed->sso,
+            $mixed->ssoId, $mixed->status, $mixed->userName, $mixed->tags);
+    }
+
+    public function toJson() {
+        $responseObj = new \stdClass();
+        $responseObj->id = $this->getId();
+        $responseObj->numericId = $this->getNumericId();
+        $responseObj->defaultRoleTemplateId = $this->getDefaultRoleTemplateId();
+        $responseObj->userName = $this->getUserName();
+        $responseObj->firstName = $this->getFirstName();
+        $responseObj->lastName = $this->getLastName();
+        $responseObj->company = $this->getCompany();
+        $responseObj->email = $this->getEmail();
+        $responseObj->phone = $this->getPhone();
+        $responseObj->mobile = $this->getMobile();
+        $responseObj->address = $this->getAddress();
+        $responseObj->accountId = $this->getAccountId();
+        $responseObj->status = $this->getStatus();
+        $responseObj->sso = $this->getSso();
+        $responseObj->ssoId = $this->getSsoId();
+        $responseObj->roles = $this->getRoles();
+        $responseObj->tags = $this->getTags();
+        $responseObj->password = $this->getPassword();
+        return json_encode($responseObj);
+    }
 }
