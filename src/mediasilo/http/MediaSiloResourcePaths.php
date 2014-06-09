@@ -25,7 +25,7 @@ class MediaSiloResourcePaths
     const PROJECT_USERS = "/projects/%s/users";
     const SAVED_SEARCHES = "/users/savedsearches";
     const USER_TAGS = "/users/%s/tags";
-    const USERS = "users";
+    const USERS = "/users";
     const USER_PREFERENCES = "/users/%s/preferences";
     const QUICKLINK = "/quicklinks";
     const SHARE = "/shares";
@@ -40,4 +40,5 @@ class MediaSiloResourcePaths
     const ANALYTICS_SPECIFIC = "/analytics/%s";
     const MY_ACCOUNT_PREFERENCES = "/account/preferences";
     const ACCOUNT_PREFERENCES = "/account/%s/preferences";
+    const PASSWORD_RESET = "/users/password/reset";
 }
