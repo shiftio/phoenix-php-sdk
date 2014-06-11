@@ -10,12 +10,14 @@ class PasswordResetRequest {
 
     private $hostname;
     private $username;
+    private $type;
     private $redirectUri;
 
-    public function __construct($hostname, $username, $redirectUri = null)
+    public function __construct($hostname, $username, $type = "reset", $redirectUri = null)
     {
         $this->setHostname($hostname);
         $this->setUsername($username);
+        $this->setType($type);
         $this->setRedirectUri($redirectUri);
     }
 
@@ -33,6 +35,22 @@ class PasswordResetRequest {
     public function getHostname()
     {
         return $this->hostname;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**
@@ -75,6 +93,7 @@ class PasswordResetRequest {
         $result = new \stdClass();
         $result->username = $this->getUsername();
         $result->hostname = $this->getHostname();
+        $result->type = $this->getType();
         $result->redirectUrl = $this->getRedirectUri();
         return json_encode($result);
     }
