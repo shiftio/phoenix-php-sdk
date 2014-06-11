@@ -837,37 +837,35 @@ class MediaSiloAPI
     /**
      * Performs a Password Reset Request (sends password reset link with token to user's email)
      * @requires System Permission
-     * @param $hostname
-     * @param $username
-     * @param $redirectUri
+     * @param String $hostname
+     * @param String $username
+     * @param String $type (optional)
+     * @param String $redirectUri (optional)
+     * @returns Object - ID property contains request token id
      */
-    public function initiatePasswordReset($hostname, $username, $redirectUri) {
-        $request = new PasswordResetRequest($hostname, $username, $redirectUri);
-        $this->webClient->post(MediaSiloResourcePaths::PASSWORD_RESET, $request->toJson());
+    public function initiatePasswordReset($hostname, $username, $type = "reset", $redirectUri = null) {
+        $request = new PasswordResetRequest($hostname, $username, $type, $redirectUri);
+        return json_decode($this->webClient->post(MediaSiloResourcePaths::PASSWORD_RESET, $request->toJson()));
     }
 
     /**
      * Validates a Password Reset Request token is still valid
      * @requires System Permission
-     * @param $token
-     * @return bool
+     * @param String $token
+     * @return Object - Reset Token Representation
      */
-    public function resetTokenIsValid($token) {
+    public function validateResetToken($token) {
         $resourcePath = sprintf("%s/%s", MediaSiloResourcePaths::PASSWORD_RESET, $token);
-        try {
-            $clientResponse = $this->webClient->get($resourcePath);
-            return $clientResponse->getCode() == 200;
-        } catch (\Exception $e) {
-            return false;
-        }
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
     /**
      * Performs a password update for a user associated with a valid token
      * * @requires System Permission
-     * @param $token
-     * @param $password
-     * @return mixed
+     * @param String $token
+     * @param String $password
+     * @return Object - redirectUrl property contains location to redirect to upon success
      */
     public function processPasswordReset($token, $password) {
         $request = new PasswordReset($token, $password);
