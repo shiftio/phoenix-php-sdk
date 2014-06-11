@@ -18,12 +18,6 @@ class UserProxy {
     }
 
     public function updateUser(User $user) {
-        error_log($user->toJson());
-        try {
-            $this->webClient->put(MediaSiloResourcePaths::USERS, $user->toJson());
-        } catch(\Exception $e) {
-            error_log($e->getMessage());
-        }
-
+        $this->webClient->put(MediaSiloResourcePaths::USERS, $user->toJson());
     }
 }
