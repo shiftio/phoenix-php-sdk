@@ -151,6 +151,8 @@ class TwoLeggedOauthClient {
             throw new RateLimitException("Your API rate limit has been exceeded", json_decode($message));
         }
         if($errorCode == 400) {
+            // Parse Out Individual Error Json for Validation Errors
+            $message = preg_replace( "/Request failed with code ([0-9]{3}):/", "", $message);
             throw new ValidationException("The request was invalid. Review the error collection to see what the problem was.", json_decode($message));
         }
         if($errorCode == 401) {
