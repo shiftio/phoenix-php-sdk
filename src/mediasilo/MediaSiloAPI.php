@@ -39,6 +39,10 @@ use mediasilo\user\UserProxy;
 use mediasilo\user\User;
 use mediasilo\user\PasswordReset;
 use mediasilo\user\PasswordResetRequest;
+use mediasilo\portal\Portal;
+use mediasilo\portal\PortalProxy;
+use mediasilo\portal\Channel as PortalChannel;
+use mediasilo\portal\Setting as PortalSetting;
 
 class MediaSiloAPI
 {
@@ -47,6 +51,7 @@ class MediaSiloAPI
     private $projectProxy;
     private $quicklinkProxy;
     private $quicklinkAnalyticsProxy;
+    private $portalProxy;
     private $shareProxy;
     private $assetProxy;
     private $channelProxy;
@@ -68,6 +73,7 @@ class MediaSiloAPI
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
+        $this->portalProxy = new PortalProxy($this->webClient);
         $this->shareProxy = new ShareProxy($this->webClient);
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
@@ -871,4 +877,109 @@ class MediaSiloAPI
         $request = new PasswordReset($token, $password);
         return json_decode($this->webClient->put(MediaSiloResourcePaths::PASSWORD_RESET, $request->toJson()));
     }
+
+    /********************************************************************************************
+     *  _____ _____ _____ _____ _____ __    _____
+     * |  _  |     | __  |_   _|  _  |  |  |   __|
+     * |   __|  |  |    -| | | |     |  |__|__   |
+     * |__|  |_____|__|__| |_| |__|__|_____|_____|
+     */
+
+    /**
+     * Fetches a portal based on UUID
+     * @param String $id
+     * @returns Portal
+     */
+    public function getPortal($id)
+    {
+        return $this->portalProxy->getPortal($id);
+    }
+
+
+    /**
+     * Fetches a list of Quicklinks
+     * @param String - query params to be included with the request
+     * @param Bool - true to embed analytics
+     * @returns Quicklink[] Array of Quicklink Objects
+     */
+    public function getPortals($params = null)
+    {
+        return $this->portalProxy->getPortals($params);
+    }
+
+    /**
+     * Creates a new Portal
+     * @param string $title Title for the Quicklink
+     * @param string $description - Description for the Quicklink
+     * @param array $channels - Array channels or std objects containing portal channel data
+     * @param array $settings - Key/Value associative array of settings
+     * @param string $configId - optional, id of portal settings preset
+     * @param string $expires - optional, timestamp in milliseconds
+     * @return Quicklink Hydrated model of created quicklink
+     */
+    public function createPortal($title, $description = "", array $channels = array(),
+                                 array $settings = array(), $configId = null, $expires = null)
+    {
+        $portalChannels = array();
+        foreach ($channels as $channel) {
+            if ($channel instanceof PortalChannel) {
+                array_push($portalChannels, $channel);
+            } else {
+                array_push($portalChannels, PortalChannel::fromStdClass($channel));
+            }
+        }
+
+        $newSettings = array();
+        foreach ($settings as $key => $value) {
+            array_push($newSettings, new PortalSetting((string)$key, (string)$value));
+        }
+        $configuration = new Configuration($configId, $newSettings);
+
+        $portal = new Portal($title, $portalChannels, $configuration, $description, $expires);
+        $this->portalProxy->createPortal($portal);
+        return $portal;
+    }
+
+    /**
+     * Updates a Portal
+     * @param String $id UUID of portal to update
+     * @param string $title Title for the Quicklink
+     * @param string $description - Description for the Quicklink
+     * @param array $channels - Array channels or std objects containing portal channel data
+     * @param array $settings - Key/Value associative array of settings
+     * @param string $configId - optional, id of portal settings preset
+     * @param string $expires - optional, timestamp in milliseconds
+     */
+    public function updatePortal($id, $title, $description = "", array $channels = array(),
+                                    array $settings = array(), $configId = null, $expires = null)
+    {
+        $portalChannels = array();
+        foreach ($channels as $channel) {
+            if ($channel instanceof PortalChannel) {
+                array_push($portalChannels, $channel);
+            } else {
+                array_push($portalChannels, PortalChannel::fromStdClass($channel));
+            }
+        }
+
+        $newSettings = array();
+        foreach ($settings as $key => $value) {
+            array_push($newSettings, new PortalSetting((string)$key, (string)$value));
+        }
+        $configuration = new Configuration($configId, $newSettings);
+
+        $portal = new Portal($title, $portalChannels, $configuration, $description, $expires);
+        $portal->setId($id);
+        $this->portalProxy->updatePortal($portal);
+    }
+
+    /**
+     * Expires a Portal
+     * @param id - id of portal to be expired
+     */
+    public function expirePortal($id)
+    {
+        $this->portalProxy->expirePortal($id);
+    }
+
 }
