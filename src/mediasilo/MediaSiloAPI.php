@@ -150,15 +150,37 @@ class MediaSiloAPI
         return $this->me;
     }
 
-    // Account //
+    /******************************************************************************************
+     * Account preferences
+     *
+     * Account preferences are used for various configuration and customization for your account.
+     * Using the following methods you can retrieve existing preferences as well as set preferences.
+     ******************************************************************************************/
+
+
+    /**
+     * Get all preferences defined for your account
+     * @return mixed
+     */
     public function getAccountPreferences() {
         return $this->accountPreferencesProxy->getAccountPreferences($this->me->accountId);
     }
 
+    /**
+     * Get a single preference that already exists for your account
+     * @param $preferenceKey The name of the preference that you'd like to get
+     * @return mixed
+     */
     public function getAccountPreference($preferenceKey) {
         return $this->accountPreferencesProxy->getAccountPreference($this->me->accountId, $preferenceKey);
     }
 
+    /**
+     * Update a single preference
+     * @param $preferenceKey The name of the preference that will be changed
+     * @param $preferenceValue The value to set the preference to
+     * @return mixed
+     */
     public function updateAccountPreference($preferenceKey, $preferenceValue) {
         return $this->accountPreferencesProxy->updateAccountPreference($this->me->accountId, $preferenceKey, $preferenceValue);
     }
