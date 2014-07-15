@@ -58,10 +58,13 @@ class MediaSiloAPI
     private $consumerSecret;
     private $baseUrl;
 
+    private $me;
+
     public function __construct() {}
 
     private function init() {
         $this->proxyInit();
+        $this->me();
     }
 
     private function proxyInit() {
@@ -78,7 +81,7 @@ class MediaSiloAPI
         $this->userProxy = new UserProxy($this->webClient);
     }
 
-    public static function createFromHostCredentials($username, $password, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
+    public static function createFromHostCredentials($username, $password, $host, $baseUrl = "p-api.mediasilo.com/v3") {
         $instance = new self();
         $instance->webClient = WebClient::createFromHostCredentials($username, $password, $host, $baseUrl); 
         $instance->init();
@@ -142,17 +145,22 @@ class MediaSiloAPI
     public function me()
     {
         $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ME);
-        return json_decode($clientResponse->getBody());
+        $this->me = json_decode($clientResponse->getBody());
+
+        return $this->me;
     }
 
     // Account //
-
-    public function getMyAccountPreferences() {
-        return $this->accountPreferencesProxy->getPreferences();
+    public function getAccountPreferences() {
+        return $this->accountPreferencesProxy->getAccountPreferences($this->me->accountId);
     }
 
-    public function getAccountPreferences($accountId) {
-        return $this->accountPreferencesProxy->getPreferencesByAccountId($accountId);
+    public function getAccountPreference($preferenceKey) {
+        return $this->accountPreferencesProxy->getAccountPreference($this->me->accountId, $preferenceKey);
+    }
+
+    public function updateAccountPreference($preferenceKey, $preferenceValue) {
+        return $this->accountPreferencesProxy->updateAccountPreference($this->me->accountId, $preferenceKey, $preferenceValue);
     }
 
     // Projects //
