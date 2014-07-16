@@ -323,7 +323,82 @@ class MediaSiloAPI
         return $this->favoriteProxy->getFavoriteProjects();
     }
 
-    // Asset //
+
+
+
+    /******************************************************************************************
+     * Assets
+     *
+     * Assets are at the core of all MediaSilo applications. Every video and audio file, image,
+     * document and archive that is uploaded is considered an Asset. Asset objects are database
+     * records that refer to files that have been uploaded. Some of these objects are fairly simple,
+     * while others (like videos) contain additional data about source files, proxies and playback
+     * options.
+     *
+     * Example Asset Object
+     *
+     *  {
+            "id": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+            "title": "videotest4.mov",
+            "description": "",
+            "fileName": "videotest4.mov",
+            "projectId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+            "folderId": null,
+            "uploadedBy": "simon",
+            "approvalStatus": "none",
+            "archiveStatus": "n/a",
+            "transcriptStatus": "N/A",
+            "type": "video",
+            "dateCreated": 1396039017000,
+            "dateModified": 1396039017000,
+            "progress": 100,
+            "commentCount": 0,
+            "myRating": null,
+            "averageRating": null,
+            "permissions": [
+                "collaboration.requestapproval",
+                "collaboration.comment",
+                "collaboration.rate",
+                "asset.create",
+                "asset.update",
+                "asset.delete",
+                "asset.source",
+                "sharing.internal",
+                "service.transcript",
+                "reporting.export"
+            ],
+            "derivatives": [
+                {
+                    "type": "source",
+                    "url": "https://1234ABCD.cloudfront.net/1234ABCD/1234ABCD-12AB-1234-1234ABCD1234ABCD.mov",
+                    "fileSize": 5696,
+                    "height": 360,
+                    "width": 640,
+                    "duration": 262060
+                },
+                {
+                    "type": "proxy",
+                    "url": "https://1234ABCD.cloudfront.net/1234ABCD/1234ABCD-12AB-1234-1234ABCD1234ABCD.mp4",
+                    "fileSize": 5696,
+                    "height": 360,
+                    "width": 640,
+                    "duration": 262060,
+                    "thumbnail": "https://s3.amazonaws.com/thumbnails.mediasilo.com/1234ABCD/1234ABCD-12AB-1234-1234ABCD1234ABCD_small.jpg",
+                    "posterFrame": "https://s3.amazonaws.com/thumbnails.mediasilo.com/1234ABCD/1234ABCD-12AB-1234-1234ABCD1234ABCD_large.jpg",
+                    "strategies": [
+                        {
+                            "type": "rtmp",
+                            "url": "1234ABCD/1234ABCD-12AB-1234-1234ABCD1234ABCD.mov?Expires=1405530970&Signature=SOMESIGNATUREVALUE&Key-Pair-Id=SOMEKEYPAIRID",
+                            "streamer": "rtmp://s37758y8jcblwg.cloudfront.net/cfx/st"
+                        }
+                    ]
+                }
+            ],
+            "tags": awesome, wicked,
+            "private": false,
+            "external": false
+        }
+     ******************************************************************************************/
 
     /**
      * Gets an asset from an asset Id.
@@ -369,7 +444,35 @@ class MediaSiloAPI
     }
 
 
-    // Channel //
+    /******************************************************************************************
+     * Channels
+     *
+     * A channel is an embeddable collection of assets
+     *
+     * Example Channel Object
+     *
+     *  {
+     *       "id": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *       "name": "My New Channel",
+     *       "dateCreated": 1223956800000,
+     *       "autoPlay": false,
+     *       "playback": "PROGRESSIVE",
+     *       "width": 656,
+     *       "height": 438,
+     *       "stretching": "exactfit",
+     *       "assets": [
+     *          "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *          "2234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *          "3234ABCD-12AB-1234-1234ABCD1234ABCD"
+     *       ],
+     *       "feeds": {
+     *          "iTunes": "https://feeds.mediasilo.com/1234ABCD-12AB-1234-1234ABCD1234ABCD/mrss/itunes/",
+     *          "Media RSS (Streaming)": "https://feeds.mediasilo.com/1234ABCD-12AB-1234-1234ABCD1234ABCD/mrss/true/",
+     *          "Media RSS": "https://feeds.mediasilo.com/1234ABCD-12AB-1234-1234ABCD1234ABCD/mrss/"
+     *       },
+     *       "public": false
+     *  }
+     ******************************************************************************************/
 
     /**
      * Gets the channel for the given Id
@@ -439,7 +542,36 @@ class MediaSiloAPI
     }
 
 
-    // Transcript //
+
+
+
+    /******************************************************************************************
+     * Transcripts
+     *
+     * MediaSilo offers logging services for assets that include dialogue.
+     *
+     * Example Channel Object
+     *
+     *  {
+     *       "logs": [
+     *           {
+     *               "startMilliseconds": 9100,
+     *               "endMilliseconds": 15660,
+     *               "speaker": "Suzie Smith",
+     *               "description": ">> Speaker 1: So, tell me a little bit about your hometown. Tell me about Sun Valley, living there and having kind so of [inaudible]. >> Rebecca Rush: I"
+     *           },
+     *           {
+     *               "startMilliseconds": 15660,
+     *               "endMilliseconds": 22480,
+     *               "speaker": "",
+     *               "description": "live in paradise. I live in Sun Valley Idaho and I live there for the mountain bike trails specifically. A lot of people know Sun Valley for"
+     *           }
+     *       ],
+     *       "formats": {
+     *           "Timecoded JSON": "https://s3.amazonaws.com/transcripts.mediasilo.com/709352581VSEJ/3473618.json"
+     *       }
+     *  }
+     ******************************************************************************************/
 
     /**
      * Gets the transcript for the given asset
@@ -452,22 +584,86 @@ class MediaSiloAPI
     }
 
 
-    // Transcript Service //
 
-    /**
-     * Gets all transcript services available for this user
-     * @return Array(TranscriptService)
-     */
-    public function getTranscriptServices()
-    {
-        return $this->transcriptServiceProxy->getTranscriptServices();
-    }
 
-    // Quicklinks //
+
+    /******************************************************************************************
+     * QuickLinks
+     *
+     * QuickLinks are one of MediaSilo's primary mechanisms for sharing assets with a designated
+     * audience through a specialized client application. QuickLinks contain one or more Assets
+     * which can be shared publicly (with or without a password) and privately (with other
+     * MediaSilo users on your account). QuickLinks contain a configuration which encapsulates a
+     * list of Settings relevant to the QuickLink. Additionally, you can send a QuickLink to a
+     * specified audience through our Shares endpoint.
+     *
+     * Example QuickLinks Object
+     *
+     *  {
+            "id": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+            "legacyUuid": null,
+            "title": "Comments Pinned",
+            "description": "",
+            "assetIds": [
+                "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+                "2234ABCD-12AB-1234-1234ABCD1234ABCD",
+                "3234ABCD-12AB-1234-1234ABCD1234ABCD",
+                "4234ABCD-12AB-1234-1234ABCD1234ABCD",
+                "5234ABCD-12AB-1234-1234ABCD1234ABCD"
+            ],
+            "configuration": {
+                "id": "",
+                "settings": [
+                    {
+                        "key": "notify_email",
+                        "value": "false"
+                    },
+                    {
+                        "key": "show_metadata",
+                        "value": null
+                    },
+                    {
+                        "key": "allow_download",
+                        "value": "false"
+                    },
+                    {
+                        "key": "audience",
+                        "value": "public"
+                    },
+
+                ]
+            },
+            "shares": [
+                {
+                    "id": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+                    "targetObjectId": "2234ABCD-12AB-1234-1234ABCD1234ABCD",
+                    "emailShare": {
+                        "audience": [
+                            {
+                                "firstName": Mike,
+                                "lastName": Moo,
+                                "email": "mikemoo@mediasilo.com",
+                                "userId": 1234ABCD-12AB-1234-1234ABCD1234ABCD
+                            }
+
+                    }
+                }
+            ],
+            "ownerId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+            "accountId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+            "created": 1399905388335,
+            "modified": 1399905414758,
+            "expires": 1407681414757,
+            "url": "https://qlnk.io/ql/1234ABCD-12AB-1234-1234ABCD1234ABCD",
+            "private": false
+        }
+     ******************************************************************************************/
 
     /**
      * Persists a QuickLink in MediaSilo
-     * NOTE! This does not send it, only creates it.
+     *
+     * NOTE: This does not send it, only creates it.
+     *
      * @param string $title Title for the Quicklink
      * @param string $description Description for the Quicklink
      * @param array $assetIds Array of Asset ID to be included in quicklink
@@ -489,6 +685,7 @@ class MediaSiloAPI
 
     /**
      * Fetches a quicklink based on UUID
+     *
      * @param String $id
      * @param Bool - true to embed analytics
      * @returns Quicklink
@@ -500,6 +697,7 @@ class MediaSiloAPI
 
     /**
      * Fetches a list of Quicklinks
+     *
      * @param String - query params to be included with the request
      * @param Bool - true to embed analytics
      * @returns Quicklink[] Array of Quicklink Objects
@@ -510,7 +708,8 @@ class MediaSiloAPI
     }
 
     /**
-     * Fetches a list of Quicklinks wrapped in a pagination object
+     * Fetches a list of QuickLinks wrapped in a pagination object
+     *
      * @param $params
      * @param bool $includeAnalytics
      * @return mixed
@@ -525,6 +724,7 @@ class MediaSiloAPI
 
     /**
      * Updates a QuickLink in MediaSilo
+     *
      * @param String $id UUID of quicklink to update
      * @param String $title Title for the Quicklink
      * @param String $description Description for the Quicklink
@@ -560,6 +760,7 @@ class MediaSiloAPI
 
     /**
      * Creates a Comment on an Asset in a Quicklink
+     *
      * @param String $quicklinkId
      * @param String $assetId
      * @param String $commentBody
@@ -582,6 +783,7 @@ class MediaSiloAPI
 
     /**
      * Shares a QuickLink
+     *
      * @param string $quicklinkId ID of the quicklink you want to share
      * @param string $subject Subject for the email
      * @param string $message Body for the email
@@ -629,8 +831,64 @@ class MediaSiloAPI
         return $this->userProxy->getUser($userId);
     }
 
+
+
+
+
+    /******************************************************************************************
+     * Users
+     *
+     *
+     * Example User Object
+     *
+     *  {
+            "id": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+            "numericId": 12345,
+            "defaultRoleTemplateId": 1234ABCD-12AB-1234-1234ABCD1234ABCD,
+            "userName": "winnie",
+            "accountId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+            "firstName": "Pooh",
+            "lastName": "Bear",
+            "company": "MediaSilo",
+            "email": "dev@mediasilo.com",
+            "phone": "0",
+            "mobile": "0",
+            "address": {
+                "address1": "123 100 Acre Wood Street",
+                "address2": "",
+                "city": "",
+                "province": "Wales",
+                "postalCode": "XL7-123",
+                "country": "GB"
+            },
+            "status": "ACTIVE",
+            "sso": false,
+            "ssoId": null,
+            "roles": [],
+            "tags": [
+                "poohbear",
+                "piglet"
+            ],
+            "preferences": [
+                {
+                    "id": 439876,
+                    "userId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+                    "name": "proxy_usesocks",
+                    "value": "false"
+                },
+                {
+                    "id": 439877,
+                    "userId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+                    "name": "proxy_useftp",
+                    "value": "false"
+                }
+            ]
+        }
+     ******************************************************************************************/
+
     /**
      * Persists Updates to a User Object
+     *
      * @param User $user
      */
     public function updateUser(User $user) {
@@ -639,6 +897,7 @@ class MediaSiloAPI
 
     /**
      * Updates a User profile based on update-able parameters
+     *
      * @param $userId
      * @param null $firstName
      * @param null $lastName
