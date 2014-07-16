@@ -10,7 +10,6 @@ if (!function_exists('json_decode')) {
     throw new \Exception('We need json_decode for the API to work. If you\'re running a linux distro install this package: php-pecl-json');
 }
 
-use mediasilo\http\exception\NotFoundException;
 use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\project\ProjectProxy;
 use mediasilo\http\WebClient;
@@ -33,41 +32,42 @@ use mediasilo\transcript\TranscriptProxy;
 use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
 use mediasilo\http\oauth\TwoLeggedOauthClient;
-use mediasilo\http\oauth\OAuthException;
 use mediasilo\quicklink\analytics\QuickLinkAnalyticsProxy;
 use mediasilo\user\UserProxy;
+use mediasilo\user\UserPreferencesProxy;
 use mediasilo\user\User;
 use mediasilo\user\PasswordReset;
 use mediasilo\user\PasswordResetRequest;
 
 class MediaSiloAPI
 {
-    private $webClient;
-    private $favoriteProxy;
-    private $projectProxy;
-    private $quicklinkProxy;
-    private $quicklinkAnalyticsProxy;
-    private $shareProxy;
-    private $assetProxy;
-    private $channelProxy;
-    private $transcriptProxy;
-    private $transcriptServiceProxy;
-    private $accountPreferencesProxy;
-    private $userProxy;
-    private $consumerKey;
-    private $consumerSecret;
-    private $baseUrl;
+    protected $webClient;
+    protected $favoriteProxy;
+    protected $projectProxy;
+    protected $quicklinkProxy;
+    protected $quicklinkAnalyticsProxy;
+    protected $shareProxy;
+    protected $assetProxy;
+    protected $channelProxy;
+    protected $transcriptProxy;
+    protected $transcriptServiceProxy;
+    protected $accountPreferencesProxy;
+    protected $userProxy;
+    protected $userPreferencesProxy;
+    protected $consumerKey;
+    protected $consumerSecret;
+    protected $baseUrl;
 
-    private $me;
+    protected $me;
 
     public function __construct() {}
 
-    private function init() {
+    protected function init() {
         $this->proxyInit();
         $this->me();
     }
 
-    private function proxyInit() {
+    protected function proxyInit() {
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
@@ -79,68 +79,17 @@ class MediaSiloAPI
         $this->quicklinkAnalyticsProxy = new QuickLinkAnalyticsProxy($this->webClient);
         $this->accountPreferencesProxy = new AccountPreferencesProxy($this->webClient);
         $this->userProxy = new UserProxy($this->webClient);
+        $this->userPreferencesProxy = new UserPreferencesProxy($this->webClient);
     }
 
-    public static function createFromHostCredentials($username, $password, $host, $baseUrl = "p-api.mediasilo.com/v3") {
+    public static function createFromHostCredentials($username, $password, $hostname, $baseUrl = Meta::API_ROOT_URL) {
         $instance = new self();
-        $instance->webClient = WebClient::createFromHostCredentials($username, $password, $host, $baseUrl); 
+        $instance->webClient = WebClient::createFromHostCredentials($username, $password, $hostname, $baseUrl);
         $instance->init();
-        
+        $instance->me();
         return $instance;
     }
 
-    public static function createFromSession($session, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
-        $instance = new self();
-        $instance->webClient = WebClient::createFromSession($session, $host, $baseUrl);
-        $instance->init();
-        
-        return $instance; 
-    }
-
-    public static function createFromApplicationConsumer($consumerKey, $consumerSecret, $baseUrl = "phoenix.mediasilo.com/v3") {
-        $instance = new self();
-        $instance->consumerKey = $consumerKey;
-        $instance->consumerSecret = $consumerSecret;
-        $instance->baseUrl = $baseUrl;
-        $instance->webClient = TwoLeggedOauthClient::create2LegClient($consumerKey, $consumerSecret, $baseUrl);
-        $instance->init();
-
-        return $instance;
-    }
-
-    public function getAccessToken($username, $password, $hostname) {
-        $params = array('username' => $username, 'password'=>$password, 'hostname' => $hostname, 'grant_type' => 'password');
-        $response = json_decode($this->webClient->getAccessToken($params));
-        $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $response->id, $this->baseUrl);
-        $this->proxyInit();
-
-        return $response->id;
-    }
-
-    public function getAccessTokenBySession($sessionKey, $hostname) {
-        $params = array('session' => $sessionKey, 'hostname' => $hostname, 'grant_type' => 'password');
-        $response = json_decode($this->webClient->getAccessToken($params));
-        $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $response->id, $this->baseUrl);
-        $this->proxyInit();
-
-        return $response->id;
-    }
-
-    public function setAccessToken($accessToken) {
-        if(!isset($this->consumerKey)) {
-            throw new OAuthException("There is no consumer credentials set for the API instance. An access token cannot be used without consumer credentials.");
-        }
-        $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $accessToken, $this->baseUrl);
-        $this->proxyInit();
-    }
-
-    public function unsetAccessToken() {
-        if(!isset($this->consumerKey)) {
-            throw new OAuthException("There is no consumer credentials set for the API instance. An access token cannot be used without consumer credentials.");
-        }
-        $this->webClient = TwoLeggedOauthClient::create2LegClient($this->consumerKey, $this->consumerSecret, $this->baseUrl);
-        $this->proxyInit();
-    }
 
     public function me()
     {
@@ -151,19 +100,29 @@ class MediaSiloAPI
     }
 
     /******************************************************************************************
-     * Account preferences
+     * Preferences
      *
-     * Account preferences are used for various configuration and customization for your account.
+     * Preferences are used for various configuration and customization for your account and user.
      * Using the following methods you can retrieve existing preferences as well as set preferences.
+     *
+     * Example Preference Object
+     *
+     *  {
+     *      "id": 1234,
+     *      "accountId": "1234ABCD",
+     *      "name": "something_i_prefer",
+     *      "value": "true"
+     *  }
      ******************************************************************************************/
 
+    // TODO: Split these INTERNAL METHODS OUT INTO AN INTERNAL USE CLASS
 
     /**
      * Get all preferences defined for your account
      * @return mixed
      */
     public function getAccountPreferences() {
-        return $this->accountPreferencesProxy->getAccountPreferences($this->me->accountId);
+        return $this->accountPreferencesProxy->getPreferences($this->me->accountId);
     }
 
     /**
@@ -172,23 +131,102 @@ class MediaSiloAPI
      * @return mixed
      */
     public function getAccountPreference($preferenceKey) {
-        return $this->accountPreferencesProxy->getAccountPreference($this->me->accountId, $preferenceKey);
+        return $this->accountPreferencesProxy->getPreference($this->me->accountId, $preferenceKey);
     }
 
     /**
-     * Update a single preference
+     * Update a single account preference
      * @param $preferenceKey The name of the preference that will be changed
      * @param $preferenceValue The value to set the preference to
      * @return mixed
      */
-    public function updateAccountPreference($preferenceKey, $preferenceValue) {
-        return $this->accountPreferencesProxy->updateAccountPreference($this->me->accountId, $preferenceKey, $preferenceValue);
+    public function updateMyAccountPreference($preferenceKey, $preferenceValue) {
+        return $this->accountPreferencesProxy->updatePreference($this->me->accountId, $preferenceKey, $preferenceValue);
     }
 
-    // Projects //
+    /**
+     * Get all preferences defined for ANY user.
+     *
+     * NOTE: This requires permission to read about another user
+     *
+     * @param $userId
+     * @return mixed
+     */
+    public function getUserPreferencesForUser($userId) {
+        return $this->userPreferencesProxy->getPreferences($userId);
+    }
 
     /**
-     * Creates a new project. The project in MediaSilo of the given project model.
+     * Get all preferences defined for you
+     * @return mixed
+     */
+    public function getUserPreferences()
+    {
+        return $this->userPreferencesProxy->getPreferences($this->me->id);
+    }
+
+    /**
+     * Get a single preference that already exists for you
+     * @param $preferenceKey The name of the preference that you'd like to get
+     * @return mixed
+     */
+    public function getUserPreference($preferenceKey)
+    {
+        return $this->userPreferencesProxy->getPreference($this->me->id, $preferenceKey);
+    }
+
+    /**
+     * Update one of you user preferences
+     * @param $preferenceKey The name of the preference that will be changed
+     * @param $preferenceValue The value to set the preference to
+     * @return mixed
+     */
+    public function updateMyPreference($preferenceKey, $preferenceValue) {
+        return $this->userPreferencesProxy->updatePreference($this->me->id, $preferenceKey, $preferenceValue);
+    }
+
+    /**
+     * Update a preference for another user
+     *
+     * NOTE: This requires permission to modify another user
+     *
+     * @param $userId The identifier of the users whoe preference will be modified
+     * @param $preferenceKey The name of the preference that will be changed
+     * @param $preferenceValue The value to set the preference to
+     * @return mixed
+     */
+    public function updateUserPreference($userId, $preferenceKey, $preferenceValue) {
+        return $this->userPreferencesProxy->updatePreference($userId, $preferenceKey, $preferenceValue);
+    }
+
+
+
+
+
+    /******************************************************************************************
+     * Projects
+     *
+     * Projects are the root container for assets and folders, they are also how you control
+     * which assets users have access to. A user must be assigned to a project in order to access
+     * the assets and folders within it OR they must be an administrator from which they can access
+     * any project.
+     *
+     * Example Project Object
+     *
+     *  {
+     *      "id": "1234ABCD",
+     *      "numericId": 987654321,
+     *      "name": "My New Project",
+     *      "description": "This project will hold the best assets we have",
+     *      "dateCreated": 1224190488000,
+     *      "ownerId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *      "folderCount": 2,
+     *      "favorite": false
+     *  }
+     ******************************************************************************************/
+
+    /**
+     * Creates a new project in your MediaSilo account
      * @param Project $project
      */
     public function createProject(Project $project)
@@ -197,7 +235,7 @@ class MediaSiloAPI
     }
 
     /**
-     * Gets an existing project for a given project Id.
+     * Gets an existing project.
      * @param $id
      * @return Project
      */
@@ -215,6 +253,19 @@ class MediaSiloAPI
     }
 
     /**
+     * Get another user projects
+     *
+     * NOTE: You must have permission to read about another user
+     *
+     * @param $userId
+     * @return mixed
+     */
+    public function getUsersProjects($userId)
+    {
+        return $this->projectProxy->getUsersProjects($userId);
+    }
+
+    /**
      * Updates an existing project. ID must be a valid project Id.
      * @param Project $project
      */
@@ -225,6 +276,9 @@ class MediaSiloAPI
 
     /**
      * Deletes an existing project from a given project Id.
+     *
+     * NOTE: The project must be empty before deletion can be invoked
+     *
      * @param $id
      */
     public function deleteProject($id)
@@ -242,14 +296,6 @@ class MediaSiloAPI
         return $this->projectProxy->cloneProject($projectId);
     }
 
-    public function getUsersProjects($userId)
-    {
-        return $this->projectProxy->getUsersProjects($userId);
-    }
-
-
-    // Favorites //
-
     /**
      * Set a given project as one of your favorites
      * @param $projectId
@@ -263,7 +309,7 @@ class MediaSiloAPI
      * Remove a given project from you list of favorites
      * @param $projectId
      */
-    public function unfavor($projectId)
+    public function unfavorProject($projectId)
     {
         $this->favoriteProxy->unfavor($projectId);
     }
@@ -660,31 +706,6 @@ class MediaSiloAPI
     public function getAssetMetaData($assetId)
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_METADATA, $assetId);
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Gets User Preference By User UUID and Preference Key
-     * @param String $userId
-     * @param String $preference
-     * @return Object
-     */
-    public function getUserPreference($userId, $preference)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::USER_PREFERENCES, $userId) . "/" . $preference;
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Get List of User Preferences by User UUID
-     * @param String $userId
-     * @return Array[Object]
-     */
-    public function getUserPreferences($userId)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::USER_PREFERENCES, $userId);
         $clientResponse = $this->webClient->get($resourcePath);
         return json_decode($clientResponse->getBody());
     }

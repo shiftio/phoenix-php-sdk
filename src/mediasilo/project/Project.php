@@ -12,13 +12,13 @@ class Project implements Serializable{
 
     public $description;
 
-    public $isFavorite;
+    public $favorite;
 
-    function __construct($description, $id = null, $isFavorite, $name)
+    function __construct($description, $id = null, $favorite, $name)
     {
         $this->description = $description;
         $this->id = $id;
-        $this->isFavorite = $isFavorite;
+        $this->favorite = $favorite;
         $this->name = $name;
     }
 
@@ -28,6 +28,6 @@ class Project implements Serializable{
 
     public static function fromJson($json) {
         $mixed = json_decode($json);
-        return new Project($mixed->description, $mixed->id, boolval($mixed->isFavorite), $mixed->name);
+        return new Project($mixed->description, $mixed->id, boolval($mixed->favorite), $mixed->name);
     }
 }

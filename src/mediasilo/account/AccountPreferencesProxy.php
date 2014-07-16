@@ -12,22 +12,19 @@ class AccountPreferencesProxy {
         $this->webClient = $webClient;
     }
 
-    public function getAccountPreferences($accountId) {
+    public function getPreferences($accountId) {
         $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::ACCOUNT_PREFERENCES,$accountId));
         return json_decode($clientResponse->getBody());
     }
 
-    public function getAccountPreference($accountId, $preferenceKey) {
-        print sprintf(MediaSiloResourcePaths::ACCOUNT_PREFERENCES."/%s",$accountId, $preferenceKey);
+    public function getPreference($accountId, $preferenceKey) {
         $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::ACCOUNT_PREFERENCES."/%s",$accountId, $preferenceKey));
         return json_decode($clientResponse->getBody());
     }
 
-    public function updateAccountPreference($accountId, $preferenceName, $preferenceValue) {
+    public function updatePreference($accountId, $preferenceName, $preferenceValue) {
         $preference = (object)array('accountId' => $accountId, 'name' => $preferenceName, 'value' => $preferenceValue);
-        print json_encode($preference);
-        print sprintf(MediaSiloResourcePaths::ACCOUNT_PREFERENCES,$accountId);
-        $clientResponse = $this->webClient->put(sprintf(MediaSiloResourcePaths::ACCOUNT_PREFERENCES,$accountId), json_encode($preference));
+        $this->webClient->put(sprintf(MediaSiloResourcePaths::ACCOUNT_PREFERENCES,$accountId), json_encode($preference));
     }
 
 }
