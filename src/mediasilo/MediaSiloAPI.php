@@ -39,6 +39,29 @@ use mediasilo\user\User;
 use mediasilo\user\PasswordReset;
 use mediasilo\user\PasswordResetRequest;
 
+/******************************************************************************************
+ * MediaSiloAPI
+ *
+ * This is the API client for the MediaSIlo REST API.
+ *
+ * Created By: Mike Delano
+ * Created On: 07/17/2014
+ *
+ * Copyright 2014 MediaSilo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************************/
 class MediaSiloAPI
 {
     protected $webClient;
@@ -82,6 +105,15 @@ class MediaSiloAPI
         $this->userPreferencesProxy = new UserPreferencesProxy($this->webClient);
     }
 
+    /**
+     * Creates an instance of MediaSilo API using username, password, and hostname
+     *
+     * @param $username
+     * @param $password
+     * @param $hostname
+     * @param $baseUrl
+     * @return MediaSiloAPI
+     */
     public static function createFromHostCredentials($username, $password, $hostname, $baseUrl = Meta::API_ROOT_URL) {
         $instance = new self();
         $instance->webClient = WebClient::createFromHostCredentials($username, $password, $hostname, $baseUrl);
@@ -91,13 +123,13 @@ class MediaSiloAPI
     }
 
 
-    public function me()
-    {
-        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ME);
-        $this->me = json_decode($clientResponse->getBody());
 
-        return $this->me;
-    }
+
+
+
+
+
+
 
     /******************************************************************************************
      * Preferences
@@ -115,10 +147,9 @@ class MediaSiloAPI
      *  }
      ******************************************************************************************/
 
-    // TODO: Split these INTERNAL METHODS OUT INTO AN INTERNAL USE CLASS
-
     /**
      * Get all preferences defined for your account
+     *
      * @return mixed
      */
     public function getAccountPreferences() {
@@ -203,8 +234,15 @@ class MediaSiloAPI
 
 
 
+
+
+
+
+
     /******************************************************************************************
      * Projects
+     *
+     * http://developers.mediasilo.com/projects
      *
      * Projects are the root container for assets and folders, they are also how you control
      * which assets users have access to. A user must be assigned to a project in order to access
@@ -214,7 +252,7 @@ class MediaSiloAPI
      * Example Project Object
      *
      *  {
-     *      "id": "1234ABCD",
+     *      "id": "12341234ABCD-12AB-1234-1234ABCD1234ABCD",
      *      "numericId": 987654321,
      *      "name": "My New Project",
      *      "description": "This project will hold the best assets we have",
@@ -227,6 +265,7 @@ class MediaSiloAPI
 
     /**
      * Creates a new project in your MediaSilo account
+     *
      * @param Project $project
      */
     public function createProject(Project $project)
@@ -236,6 +275,7 @@ class MediaSiloAPI
 
     /**
      * Gets an existing project.
+     *
      * @param $id
      * @return Project
      */
@@ -246,6 +286,7 @@ class MediaSiloAPI
 
     /**
      * Gets a list of Projects
+     *
      * @return Array[Project]
      */
     public function getProjects() {
@@ -267,6 +308,7 @@ class MediaSiloAPI
 
     /**
      * Updates an existing project. ID must be a valid project Id.
+     *
      * @param Project $project
      */
     public function updateProject(Project $project)
@@ -288,6 +330,7 @@ class MediaSiloAPI
 
     /**
      * Copies the structure and users of an existing project to a new project
+     *
      * @param $projectId
      * @return mixed
      */
@@ -298,6 +341,7 @@ class MediaSiloAPI
 
     /**
      * Set a given project as one of your favorites
+     *
      * @param $projectId
      */
     public function favorProject($projectId)
@@ -307,6 +351,7 @@ class MediaSiloAPI
 
     /**
      * Remove a given project from you list of favorites
+     *
      * @param $projectId
      */
     public function unfavorProject($projectId)
@@ -316,12 +361,96 @@ class MediaSiloAPI
 
     /**
      * Get all of your favorite projects
+     *
      * @return array
      */
     public function getFavoriteProjects()
     {
         return $this->favoriteProxy->getFavoriteProjects();
     }
+
+    /**
+     * Gets a list of Project's Sub-folders
+     *
+     * @param $projectId
+     * @return Array[Object]
+     */
+    public function getProjectFolders($projectId)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_FOLDERS, $projectId);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
+    }
+
+
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Folders
+     *
+     * http://developers.mediasilo.com/folders
+     *
+     * Folders are containers for assets that can exist in a project or in another folder. Users
+     * who have access to the root project the folder exists in will automatically have access to
+     * the folder, permission can not be controlled on a folder by folder basis.
+     *
+     * Folders are structured in a hierarchy, a folder will either exist in the root of a project
+     * or in another folder, you can only retrieve a single layer of the hierarchy at a time. The
+     * way you retrieve the first layer of the hierarchy, or the folders in the root of a project,
+     * is different then when you request folders that are contained with in another folder.
+     *
+     * Each folder object will have the projectId of the project it belongs to, even if the folder
+     * is contained in another folder. If the folder is contained with in another folder it will
+     * also have a parentId, which is the Id of the folder it exists in, if the folder belongs to
+     * a project and is not in another folder the parentId will be 0.
+     *
+     * Example Folder Object
+     *
+     *  {
+     *      "id": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *      "name": "Flying Balloons",
+     *      "parentId": null,
+     *      "parentNumericId": null,
+     *      "projectId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *      "numericId": 1234,
+     *      "folderCount": 1
+     *  }
+     ******************************************************************************************/
+
+    /**
+     * Get Folder By UUID
+     * @param String $id
+     * @return Object
+     */
+    public function getFolder($id)
+    {
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::FOLDERS . "/" . $id);
+        return json_decode($clientResponse->getBody());
+    }
+
+    /**
+     * Gets a list of Folder's Sub-folders
+     * @param String $parentFolderId
+     * @return Array[Object]
+     */
+    public function getSubfolders($parentFolderId)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::SUB_FOLDERS, $parentFolderId);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
+    }
+
+
+
+
+
+
 
 
 
@@ -444,6 +573,109 @@ class MediaSiloAPI
     }
 
 
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Ratings
+     *
+     * http://developers.mediasilo.com/ratings
+     *
+     * Ratings enable users to rate assets on a scale from 0 to 5. All user ratings for a given
+     * asset can be retrieved, and a user may modify their rating for a given asset if they have
+     * permission to do so. A rating can not be deleted but it can be set to 0, the ratings
+     * resource acts the same for both PUT and POST requests.
+     *
+     * Example Rating Object
+     *
+     *  {
+     *      "ownerId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *      "dateCreated": 1405610017,
+     *      "rating": 4,
+     *  }
+     ******************************************************************************************/
+
+    /**
+     * Get a list of Ratings by Asset UUID
+     * @param String $assetId
+     * @return Array[Object]
+     */
+    public function getAssetRatings($assetId)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_RATINGS, $assetId);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
+    }
+
+
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Meta Data
+     *
+     * http://developers.mediasilo.com/metadata
+     *
+     * Metadata are key value pairs attached to a given asset that can store various kinds of
+     * information. Metadata is always associated with an asset and can not exist on its own.
+     *
+     * Example Meta Data Object
+     *
+     *  {
+     *      "type": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *      "key": Artist,
+     *      "value": "Passenger",
+     *      "valueType": "String",
+     *      "createdBy": "1234ABCD-12AB-1234-1234ABCD1234ABCD"
+     *  }
+     ******************************************************************************************/
+
+    /**
+     * Gets an Asset's Meta Data entry by Key
+     *
+     * @param String $assetId
+     * @param String $key
+     * @return Object
+     */
+    public function getAssetMetaDatum($assetId, $key)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_METADATA, $assetId) . "/" . $key;
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
+    }
+
+    /**
+     * Gets a list of an asset's Meta Data
+     *
+     * @param String $assetId
+     * @return Array
+     */
+    public function getAssetMetaData($assetId)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_METADATA, $assetId);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
+    }
+
+
+
+
+
+
+
+
+
+
     /******************************************************************************************
      * Channels
      *
@@ -545,6 +777,11 @@ class MediaSiloAPI
 
 
 
+
+
+
+
+
     /******************************************************************************************
      * Transcripts
      *
@@ -582,6 +819,11 @@ class MediaSiloAPI
     {
         return $this->transcriptProxy->getTranscript($assetId);
     }
+
+
+
+
+
 
 
 
@@ -758,6 +1000,99 @@ class MediaSiloAPI
         $this->quicklinkProxy->updateQuicklink($quickLink);
     }
 
+
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Quick Link Settings
+     *
+     * http://developers.mediasilo.com/quicklinksettings
+     *
+     * QuickLinkSettings are used to store user-defined presets that can be applied to individual QuickLinks.
+     *
+     * Example Settings Object
+     *
+     *  {
+     *      "name": "My New Quick Link",
+     *      "description": "Some great new shots from the red carpet",
+     *      "targetObjectId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *      "keyValuePairs": [
+     *          {
+     *              "key": "audience",
+     *              "value": "public"
+     *          },,
+     *          {
+     *              "key": "expiration_value",
+     *              "value": 365
+     *          }
+     *      ]
+     *  }
+     ******************************************************************************************/
+
+    /**
+     * Get an individual Quicklink Preset by UUID
+     * @param String $settingId
+     * @return Object
+     */
+    public function getQuickLinkSetting($settingId)
+    {
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::QUICK_LINK_SETTINGS . "/" . $settingId);
+        return json_decode($clientResponse->getBody());
+    }
+
+    /**
+     * Get a list of Quicklink Presets
+     * @return Array[Object]
+     */
+    public function getQuickLinkSettings()
+    {
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::QUICK_LINK_SETTINGS);
+        return json_decode($clientResponse->getBody());
+    }
+
+
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Comments
+     *
+     * http://developers.mediasilo.com/comments
+     *
+     * Comments provide threaded feedback and discussion capability, optionally at specific
+     * timecodes within an Asset. Comments on QuickLink Assets are specific to that QuickLink,
+     * and are separate from comments on the same Asset in other QuickLinks or on the Asset
+     * itself outside of any QuickLink.
+     *
+     * Example Comment Object
+     *
+     *  {
+     *       "context":"1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *       "at":"1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *       "body":"Hey Yogi, the Ranger's not going to like this part.",
+     *       "startTimeCode":121,
+     *       "endTimeCode":134,
+     *       "user":{
+     *           "id":"1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *           "userName":booboo,
+     *           "firstName":"Boo-Boo",
+     *           "lastName":"Bear",
+     *           "email":"booboo@example.com"
+     *       }
+     *  }
+     ******************************************************************************************/
+
     /**
      * Creates a Comment on an Asset in a Quicklink
      *
@@ -780,6 +1115,72 @@ class MediaSiloAPI
         $result = json_decode($this->webClient->post($resourcePath, $comment->toJson()));
         return $result->id;
     }
+
+    /**
+     * Get a list of comments on an Asset in a Quicklink
+     *
+     * @param String $quickLinkId
+     * @param String $assetId
+     * @return Array[Object]
+     */
+    public function getQuickLinkComments($quickLinkId, $assetId)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId, $assetId);
+
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
+    }
+
+    /**
+     * Get a list of comments on an Asset in a Quicklink in a specified format
+     *
+     * @param String $quickLinkId
+     * @param String $assetId
+     * @param String $format
+     * @return Array[Object]
+     */
+    public function getQuickLinkCommentsAs($quickLinkId, $assetId, $format="txt")
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_COMMENTS_EXPORT, $quickLinkId, $assetId, $format);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return $clientResponse->getBody();
+    }
+
+
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Share
+     *
+     * http://developers.mediasilo.com/shares
+     *
+     * Shares allows you to send a quick link to a given audience of internal
+     * or external users.
+     *
+     * Example Share Object
+     *
+     *  {
+     *       "targetObjectId": "1234ABCD-12AB-1234-1234ABCD1234ABCD",
+     *       "emailShare": {
+     *       "audience": [
+     *           {
+     *           "email": "deathstar@mediasilo.com",
+     *           "firstName": "Lord",
+     *           "lastName": "Vador",
+     *           "userId": null
+     *           }
+     *       ],
+     *       "message": "We have gathered intel on the rebels activity.",
+     *       "subject": "The rebels are on Endor!"
+     *       }
+     *  }
+     ******************************************************************************************/
 
     /**
      * Shares a QuickLink
@@ -821,15 +1222,10 @@ class MediaSiloAPI
         return $quickLinkEvents;
     }
 
-    /**
-     * Gets a User by UUID
-     * @param String $userId
-     * @return Array
-     */
-    public function getUser($userId)
-    {
-        return $this->userProxy->getUser($userId);
-    }
+
+
+
+
 
 
 
@@ -838,6 +1234,7 @@ class MediaSiloAPI
     /******************************************************************************************
      * Users
      *
+     * http://developers.mediasilo.com/users
      *
      * Example User Object
      *
@@ -887,6 +1284,42 @@ class MediaSiloAPI
      ******************************************************************************************/
 
     /**
+     * Get the current user
+     *
+     * @return mixed
+     */
+    public function me()
+    {
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ME);
+        $this->me = json_decode($clientResponse->getBody());
+
+        return $this->me;
+    }
+
+    /**
+     * Gets a User by UUID
+     *
+     * @param String $userId
+     * @return Array
+     */
+    public function getUser($userId)
+    {
+        return $this->userProxy->getUser($userId);
+    }
+
+    /**
+     * Get a list of a Projects's users
+     * @param String $projectId
+     * @return Array[Object]
+     */
+    public function getProjectUsers($projectId)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_USERS, $projectId);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
+    }
+
+    /**
      * Persists Updates to a User Object
      *
      * @param User $user
@@ -923,8 +1356,54 @@ class MediaSiloAPI
         $this->userProxy->updateUser($user);
     }
 
+
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Saved Search
+     *
+     * http://developers.mediasilo.com/savedsearch
+     *
+     * Saved Search is a specialized object that stores the criteria needed for searching for
+     * specific assets, these objects can be saved and retireved via the API. In the MediaSilo
+     * application you will see these SavedSearch objects which will allow the MediaSilo application
+     * to repeat the search with the given criteria with a single click.
+     *
+     * Example Saved Search Object
+     *
+     *   {
+     *       "name": "Assets With Comments",
+     *       "description": "My saved search",
+     *       "keyValuePairs":
+     *       [
+     *           {
+     *               "key": "projectid",
+     *               "value": "1111",
+     *               "operator": "is"
+     *           },
+     *           {
+     *               "key": "filetypefilter",
+     *               "value": "video,",
+     *               "operator": "is"
+     *           },
+     *           {
+     *               "key": "hascomments",
+     *               "value": "True",
+     *               "operator": "is"
+     *           }
+     *       ]
+     *   }
+     ******************************************************************************************/
+
     /**
-     * Gets a Saved Search by UUID
+     * Get a specific saved search
+     *
      * @param String $id
      * @return Array
      */
@@ -944,27 +1423,43 @@ class MediaSiloAPI
         return json_decode($clientResponse->getBody());
     }
 
-    /**
-     * Gets an Asset's Meta Data entry by Key
-     * @param String $assetId
-     * @param String $key
-     * @return Object
-     */
-    public function getAssetMetaDatum($assetId, $key)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_METADATA, $assetId) . "/" . $key;
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
+
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Tags
+     *
+     * http://developers.mediasilo.com/tags
+     *
+     * Tags are basic Strings that can be attached to a given object which can denote content or
+     * purpose of the given object. Tags can also be used to filter objects such as users.
+     * Currently tags are only available for users.
+     *
+     * Example Tag Object
+     *
+     *   {
+            "id": "8C0EB657-1111-1111-56610D0B33185B74",
+            "tags":
+            [
+                "Boston",
+                "Tree"
+            ]
+        }
+     ******************************************************************************************/
 
     /**
-     * Gets a list of an asset's Meta Data
-     * @param String $assetId
-     * @return Array
+     * Gets a list of my tags
+     * @return Array[Object]
      */
-    public function getAssetMetaData($assetId)
+    public function getMyTags()
     {
-        $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_METADATA, $assetId);
+        $resourcePath = sprintf(MediaSiloResourcePaths::USER_TAGS, $this->me->id);
         $clientResponse = $this->webClient->get($resourcePath);
         return json_decode($clientResponse->getBody());
     }
@@ -981,26 +1476,48 @@ class MediaSiloAPI
         return json_decode($clientResponse->getBody());
     }
 
-    /**
-     * Gets a User Key/Value Pair By UUID
-     * @param String $id
-     * @return Object
-     */
-    public function getUserKeyPair($id)
-    {
-        $clientResponse = $this->webClient->get($this->webClient->get(MediaSiloResourcePaths::USER_LOOKUPS . "/" . $id));
-        return json_decode($clientResponse->getBody());
-    }
 
-    /**
-     * Gets a list of User Key/Value Pairs
-     * @return Array[Object]
-     */
-    public function getUserKeyPairs()
-    {
-        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::USER_LOOKUPS);
-        return json_decode($clientResponse->getBody());
-    }
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Distribution Lists
+     *
+     * http://developers.mediasilo.com/distribution-lists
+     *
+     * Distribution Lists enable users to store frequently-used groups of email recipients as
+     * presets, simplifying the workflow of distributing Assets to production teams or decision
+     * makers via QuickLinks.
+     *
+     * Example Distribution List Object
+     *
+     *   {
+     *       "name": "Puppets",
+     *       "description": "A group of opinionated puppets.",
+     *       "recipients": [
+     *           {
+     *               "firstName": "Big",
+     *               "lastName": "Bird",
+     *               "email": "thebigbyrd@sesamestreet.org",
+     *               "userId": "bf33b7fc-53f1-4517-bd36-afe5ce45add5"
+     *           },
+     *           {
+     *               "firstName": "Oscar",
+     *               "lastName": "Grouch",
+     *               "email": "leavemealone@sesamestreet.org",
+     *               "userId": "c84560b3-cccd-4da5-a9e4-2fd98937f681"
+     *           },
+     *           {
+     *               "email": "mspiggy@themuppetshow.org"
+     *           }
+     *       ]
+     *   }
+     ******************************************************************************************/
 
     /**
      * Gets a list of Distribution Lists
@@ -1021,164 +1538,5 @@ class MediaSiloAPI
     {
         $clientResponse = $this->webClient->get(MediaSiloResourcePaths::DISTRIBUTION_LISTS . "/" . $id);
         return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Get Folder By UUID
-     * @param String $id
-     * @return Object
-     */
-    public function getFolder($id)
-    {
-        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::FOLDERS . "/" . $id);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Gets a list of Folder's Sub-folders
-     * @param String $parentFolderId
-     * @return Array[Object]
-     */
-    public function getSubfolders($parentFolderId)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::SUB_FOLDERS, $parentFolderId);
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Gets a list of Project's Sub-folders
-     * @param $projectId
-     * @return Array[Object]
-     */
-    public function getProjectFolders($projectId)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_FOLDERS, $projectId);
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Get a list of a Projects's Users
-     * @param String $projectId
-     * @return Array[Object]
-     */
-    public function getProjectUsers($projectId)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_USERS, $projectId);
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Get an individual Quicklink Preset by UUID
-     * @param String $settingId
-     * @return Object
-     */
-    public function getQuickLinkSetting($settingId)
-    {
-        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::QUICK_LINK_SETTINGS . "/" . $settingId);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Get a list of Quicklink Presets
-     * @return Array[Object]
-     */
-    public function getQuickLinkSettings()
-    {
-        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::QUICK_LINK_SETTINGS);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Get a list of Ratings by Asset UUID
-     * @param String $assetId
-     * @return Array[Object]
-     */
-    public function getAssetRatings($assetId)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_RATINGS, $assetId);
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Get a list of comments on an Asset in a Quicklink
-     * @param String $quickLinkId
-     * @param String $assetId
-     * @return Array[Object]
-     */
-    public function getQuickLinkComments($quickLinkId, $assetId)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::QUICK_LINK_COMMENTS, $quickLinkId, $assetId);
-
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Get a list of comments on an Asset in a Quicklink in a specified export format
-     * @param String $quickLinkId
-     * @param String $assetId
-     * @param String $format
-     * @return Array[Object]
-     */
-    public function getQuickLinkCommentsExport($quickLinkId, $assetId, $format="txt")
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_COMMENTS_EXPORT, $quickLinkId, $assetId, $format);
-        $clientResponse = $this->webClient->get($resourcePath);
-        return $clientResponse->getBody();
-    }
-
-    /**
-     * Get a list of tracked events specified by the events list and filtered by a query
-     * @param Array $events
-     * @param String $query
-     * @return Array[Object]
-     */
-    public function getAnalytics($events, $query)
-    {
-        $resourcePath = sprintf(MediaSiloResourcePaths::ANALYTICS_SPECIFIC, join(",", $events));
-        $clientResponse = json_decode($this->webClient->post($resourcePath, $query));
-        return $clientResponse;
-    }
-
-    /**
-     * Performs a Password Reset Request (sends password reset link with token to user's email)
-     * @requires System Permission
-     * @param String $hostname
-     * @param String $username
-     * @param String $type (optional)
-     * @param String $redirectUri (optional)
-     * @returns Object - ID property contains request token id
-     */
-    public function initiatePasswordReset($hostname, $username, $type = "reset", $redirectUri = null) {
-        $request = new PasswordResetRequest($hostname, $username, $type, $redirectUri);
-        return json_decode($this->webClient->post(MediaSiloResourcePaths::PASSWORD_RESET, $request->toJson()));
-    }
-
-    /**
-     * Validates a Password Reset Request token is still valid
-     * @requires System Permission
-     * @param String $token
-     * @return Object - Reset Token Representation
-     */
-    public function validateResetToken($token) {
-        $resourcePath = sprintf("%s/%s", MediaSiloResourcePaths::PASSWORD_RESET, $token);
-        $clientResponse = $this->webClient->get($resourcePath);
-        return json_decode($clientResponse->getBody());
-    }
-
-    /**
-     * Performs a password update for a user associated with a valid token
-     * * @requires System Permission
-     * @param String $token
-     * @param String $password
-     * @return Object - redirectUrl property contains location to redirect to upon success
-     */
-    public function processPasswordReset($token, $password) {
-        $request = new PasswordReset($token, $password);
-        return json_decode($this->webClient->put(MediaSiloResourcePaths::PASSWORD_RESET, $request->toJson()));
     }
 }
