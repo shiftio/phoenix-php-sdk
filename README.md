@@ -54,8 +54,75 @@ $password = "T!gger!sPushy";
 $host = "100acreforest";
 
 // Instantiate client
-$mediaSiloAPI = MediaSiloAPI::createFromHostCredentials($username, $password, $host);
+try {
+    $mediaSiloApi = MediaSiloAPI::createFromHostCredentials($username, $password, $host);
+}
+catch(\mediasilo\http\exception\NotAuthenticatedException $e) {
+    print "Bad credentials. Cat on the keyboard? \n";
+    exit;
+}
 
 // Start making some calls
 $me = $mediaSiloAPI->me();
+```
+#### Examples
 
+##### Get Assets By Folder
+
+```
+<?php
+
+require_once('vendor/autoload.php');
+
+use mediasilo\MediaSiloAPI;
+use mediasilo\http\exception\NotFoundException;
+use mediasilo\http\exception\NotAuthenticatedException;
+
+// Set your credentials
+$username = "PoohBear";
+$password = "T!gger!sPushy";
+$host = "100acreforest";
+
+// Initialize the API
+try {
+    $mediaSiloApi = MediaSiloAPI::createFromHostCredentials($username, $password, $host);
+}
+catch(\mediasilo\http\exception\NotAuthenticatedException $e) {
+    print "Bad credentials. Cat on the keyboard? \n";
+    exit;
+}
+
+// Here's the project we're interested in traversing
+$projectId = "07706DCC-014B-2CE0-CF518D31A23C393E";
+
+// Let's find everything at the root of the projects
+$rootLevelAssets = $mediaSiloApi->getAssetsByProject($projectId);
+$rootLevelFolders = $mediaSiloApi->getProjectFolders($projectId);
+
+// Ok, now let's traverse the prject to find the rest of the assets
+foreach($rootLevelFolders as $folder) {
+    get_folder_contents($mediaSiloApi, $folder->id);
+}
+
+function get_folder_contents($mediaSiloApi, $folderId) {
+    print "FolderId:".$folderId."\n";
+    try {
+        $assets = $mediaSiloApi->getAssetsByFolder($folderId);
+        var_dump($assets);
+    }
+    catch(NotFoundException $e) {
+        print "There are not assets in this folder. Better get cracking and add some! \n";
+    }
+
+    try {
+        $subfolders = $mediaSiloApi->getSubfolders($folderId);
+
+        foreach($subfolders as $subfolder) {
+            get_folder_contents($mediaSiloApi, $subfolder->id);
+        }
+    }
+    catch(NotFoundException $e) {
+        print "No more folders here!";
+    }
+}
+```
