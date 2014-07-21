@@ -27,7 +27,6 @@ To use a development copy of this SDK in a project, setup your composer.json as 
 
 ```
 {
-{
     "repositories": [
         {
             "type": "vcs",
