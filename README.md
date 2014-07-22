@@ -4,14 +4,15 @@ MediaSilo PHP SDK
 
 MediaSilo makes it easy to share and collaborate with your team and customers anywhere. Check out our full feature set [here](https://www.mediasilo.com/features.php)!
 
+The SDK is built on top of our REST API. To learn more about our REST API have a look at our documentation [here](http://developers.mediasilo.com/).
+
 #### Requirements
 
-The SDK uses Composer for dependency management and auto loading. After you've [downloaded](https://github.com/mediasilo/phoenix-php-sdk/archive/0.1.0.zip) this SDK move into it's root and install composer:
-
+The SDK is most easily used with composer. To install composer:
+```
     cd <INSTALL_DIRECTORY>
     curl -sS https://getcomposer.org/installer | php
-
-This will install composer into the SDK. Checkout [Composer](https://getcomposer.org) for more details on installation options.
+```   
 
 Check to see that composer has been installed:
 
@@ -23,7 +24,7 @@ Install the SDK's dependencies:
 
 #### Install
 
-To use a development copy of this SDK in a project, setup your composer.json as follows, where ```dev-{branch-name}`` include the branch name and ```{project-path}``` is the path to your project.
+In the root of your project create a composer.json as follows. More info on getting started with composer can be found [here](https://getcomposer.org/doc/00-intro.md). 
 
 ```
 {
