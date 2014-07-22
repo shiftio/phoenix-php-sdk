@@ -8,9 +8,9 @@ The SDK is built on top of our REST API. To learn more about our REST API have a
 
 #### Requirements
 
-The SDK is most easily used with composer. To install composer:
+The SDK is most easily used with [Composer](https://getcomposer.org). To install Composer:
 ```
-    cd <INSTALL_DIRECTORY>
+    cd <YOUR PROJECT ROOT>
     curl -sS https://getcomposer.org/installer | php
 ```   
 
@@ -22,7 +22,7 @@ Install the SDK's dependencies:
 
     php composer.phar install
 
-#### Install
+#### Install the SDK into your project
 
 In the root of your project create a composer.json as follows. More info on getting started with composer can be found [here](https://getcomposer.org/doc/00-intro.md). 
 
@@ -38,6 +38,11 @@ In the root of your project create a composer.json as follows. More info on gett
         "mediasilo/phoenix-php-sdk": "0.6.1"
     }
 }
+```
+
+Next, install the SDK using
+```
+composer install
 ```
 
 #### Usage
