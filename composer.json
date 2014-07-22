@@ -13,7 +13,6 @@
         }
     ],
     "require" : {
-        "monolog/monolog": "1.0.*",
         "mdelano/oauth-php": "0.0.13"
     },
     "require-dev": {
