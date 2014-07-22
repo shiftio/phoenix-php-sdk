@@ -10,8 +10,8 @@ The SDK is built on top of our REST API. To learn more about our REST API have a
 
 The SDK is most easily used with [Composer](https://getcomposer.org). To install Composer:
 ```
-    cd <YOUR PROJECT ROOT>
-    curl -sS https://getcomposer.org/installer | php
+cd <YOUR PROJECT ROOT>
+curl -sS https://getcomposer.org/installer | php
 ```   
 
 Check to see that composer has been installed:
