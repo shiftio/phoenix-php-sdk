@@ -30,7 +30,6 @@ class RoleManager
     {
         if (empty($this->roles[$asset->projectId])) {
             $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::ME, $asset->projectId));
-            var_dump($clientResponse);
             $roleResults = json_decode($clientResponse->getBody())->roles;
 
             for ($i = 0; $i < count($roleResults); $i++) {
