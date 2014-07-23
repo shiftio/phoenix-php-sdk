@@ -1,5 +1,5 @@
 {
-    "name" : "mediasilo/phoenix-php-sdk",
+    "name" : "stilesb/phoenix-php-sdk",
     "autoload": {
         "psr-0": {
             "mediasilo\\": "src/"
