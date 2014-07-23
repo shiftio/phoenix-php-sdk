@@ -59,15 +59,53 @@ class AssetProxy {
     }
 
     /**
+     * Gets an exiting asset given search an array of search parameters
+     * @param Array $searchParams - Array of search parameters
+     * @param Bool $acl - Array of search parameters
+     * @return Array(Asset)
+     */
+    public function getAssets($searchParams, $acl = false) {
+        $assets = array();
+        $searchQuery = '?';
+
+        foreach ($searchParams as $key => $value) {
+            $searchQuery .= $key . '=' . $value . '&';
+        }
+
+        $searchQuery = substr($searchQuery, 0, -1);
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::ASSETS) . $searchQuery);
+        $results = json_decode($clientResponse->getBody());
+
+        if (!empty($results)) {
+            foreach($results as $assetsResult) {
+                $asset = Asset::fromStdClass($assetsResult);
+                if($acl == true) {
+                    $this->attachAclToAsset($asset);
+                }
+                array_push($assets, $asset);
+            }
+        }
+
+        return $assets;
+    }
+
+    /**
      * Gets multiple assets given asset Ids
      * @param String $projectId
      * @param Bool $acl - True to include acl hash on asset object
+     * @param Array $searchParams - Array of search parameters
      * @return Array(Asset)
      */
-    public function getAssetsByProjectId($projectId, $acl = false) {
+    public function getAssetsByProjectId($projectId, $acl = false, $searchParams = array()) {
         $assets = array();
+        $searchQuery = '?';
 
-        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS, $projectId));
+        foreach ($searchParams as $key => $value) {
+            $searchQuery .= $key . '=' . $value . '&';
+        }
+
+        $searchQuery = substr($searchQuery, 0, -1);
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS, $projectId) . $searchQuery);
         $assetsResults = json_decode($clientResponse->getBody($clientResponse));
 
         if(!empty($assetsResults)) {
@@ -86,13 +124,20 @@ class AssetProxy {
     /**
      * Gets multiple assets given asset Ids
      * @param String $folderId
+     * @param Array $searchParams - Array of search parameters
      * @param Bool $acl
      * @return Array(Asset)
      */
-    public function getAssetsByFolderId($folderId, $acl = false) {
+    public function getAssetsByFolderId($folderId, $acl = false, $searchParams = array()) {
         $assets = array();
+        $searchQuery = '?';
 
-        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS,$folderId));
+        foreach ($searchParams as $key => $value) {
+            $searchQuery .= $key . '=' . $value . '&';
+        }
+
+        $searchQuery = substr($searchQuery, 0, -1);
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS, $folderId) . $searchQuery);
         $assetResults = json_decode($clientResponse->getBody($clientResponse));
 
         if(!empty($assetResults)) {
