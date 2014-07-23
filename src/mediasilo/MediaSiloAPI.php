@@ -124,14 +124,13 @@ class MediaSiloAPI
         return $instance;
     }
 
+    public static function createFromSession($session, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
+        $instance = new self();
+        $instance->webClient = WebClient::createFromSession($session, $host, $baseUrl);
+        $instance->init();
 
-
-
-
-
-
-
-
+        return $instance;
+    }
 
     /******************************************************************************************
      * Preferences
@@ -550,7 +549,7 @@ class MediaSiloAPI
      */
     public function getAssets($searchParams, $acl = false)
     {
-        return $this->assetProxy->getAsset($searchParams, $acl);
+        return $this->assetProxy->getAssets($searchParams, $acl);
     }
 
     /**
