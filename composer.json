@@ -1,12 +1,11 @@
 {
-    "name" : "stilesb/phoenix-php-sdk",
+    "name" : "mediasilo/phoenix-php-sdk",
     "autoload": {
         "psr-0": {
             "mediasilo\\": "src/"
         }
 
     },
-    "minimum-stability": "dev",
     "repositories": [
         {
             "type": "vcs",
@@ -20,4 +19,3 @@
         "phpunit/phpunit": "3.7.*"
     }
 }
-
