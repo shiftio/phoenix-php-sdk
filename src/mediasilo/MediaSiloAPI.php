@@ -10,6 +10,8 @@ if (!function_exists('json_decode')) {
     throw new \Exception('We need json_decode for the API to work. If you\'re running a linux distro install this package: php-pecl-json');
 }
 
+use mediasilo\http\exception\NotFoundException;
+use mediasilo\http\oauth\OAuthException;
 use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\project\ProjectProxy;
 use mediasilo\http\WebClient;
@@ -122,14 +124,13 @@ class MediaSiloAPI
         return $instance;
     }
 
+    public static function createFromSession($session, $host, $baseUrl = "phoenix.mediasilo.com/v3") {
+        $instance = new self();
+        $instance->webClient = WebClient::createFromSession($session, $host, $baseUrl);
+        $instance->init();
 
-
-
-
-
-
-
-
+        return $instance;
+    }
 
     /******************************************************************************************
      * Preferences
@@ -541,6 +542,17 @@ class MediaSiloAPI
     }
 
     /**
+     * Gets assets based on an array of key value search queries
+     * @param $searchParams
+     * @param $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @return Assets
+     */
+    public function getAssets($searchParams, $acl = false)
+    {
+        return $this->assetProxy->getAssets($searchParams, $acl);
+    }
+
+    /**
      * Gets a list of assets from an array of asset Ids.
      * @param Array $ids
      * @param Boolean $acl (if true the ACL for the requesting user will be attached to each asset)
@@ -553,23 +565,25 @@ class MediaSiloAPI
     /**
      * Gets assets in the given project
      * @param $projectId
+     * @param $searchParams
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
      * @return Array(Asset)
      */
-    public function getAssetsByProject($projectId, $acl = false)
+    public function getAssetsByProject($projectId, $acl = false, $searchParams = array())
     {
-        return $this->assetProxy->getAssetsByProjectId($projectId, $acl);
+        return $this->assetProxy->getAssetsByProjectId($projectId, $acl, $searchParams);
     }
 
     /**
      * Gets assets in the given folder
      * @param $folderId
+     * @param $searchParams
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
      * @return Array(Asset)
      */
-    public function getAssetsByFolder($folderId, $acl = false)
+    public function getAssetsByFolder($folderId, $acl = false, $searchParams = array())
     {
-        return $this->assetProxy->getAssetsByFolderId($folderId, $acl);
+        return $this->assetProxy->getAssetsByFolderId($folderId, $acl, $searchParams);
     }
 
 
