@@ -61,7 +61,7 @@ $host = "100acreforest";
 
 // Instantiate client
 try {
-    $mediaSiloApi = MediaSiloAPI::createFromHostCredentials($username, $password, $host);
+    $mediaSiloAPI = MediaSiloAPI::createFromHostCredentials($username, $password, $host);
 }
 catch(\mediasilo\http\exception\NotAuthenticatedException $e) {
     print "Bad credentials. Cat on the keyboard? \n";
