@@ -35,7 +35,7 @@ In the root of your project create a composer.json as follows. More info on gett
         }
     ],
     "require" : {
-        "mediasilo/phoenix-php-sdk": "0.6.1"
+        "mediasilo/phoenix-php-sdk": "0.6.3
     }
 }
 ```
