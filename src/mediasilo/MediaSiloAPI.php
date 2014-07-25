@@ -38,6 +38,7 @@ use mediasilo\user\UserPreferencesProxy;
 use mediasilo\user\User;
 use mediasilo\user\PasswordReset;
 use mediasilo\user\PasswordResetRequest;
+use mediasilo\config\Meta;
 
 /******************************************************************************************
  * MediaSiloAPI
