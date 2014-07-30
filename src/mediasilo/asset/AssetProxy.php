@@ -60,23 +60,56 @@ class AssetProxy {
     }
 
     /**
-     * Gets multiple assets given asset Ids
+     * Gets an exiting asset given search an array of search parameters
+     * @param Array $searchParams - Array of search parameters
+     * @param Bool $acl - Array of search parameters
+     * @return Array(Asset)
+     */
+    public function getAssets($searchParams, $acl = false) {
+        $assets = array();
+        $searchQuery = '?';
+
+        foreach ($searchParams as $key => $value) {
+            $searchQuery .= $key . '=' . $value . '&';
+        }
+
+        $searchQuery = substr($searchQuery, 0, -1);
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::ASSETS) . $searchQuery);
+        $results = json_decode($clientResponse->getBody());
+
+        if (!empty($results)) {
+            foreach($results as $assetsResult) {
+                $asset = Asset::fromStdClass($assetsResult);
+                if($acl == true) {
+                    $this->attachAclToAsset($asset);
+                }
+                array_push($assets, $asset);
+            }
+        }
+
+        return $assets;
+    }
+
+    /**
+     * Gets multiple assets given Project Id
      * @param String $projectId
      * @param Bool $acl - True to include acl hash on asset object
-     * @param String $params - Pagination Query String
+     * @param Array $searchParams - Array of search parameters
      * @param Bool $wrapPagination
      * @return Array(Asset)
      */
-    public function getAssetsByProjectId($projectId, $acl = false, $params = null, $wrapPagination = false) {
+    public function getAssetsByProjectId($projectId, $acl = false, $searchParams = array(), $wrapPagination = false) {
         $assets = array();
+        $searchQuery = '?';
 
-        $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_ASSETS, $projectId);
-        if (!is_null($params)) $resourcePath = sprintf("%s?%s", $resourcePath, $params);
+        foreach ($searchParams as $key => $value) {
+            $searchQuery .= $key . '=' . $value . '&';
+        }
+        $searchQuery = substr($searchQuery, 0, -1);
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS, $projectId) . $searchQuery);
+        $assetsResults = json_decode($clientResponse->getBody());
 
-        $clientResponse = $this->webClient->get($resourcePath);
-        $assetsResults = json_decode($clientResponse->getBody($clientResponse));
-
-        if(!empty($assetsResults)) {
+        if (!empty($assetsResults)) {
             foreach($assetsResults as $assetResult) {
                 $asset = Asset::fromStdClass($assetResult);
                 if($acl == true) {
@@ -107,21 +140,24 @@ class AssetProxy {
     }
 
     /**
-     * Gets multiple assets given asset Ids
+     * Gets multiple assets given Folder Id
      * @param String $folderId
-     * @param Bool $acl
-     * @param String $params - Pagination Query String
+     * @param Bool $acl - True to include acl hash on asset object
+     * @param Array $searchParams - Array of search parameters
      * @param Bool $wrapPagination
      * @return Array(Asset)
      */
-    public function getAssetsByFolderId($folderId, $acl = false, $params = null, $wrapPagination = false) {
+    public function getAssetsByFolderId($folderId, $acl = false, $searchParams = array(), $wrapPagination = false) {
         $assets = array();
+        $searchQuery = '?';
 
-        $resourcePath = sprintf(MediaSiloResourcePaths::FOLDER_ASSETS, $folderId);
-        if (!is_null($params)) $resourcePath = sprintf("%s?%s", $resourcePath, $params);
+        foreach ($searchParams as $key => $value) {
+            $searchQuery .= $key . '=' . $value . '&';
+        }
 
-        $clientResponse = $this->webClient->get($resourcePath);
-        $assetResults = json_decode($clientResponse->getBody($clientResponse));
+        $searchQuery = substr($searchQuery, 0, -1);
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS, $folderId) . $searchQuery);
+        $assetResults = json_decode($clientResponse->getBody());
 
         if(!empty($assetResults)) {
             foreach($assetResults as $assetResult) {

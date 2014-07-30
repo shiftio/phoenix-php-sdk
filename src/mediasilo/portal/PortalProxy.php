@@ -25,15 +25,21 @@ class PortalProxy {
 
     /**
      * Read Many
-     * @param String - Additional query parameters to include
+     * @param Array $searchParams - Array of search parameters
      * @returns Array[Portal]
      */
-    public function getPortals($params = null) {
-        $endpoint = is_null($params) ? MediaSiloResourcePaths::PORTAL : sprintf("%s?%s", MediaSiloResourcePaths::PORTAL, $params);
-        $clientResponse = $this->webClient->get($endpoint);
+    public function getPortals($searchParams = array()) {
+        $portals = array();
+        $searchQuery = '?';
+
+        foreach ($searchParams as $key => $value) {
+            $searchQuery .= $key . '=' . $value . '&';
+        }
+
+        $searchQuery = substr($searchQuery, 0, -1);
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::PORTAL . $searchQuery);
         $results = json_decode($clientResponse->getBody());
 
-        $portals = array();
         foreach($results as $result) {
             array_push($portals, Portal::fromStdClass($result));
         }

@@ -15,7 +15,7 @@ class ProjectProxy {
     }
 
     /**
-     * Creates a brand spankin new project
+     * Creates a brand spankin' new project
      * @param Project $project
      */
     public function createProject(Project $project)
@@ -64,15 +64,26 @@ class ProjectProxy {
     }
 
     /**
-     * Have a project that has the structure that you need. Use this function to clone it.
+     * Have a project that has the structure that you need? Use this function to clone it.
      * You can also clone users and roles within a project.
-     * @param $projectId
+     *
+     * @param $projectId The id of the project that you'd like to clone
+     * @param null $newName What you'd like to name the newly created project
+     * @param string $newDescription
+     * @param bool $cloneRoles If you'd like to copy the roles from the source project set this to true
+     * @param bool $cloneUsers If you'd like to copy the users from the source project set this to true
      * @return mixed
      */
-    public function cloneProject($projectId)
+    public function cloneProject($projectId, $newName = null, $newDescription = "", $cloneRoles = false, $cloneUsers = false)
     {
+        if(is_null($newName)) {
+            $newName = $projectId."Copy";
+        }
+
         $resourcePath = sprintf(MediaSiloResourcePaths::CLONE_PROJECTS, $projectId);
-        return json_decode($this->webClient->post($resourcePath, null));
+        return json_decode($this->webClient->post($resourcePath,
+            sprintf("{\"id\":\"%s\", \"name\":\"%s\", \"description\":\"%s\", \"cloneRoles\":%s, \"cloneUsers\":%s}",
+            $projectId, $newName, $newDescription, $cloneRoles ? 'true' : 'false', $cloneUsers ? 'true' : 'false')));
     }
 
     /**

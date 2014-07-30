@@ -11,7 +11,7 @@ class MediaSiloResourcePaths
     const PROJECTS = "/projects";
     const PROJECT_FOLDERS = "/projects/%s/folders";
     const USERS_PROJECTS = "/users/%s/projects";
-    const CLONE_PROJECTS = "/projects/{id}/clone";
+    const CLONE_PROJECTS = "/projects/%s/clone";
     const FOLDERS = "/folders";
     const SUB_FOLDERS = "/folders/%s/subfolders";
     const DISTRIBUTION_LISTS = "/distributionlists";
@@ -39,7 +39,6 @@ class MediaSiloResourcePaths
     const TRANSCRIPT_SERVICES = "/transcripts/services";
     const ANALYTICS = "/analytics";
     const ANALYTICS_SPECIFIC = "/analytics/%s";
-    const MY_ACCOUNT_PREFERENCES = "/account/preferences";
     const ACCOUNT_PREFERENCES = "/account/%s/preferences";
     const PASSWORD_RESET = "/users/password/reset";
 }
