@@ -278,24 +278,28 @@ class MediaSiloAPI
 
     /**
      * Gets assets in the given project
-     * @param $projectId
-     * @param $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @param String $projectId
+     * @param Bool $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @param String $params - Pagination Query String
+     * @param Bool $wrapPagination - optional
      * @return Array(Asset)
      */
-    public function getAssetsByProject($projectId, $acl = false)
+    public function getAssetsByProject($projectId, $acl = false, $params = null, $wrapPagination = false)
     {
-        return $this->assetProxy->getAssetsByProjectId($projectId, $acl);
+        return $this->assetProxy->getAssetsByProjectId($projectId, $acl, $params, $wrapPagination);
     }
 
     /**
      * Gets assets in the given folder
-     * @param $folderId
-     * @param $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @param String $folderId
+     * @param Bool $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @param String $params - Pagination Query String
+     * @param Bool $wrapPagination - optional
      * @return Array(Asset)
      */
-    public function getAssetsByFolder($folderId, $acl = false)
+    public function getAssetsByFolder($folderId, $acl = false, $params = null, $wrapPagination = false)
     {
-        return $this->assetProxy->getAssetsByFolderId($folderId, $acl);
+        return $this->assetProxy->getAssetsByFolderId($folderId, $acl, $params, $wrapPagination);
     }
 
 

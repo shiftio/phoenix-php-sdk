@@ -6,18 +6,18 @@ use mediasilo\model\Serializable;
 
 class Portal implements Serializable {
 
-    private $accountId;
-    private $channels;
-    private $configuration;
-    private $created;
-    private $description;
-    private $expires;
-    private $id;
-    private $modified;
-    private $ownerId;
-    private $private;
-    private $title;
-    private $url;
+    public $accountId;
+    public $channels;
+    public $configuration;
+    public $created;
+    public $description;
+    public $expires;
+    public $id;
+    public $modified;
+    public $ownerId;
+    public $private;
+    public $title;
+    public $url;
 
     function __construct($title, $channels, $configuration, $description = "", $expires = null) {
         $this->title = $title;
@@ -148,20 +148,7 @@ class Portal implements Serializable {
     }
 
     function toJson() {
-        $result = new \stdClass();
-        $result->accountId = $this->accountId;
-        $result->channels = $this->channels;
-        $result->configuration = $this->configuration;
-        $result->created = $this->created;
-        $result->description = $this->description;
-        $result->expires = $this->expires;
-        $result->id = $this->id;
-        $result->modified = $this->modified;
-        $result->ownerId = $this->ownerId;
-        $result->private = $this->private;
-        $result->title = $this->title;
-        $result->url = $this->url;
-        return json_encode($result);
+        return json_encode($this);
     }
 
     public static function fromJson($json) {
