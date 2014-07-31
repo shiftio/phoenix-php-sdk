@@ -150,9 +150,9 @@ class Asset implements Serializable
         $acl = array();
 
         foreach ($assetPermissionStringArray as $assetPermissionString) {
-            $displayName = strtoupper(explode('.', $assetPermissionString)[0]);
-            $groupIdentifier = $displayName;
-            $permission = strtoupper(explode('.', $assetPermissionString)[1]);
+            $nameParts = explode('.', $assetPermissionString);
+            $groupIdentifier = strtoupper($nameParts[0]);
+            $permission = strtoupper($nameParts[1]);
 
             $addItemFlag = true;
 
