@@ -31,13 +31,15 @@ use mediasilo\share\email\EmailShare;
 use mediasilo\transcript\TranscriptProxy;
 use mediasilo\transcript\TranscriptServiceProxy;
 use mediasilo\quicklink\Setting;
-use mediasilo\http\oauth\TwoLeggedOauthClient;
 use mediasilo\quicklink\analytics\QuickLinkAnalyticsProxy;
 use mediasilo\user\UserProxy;
 use mediasilo\user\UserPreferencesProxy;
 use mediasilo\user\User;
-use mediasilo\user\PasswordReset;
-use mediasilo\user\PasswordResetRequest;
+use mediasilo\portal\Portal;
+use mediasilo\portal\PortalProxy;
+use mediasilo\portal\Channel as PortalChannel;
+use mediasilo\portal\Setting as PortalSetting;
+
 use mediasilo\config\Meta;
 
 /******************************************************************************************
@@ -70,6 +72,7 @@ class MediaSiloAPI
     protected $projectProxy;
     protected $quicklinkProxy;
     protected $quicklinkAnalyticsProxy;
+    protected $portalProxy;
     protected $shareProxy;
     protected $assetProxy;
     protected $channelProxy;
@@ -95,6 +98,7 @@ class MediaSiloAPI
         $this->favoriteProxy = new FavoriteProxy($this->webClient);
         $this->projectProxy = new ProjectProxy($this->webClient);
         $this->quicklinkProxy = new QuickLinkProxy($this->webClient);
+        $this->portalProxy = new PortalProxy($this->webClient);
         $this->shareProxy = new ShareProxy($this->webClient);
         $this->assetProxy = new AssetProxy($this->webClient);
         $this->channelProxy = new ChannelProxy($this->webClient);
@@ -119,7 +123,6 @@ class MediaSiloAPI
         $instance = new self();
         $instance->webClient = WebClient::createFromHostCredentials($username, $password, $hostname, $baseUrl);
         $instance->init();
-        $instance->me();
         return $instance;
     }
 
@@ -558,11 +561,12 @@ class MediaSiloAPI
      * @param $projectId
      * @param $searchParams
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @param $wrapPagination (if true, the array of assets will be wrapped in an object with the pagination information)
      * @return Array(Asset)
      */
-    public function getAssetsByProject($projectId, $acl = false, $searchParams = array())
+    public function getAssetsByProject($projectId, $acl = false, $searchParams = array(), $wrapPagination = false)
     {
-        return $this->assetProxy->getAssetsByProjectId($projectId, $acl, $searchParams);
+        return $this->assetProxy->getAssetsByProjectId($projectId, $acl, $searchParams, $wrapPagination);
     }
 
     /**
@@ -570,11 +574,12 @@ class MediaSiloAPI
      * @param $folderId
      * @param $searchParams
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @param $wrapPagination (if true, the array of assets will be wrapped in an object with the pagination information)
      * @return Array(Asset)
      */
-    public function getAssetsByFolder($folderId, $acl = false, $searchParams = array())
+    public function getAssetsByFolder($folderId, $acl = false, $searchParams = array(), $wrapPagination = false)
     {
-        return $this->assetProxy->getAssetsByFolderId($folderId, $acl, $searchParams);
+        return $this->assetProxy->getAssetsByFolderId($folderId, $acl, $searchParams, $wrapPagination);
     }
 
 
@@ -1544,4 +1549,199 @@ class MediaSiloAPI
         $clientResponse = $this->webClient->get(MediaSiloResourcePaths::DISTRIBUTION_LISTS . "/" . $id);
         return json_decode($clientResponse->getBody());
     }
+
+
+
+
+
+
+
+
+
+
+
+    /******************************************************************************************
+     * Portals
+     *
+     * http://developers.mediasilo.com/portals
+     *
+     * Portals are another of MediaSilo's primary mechanisms for sharing assets with a designated
+     * audience through a specialized client application. QuickLinks contain one or more categories
+     * called channels which are one of three types of objects: a Project, a Folder, or a
+     * Saved Search.  Portals can be configured through various settings including a theme,
+     * audience settings, and custom css overrides.
+     *
+     * Example Portal Object
+     *
+     *
+     * {
+     *     "id": "53d9120d310421138e1e396b",
+     *     "title": "Test Portal - User Has Full Access to all items",
+     *     "description": "What does the fox say?",
+     *     "channels": [
+     *         {
+     *             "title": "99 Red Balloons",
+     *             "description": "",
+     *             "slug": "99-red-balloons",
+     *             "type": "PROJECT",
+     *             "targetObjectId": "046823E1-EF00-2F34-35C3123BF2D34A291"
+     *         },
+     *         {
+     *             "title": "Sample Folder",
+     *             "description": "",
+     *             "slug": "sample",
+     *             "type": "FOLDER",
+     *             "targetObjectId": "d1bc307b-4e0e-4675-9d94-da50fe2560de"
+     *         }
+     *     ],
+     *     "configuration": {
+     *         "id": "",
+     *         "settings": [
+     *             {
+     *                 "key": "notify_email",
+     *                 "value": "false"
+     *             },
+     *             {
+     *                 "key": "show_metadata",
+     *                 "value": "false"
+     *             },
+     *             {
+     *                 "key": "allow_download",
+     *                 "value": "false"
+     *             },
+     *             {
+     *                 "key": "audience",
+     *                 "value": "public"
+     *             },
+     *             {
+     *                 "key": "playback",
+     *                 "value": "progressive"
+     *             },
+     *             {
+     *                 "key": "custom_css",
+     *                 "value": "body { color: red; }"
+     *             },
+     *             {
+     *                 "key": "theme_name",
+     *                 "value": "tentpole"
+     *             },
+     *             {
+     *                 "key": "password",
+     *                 "value": ""
+     *             },
+     *             {
+     *                 "key": "logo_url",
+     *                 "value": "app/images/default-logo.png"
+     *             },
+     *             {
+     *                 "key": "allow_feedback",
+     *                 "value": "false"
+     *             }
+     *         ]
+     *     },
+     *     "ownerId": "8326EEF3-0CE9-35F5-80EC9BDA297D6917",
+     *     "accountId": "967262861JBDF",
+     *     "created": 1406734860666,
+     *     "modified": 1406734860666,
+     *     "expires": 1414510861733,
+     *     "private": false,
+     *     "url": "https://portals.mediasilo.com/53d9120d300421138e1e7b6b"
+     * }
+     ******************************************************************************************/
+
+    /**
+     * Gets a Portal by UUID
+     * @param String $id
+     * @return Object
+     */
+    public function getPortal($id)
+    {
+        return $this->portalProxy->getPortal($id);
+    }
+
+    /**
+     * Gets a list of Distribution Lists
+     * @param $searchParams
+     * @return Array[Object]
+     */
+    public function getPortals($searchParams = array())
+    {
+        return $this->portalProxy->getPortals($searchParams);
+    }
+
+    /**
+     * Creates a new Portal
+     * @param string $title Title for the Quicklink
+     * @param string $description - Description for the Quicklink
+     * @param array $channels - Array channels or std objects containing portal channel data
+     * @param array $settings - Key/Value associative array of settings
+     * @param string $configId - optional, id of portal settings preset
+     * @param string $expires - optional, timestamp in milliseconds
+     * @return Quicklink Hydrated model of created quicklink
+     */
+    public function createPortal($title, $description = "", array $channels = array(),
+                                 array $settings = array(), $configId = null, $expires = null)
+    {
+        $portalChannels = array();
+        foreach ($channels as $channel) {
+            if ($channel instanceof PortalChannel) {
+                array_push($portalChannels, $channel);
+            } else {
+                array_push($portalChannels, PortalChannel::fromStdClass($channel));
+            }
+        }
+
+        $newSettings = array();
+        foreach ($settings as $key => $value) {
+            array_push($newSettings, new PortalSetting((string)$key, (string)$value));
+        }
+        $configuration = new Configuration($configId, $newSettings);
+
+        $portal = new Portal($title, $portalChannels, $configuration, $description, $expires);
+        $this->portalProxy->createPortal($portal);
+        return $portal;
+    }
+
+    /**
+     * Updates a Portal
+     * @param String $id UUID of portal to update
+     * @param string $title Title for the Quicklink
+     * @param string $description - Description for the Quicklink
+     * @param array $channels - Array channels or std objects containing portal channel data
+     * @param array $settings - Key/Value associative array of settings
+     * @param string $configId - optional, id of portal settings preset
+     * @param string $expires - optional, timestamp in milliseconds
+     */
+    public function updatePortal($id, $title, $description = "", array $channels = array(),
+                                    array $settings = array(), $configId = null, $expires = null)
+    {
+        $portalChannels = array();
+        foreach ($channels as $channel) {
+            if ($channel instanceof PortalChannel) {
+                array_push($portalChannels, $channel);
+            } else {
+                array_push($portalChannels, PortalChannel::fromStdClass($channel));
+            }
+        }
+
+        $newSettings = array();
+        foreach ($settings as $key => $value) {
+            array_push($newSettings, new PortalSetting((string)$key, (string)$value));
+        }
+        $configuration = new Configuration($configId, $newSettings);
+
+        $portal = new Portal($title, $portalChannels, $configuration, $description, $expires);
+        $portal->setId($id);
+        $this->portalProxy->updatePortal($portal);
+    }
+
+    /**
+     * Expires a Portal
+     * @param id - id of portal to be expired
+     */
+    public function expirePortal($id)
+    {
+        $this->portalProxy->expirePortal($id);
+    }
+
 }

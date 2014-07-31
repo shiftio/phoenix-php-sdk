@@ -7,6 +7,7 @@ use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\asset\Asset;
 use mediasilo\role\RoleManager;
 use mediasilo\http\exception\NotFoundException;
+use stdClass;
 
 class AssetProxy {
 
@@ -90,25 +91,25 @@ class AssetProxy {
     }
 
     /**
-     * Gets multiple assets given asset Ids
+     * Gets multiple assets given Project Id
      * @param String $projectId
      * @param Bool $acl - True to include acl hash on asset object
      * @param Array $searchParams - Array of search parameters
+     * @param Bool $wrapPagination
      * @return Array(Asset)
      */
-    public function getAssetsByProjectId($projectId, $acl = false, $searchParams = array()) {
+    public function getAssetsByProjectId($projectId, $acl = false, $searchParams = array(), $wrapPagination = false) {
         $assets = array();
         $searchQuery = '?';
 
         foreach ($searchParams as $key => $value) {
             $searchQuery .= $key . '=' . $value . '&';
         }
-
         $searchQuery = substr($searchQuery, 0, -1);
         $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::PROJECT_ASSETS, $projectId) . $searchQuery);
-        $assetsResults = json_decode($clientResponse->getBody($clientResponse));
+        $assetsResults = json_decode($clientResponse->getBody());
 
-        if(!empty($assetsResults)) {
+        if (!empty($assetsResults)) {
             foreach($assetsResults as $assetResult) {
                 $asset = Asset::fromStdClass($assetResult);
                 if($acl == true) {
@@ -118,17 +119,35 @@ class AssetProxy {
             }
         }
 
-        return $assets;
+        if ($wrapPagination) {
+            $response = new stdClass();
+            $response->paging = new stdClass();
+
+            try {
+                $headers = $clientResponse->getHeaders();
+                $totalResults = $headers['total-results'];
+                $response->paging->total = intval($totalResults);
+            } catch (\Exception $e) {
+                $response->paging->total = 0;
+            }
+
+            $response->results = $assets;
+            return $response;
+
+        } else {
+            return $assets;
+        }
     }
 
     /**
-     * Gets multiple assets given asset Ids
+     * Gets multiple assets given Folder Id
      * @param String $folderId
+     * @param Bool $acl - True to include acl hash on asset object
      * @param Array $searchParams - Array of search parameters
-     * @param Bool $acl
+     * @param Bool $wrapPagination
      * @return Array(Asset)
      */
-    public function getAssetsByFolderId($folderId, $acl = false, $searchParams = array()) {
+    public function getAssetsByFolderId($folderId, $acl = false, $searchParams = array(), $wrapPagination = false) {
         $assets = array();
         $searchQuery = '?';
 
@@ -138,7 +157,7 @@ class AssetProxy {
 
         $searchQuery = substr($searchQuery, 0, -1);
         $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::FOLDER_ASSETS, $folderId) . $searchQuery);
-        $assetResults = json_decode($clientResponse->getBody($clientResponse));
+        $assetResults = json_decode($clientResponse->getBody());
 
         if(!empty($assetResults)) {
             foreach($assetResults as $assetResult) {
@@ -152,7 +171,24 @@ class AssetProxy {
             }
         }
 
-        return $assets;
+        if ($wrapPagination) {
+            $response = new stdClass();
+            $response->paging = new stdClass();
+
+            try {
+                $headers = $clientResponse->getHeaders();
+                $totalResults = $headers['total-results'];
+                $response->paging->total = intval($totalResults);
+            } catch (\Exception $e) {
+                $response->paging->total = 0;
+            }
+
+            $response->results = $assets;
+            return $response;
+
+        } else {
+            return $assets;
+        }
     }
 
     private function getRoleManager() {
