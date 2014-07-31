@@ -151,6 +151,7 @@ class Asset implements Serializable
 
         foreach ($assetPermissionStringArray as $assetPermissionString) {
             $nameParts = explode('.', $assetPermissionString);
+            if (count($nameParts) < 2) continue;
             $groupIdentifier = strtoupper($nameParts[0]);
             $permission = strtoupper($nameParts[1]);
 
@@ -168,7 +169,7 @@ class Asset implements Serializable
                     $acl,
                     array(
                         'groupIdentifier' => $groupIdentifier,
-                        'displayName' => $displayName,
+                        'displayName' => $groupIdentifier,
                         'permissions' => array(
                             $permission
                         )
@@ -177,6 +178,7 @@ class Asset implements Serializable
             }
         }
 
+        
         return $acl;
     }
 }
