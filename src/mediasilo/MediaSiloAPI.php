@@ -91,6 +91,7 @@ class MediaSiloAPI
 
     protected function init() {
         $this->proxyInit();
+        $this->me();
     }
 
     protected function proxyInit() {
@@ -122,7 +123,6 @@ class MediaSiloAPI
         $instance = new self();
         $instance->webClient = WebClient::createFromHostCredentials($username, $password, $hostname, $baseUrl);
         $instance->init();
-        $instance->me();
         return $instance;
     }
 

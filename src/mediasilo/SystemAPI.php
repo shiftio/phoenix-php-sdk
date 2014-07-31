@@ -19,7 +19,6 @@ class SystemAPI extends MediaSiloAPI
         $instance = new self();
         $instance->webClient = WebClient::createFromHostCredentials($username, $password, $hostname, $baseUrl);
         $instance->init();
-        $instance->me();
         return $instance;
     }
 
@@ -27,8 +26,6 @@ class SystemAPI extends MediaSiloAPI
         $instance = new self();
         $instance->webClient = WebClient::createFromSession($session, $host, $baseUrl);
         $instance->init();
-        $instance->me();
-
         return $instance;
     }
 
@@ -38,8 +35,7 @@ class SystemAPI extends MediaSiloAPI
         $instance->consumerSecret = $consumerSecret;
         $instance->baseUrl = $baseUrl;
         $instance->webClient = TwoLeggedOauthClient::create2LegClient($consumerKey, $consumerSecret, $baseUrl);
-        $instance->init();
-
+        $instance->proxyInit();
         return $instance;
     }
 
@@ -47,8 +43,7 @@ class SystemAPI extends MediaSiloAPI
         $params = array('username' => $username, 'password'=>$password, 'hostname' => $hostname, 'grant_type' => 'password');
         $response = json_decode($this->webClient->getAccessToken($params));
         $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $response->id, $this->baseUrl);
-        $this->proxyInit();
-
+        $this->init();
         return $response->id;
     }
 
@@ -56,8 +51,7 @@ class SystemAPI extends MediaSiloAPI
         $params = array('session' => $sessionKey, 'hostname' => $hostname, 'grant_type' => 'password');
         $response = json_decode($this->webClient->getAccessToken($params));
         $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $response->id, $this->baseUrl);
-        $this->proxyInit();
-
+        $this->init();
         return $response->id;
     }
 
@@ -66,7 +60,7 @@ class SystemAPI extends MediaSiloAPI
             throw new OAuthException("There is no consumer credentials set for the API instance. An access token cannot be used without consumer credentials.");
         }
         $this->webClient = TwoLeggedOauthClient::create2LegProxyCredsClient($this->consumerKey, $this->consumerSecret, $accessToken, $this->baseUrl);
-        $this->proxyInit();
+        $this->init();
     }
 
     public function unsetAccessToken() {
