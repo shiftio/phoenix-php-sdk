@@ -6,7 +6,6 @@ use mediasilo\model\Serializable;
 
 class Asset implements Serializable
 {
-
     public $id;
     public $title;
     public $description;
@@ -27,9 +26,8 @@ class Asset implements Serializable
     public $external;
     public $tags;
     public $derivatives;
-    public $acl;
     public $commentCount;
-
+    public $acl;
 
     function __construct($id,
                          $title,
@@ -51,7 +49,8 @@ class Asset implements Serializable
                          $external,
                          $tags,
                          $derivatives,
-                         $commentCount
+                         $commentCount,
+                         $acl
     )
     {
         $this->id = $id;
@@ -75,6 +74,7 @@ class Asset implements Serializable
         $this->tags = $tags;
         $this->derivatives = $derivatives;
         $this->commentCount = $commentCount;
+        $this->acl = array();
     }
 
     function toJson()
@@ -82,10 +82,15 @@ class Asset implements Serializable
         return json_encode($this);
     }
 
+    public function setAcl($acl) {
+        $this->acl = $acl;
+    }
+
     public static function fromJson($json)
     {
         $mixed = json_decode($json);
-        return new Asset($mixed->id,
+        return new Asset(
+            $mixed->id,
             $mixed->title,
             $mixed->description,
             $mixed->fileName,
@@ -105,7 +110,8 @@ class Asset implements Serializable
             $mixed->external,
             $mixed->tags,
             $mixed->derivatives,
-            $mixed->commentCount
+            $mixed->commentCount,
+            array()
         );
     }
 
@@ -135,8 +141,43 @@ class Asset implements Serializable
             $stdClass->external,
             $stdClass->tags,
             $stdClass->derivatives,
-            $stdClass->commentCount
+            $stdClass->commentCount,
+            array()
         );
+    }
+
+    static public function convertAssetPermissionsArrayToAcl($assetPermissionStringArray) {
+        $acl = array();
+
+        foreach ($assetPermissionStringArray as $assetPermissionString) {
+            $displayName = strtoupper(explode('.', $assetPermissionString)[0]);
+            $groupIdentifier = $displayName;
+            $permission = strtoupper(explode('.', $assetPermissionString)[1]);
+
+            $addItemFlag = true;
+
+            for ($i = 0; $i < count($acl); $i++) {
+                if ($acl[$i]['groupIdentifier'] == $groupIdentifier) {
+                    array_push($acl[$i]['permissions'], $permission);
+                    $addItemFlag = false;
+                }
+            }
+
+            if ($addItemFlag) {
+                array_push(
+                    $acl,
+                    array(
+                        'groupIdentifier' => $groupIdentifier,
+                        'displayName' => $displayName,
+                        'permissions' => array(
+                            $permission
+                        )
+                    )
+                );
+            }
+        }
+
+        return $acl;
     }
 }
 

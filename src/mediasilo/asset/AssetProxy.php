@@ -25,11 +25,12 @@ class AssetProxy {
      * @return Asset
      */
     public function getAsset($id, $acl = false) {
-        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ASSETS . "/" . $id);
-        $asset = Asset::fromJson($clientResponse->getBody());
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ASSETS . "/" . $id)->getBody();
+        $asset = Asset::fromJson($clientResponse);
 
-        if($acl == true) {
-            $this->attachAclToAsset($asset);
+        if($acl) {
+            $acl = Asset::convertAssetPermissionsArrayToAcl($clientResponse->permissions);
+            $asset->setAcl($acl);
         }
 
         return $asset;
@@ -50,8 +51,9 @@ class AssetProxy {
         if(!empty($results)) {
             foreach($results as $assetsResult) {
                 $asset = Asset::fromStdClass($assetsResult);
-                if($acl == true) {
-                    $this->attachAclToAsset($asset);
+                if($acl) {
+                    $acl = Asset::convertAssetPermissionsArrayToAcl($assetsResult->permissions);
+                    $asset->setAcl($acl);
                 }
                 array_push($assets, $asset);
             }
@@ -80,8 +82,9 @@ class AssetProxy {
         if (!empty($results)) {
             foreach($results as $assetsResult) {
                 $asset = Asset::fromStdClass($assetsResult);
-                if($acl == true) {
-                    $this->attachAclToAsset($asset);
+                if($acl) {
+                    $acl = Asset::convertAssetPermissionsArrayToAcl($assetsResult->permissions);
+                    $asset->setAcl($acl);
                 }
                 array_push($assets, $asset);
             }
@@ -112,9 +115,12 @@ class AssetProxy {
         if (!empty($assetsResults)) {
             foreach($assetsResults as $assetResult) {
                 $asset = Asset::fromStdClass($assetResult);
-                if($acl == true) {
-                    $this->attachAclToAsset($asset);
+
+                if($acl) {
+                    $acl = Asset::convertAssetPermissionsArrayToAcl($assetResult->permissions);
+                    $asset->setAcl($acl);
                 }
+
                 array_push($assets, $asset);
             }
         }
@@ -163,8 +169,9 @@ class AssetProxy {
             foreach($assetResults as $assetResult) {
                 $asset = Asset::fromStdClass($assetResult);
 
-                if ($acl == true) {
-                    $this->attachAclToAsset($asset);
+                if ($acl) {
+                    $acl = Asset::convertAssetPermissionsArrayToAcl($assetResult->permissions);
+                    $asset->setAcl($acl);
                 }
 
                 array_push($assets, $asset);
