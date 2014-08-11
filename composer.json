@@ -3,8 +3,10 @@
     "autoload": {
         "psr-0": {
             "mediasilo\\": "src/"
-        }
-
+        },
+        "files": [
+            "src/mediasilo/lib/shims.php"
+        ]
     },
     "repositories": [
         {
