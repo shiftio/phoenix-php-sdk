@@ -14,6 +14,10 @@ class Project implements Serializable{
 
     public $favorite;
 
+    public $folderCount;
+
+    public $dateCreated;
+
     function __construct($description, $id = null, $favorite, $name)
     {
         $this->description = $description;
@@ -28,6 +32,9 @@ class Project implements Serializable{
 
     public static function fromJson($json) {
         $mixed = json_decode($json);
-        return new Project($mixed->description, $mixed->id, boolval($mixed->favorite), $mixed->name);
+        $newProject = new Project($mixed->description, $mixed->id, boolval($mixed->favorite), $mixed->name);
+        $newProject->folderCount = $mixed->folderCount;
+        $newProject->dateCreated = $mixed->dateCreated;
+        return $newProject;
     }
 }
