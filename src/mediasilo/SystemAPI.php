@@ -7,12 +7,10 @@ use mediasilo\http\WebClient;
 use mediasilo\http\oauth\TwoLeggedOauthClient;
 use mediasilo\http\oauth\OAuthException;
 use mediasilo\config\Meta;
-
-use mediasilo\account\AccountPreferencesProxy;
+use mediasilo\http\MediaSiloResourcePaths;
 
 class SystemAPI extends MediaSiloAPI
 {
-
     public function __construct() {}
 
     public static function createFromHostCredentials($username, $password, $hostname, $baseUrl = Meta::API_ROOT_URL) {
@@ -37,6 +35,18 @@ class SystemAPI extends MediaSiloAPI
         $instance->webClient = TwoLeggedOauthClient::create2LegClient($consumerKey, $consumerSecret, $baseUrl);
         $instance->proxyInit();
         return $instance;
+    }
+
+    public function setOAuthHostContext($hostname) {
+        if ($this->webClient instanceof TwoLeggedOauthClient) {
+            $this->webClient->setHostContext($hostname);
+        }
+    }
+
+    public function unsetOAuthHostContext() {
+        if ($this->webClient instanceof TwoLeggedOauthClient) {
+            $this->webClient->clearHostContext();
+        }
     }
 
     public function getAccessToken($username, $password, $hostname) {
@@ -130,6 +140,18 @@ class SystemAPI extends MediaSiloAPI
     public function processPasswordReset($token, $password) {
         $request = new PasswordReset($token, $password);
         return json_decode($this->webClient->put(MediaSiloResourcePaths::PASSWORD_RESET, $request->toJson()));
+    }
+
+    /**
+     * Validates a project invite request is valid, and returns the details
+     * @requires System Permissions
+     * @param String $token
+     * @return Object - Invite Token Representation
+     */
+    public function validateInviteToken($token) {
+        $resourcePath = sprintf("%s/%s", MediaSiloResourcePaths::PROJECT_INVITE, $token);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return json_decode($clientResponse->getBody());
     }
 
     /**

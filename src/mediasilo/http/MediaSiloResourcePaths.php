@@ -5,11 +5,12 @@ namespace mediasilo\http;
 
 class MediaSiloResourcePaths
 {
-
     const ACCESS_TOKEN = "/";
     const ME = "/me";
     const PROJECTS = "/projects";
     const PROJECT_FOLDERS = "/projects/%s/folders";
+    const PROJECT_INVITE = "/projects/invitation";
+    const PROJECT_INVITE_ACCEPT = "/projects/invitation/%s/accept";
     const USERS_PROJECTS = "/users/%s/projects";
     const CLONE_PROJECTS = "/projects/%s/clone";
     const FOLDERS = "/folders";
