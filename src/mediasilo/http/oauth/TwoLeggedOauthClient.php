@@ -20,6 +20,7 @@ class TwoLeggedOauthClient {
 	public $baseUrl;
 	public $options;
 	public $oauthWorkflow = '2Leg';
+    public $hostContext = null;
 
 	function __construct($consumerKey, $consumerSecret, $baseUrl) {
 		$this->consumerKey = $consumerKey;
@@ -56,6 +57,14 @@ class TwoLeggedOauthClient {
 		$this->oauthWorkflow = $oauthWorkflow;
 	}
 
+    public function setHostContext($hostname) {
+        $this->hostContext = $hostname;
+    }
+
+    public function clearHostContext() {
+        $this->hostContext = null;
+    }
+
 	public function getAccessToken($params) {
         $path = "/";
         $method = "GET";
@@ -80,6 +89,11 @@ class TwoLeggedOauthClient {
         // Obtain a request object for the request we want to make
         $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, $params);
 
+        // If we need to send along a hostcontext header with the request
+        if (!is_null($this->hostContext)) {
+            $request->setHostContext($this->hostContext);
+        }
+
         // Sign the request, perform a curl request and return the results, 
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
@@ -96,6 +110,11 @@ class TwoLeggedOauthClient {
 
         // Obtain a request object for the request we want to make
         $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, null, $payload);
+
+        // If we need to send along a hostcontext header with the request
+        if (!is_null($this->hostContext)) {
+            $request->setHostContext($this->hostContext);
+        }
 
         // Sign the request, perform a curl request and return the results, 
         // throws OAuthException2 exception on an error
@@ -114,6 +133,11 @@ class TwoLeggedOauthClient {
         // Obtain a request object for the request we want to make
         $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, null, $payload);
 
+        // If we need to send along a hostcontext header with the request
+        if (!is_null($this->hostContext)) {
+            $request->setHostContext($this->hostContext);
+        }
+
         // Sign the request, perform a curl request and return the results, 
         // throws OAuthException2 exception on an error
         // $result is an array of the form: array ('code'=>int, 'headers'=>array(), 'body'=>string)
@@ -129,7 +153,12 @@ class TwoLeggedOauthClient {
 		$method = "DELETE";
 
         // Obtain a request object for the request we want to make
-        $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method, $params);
+        $request = new OAuthRequester((rtrim($this->baseUrl, "/")."/".rtrim(ltrim($path, "/"))), $method);
+
+        // If we need to send along a hostcontext header with the request
+        if (!is_null($this->hostContext)) {
+            $request->setHostContext($this->hostContext);
+        }
 
         // Sign the request, perform a curl request and return the results, 
         // throws OAuthException2 exception on an error

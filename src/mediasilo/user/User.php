@@ -24,7 +24,7 @@ class User {
     private $tags;
     private $password;
 
-    function __construct(Address $address, $company, $defaultRoleTemplateId, $email, $firstName, $id, $lastName, $mobile, $numericId, $phone, array $roles, $sso, $ssoId, $status, $userName, $tags)
+    function __construct(Address $address, $company, $defaultRoleTemplateId, $email, $firstName, $id, $lastName, $mobile, $numericId, $phone, array $roles, $sso, $ssoId, $status, $userName)
     {
         $this->address = $address;
         $this->company = $company;

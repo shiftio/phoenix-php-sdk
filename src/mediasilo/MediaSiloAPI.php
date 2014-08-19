@@ -377,10 +377,15 @@ class MediaSiloAPI
         return json_decode($clientResponse->getBody());
     }
 
-
-
-
-
+    /**
+     * Accepts a Project Invitation
+     *
+     * @param $token
+     */
+    public function resolveInviteToken($token) {
+        $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_INVITE_ACCEPT, $token);
+        $this->webClient->put($resourcePath);
+    }
 
 
 
@@ -1327,6 +1332,16 @@ class MediaSiloAPI
         $resourcePath = sprintf(MediaSiloResourcePaths::PROJECT_USERS, $projectId);
         $clientResponse = $this->webClient->get($resourcePath);
         return json_decode($clientResponse->getBody());
+    }
+
+    /**
+     * Creates a new user object for the current account
+     * @param $user - Object representation of user object to persist
+     * @return User - now populated with user id
+     */
+    public function createUser(User $user) {
+        $this->userProxy->createUser($user);
+        return $user;
     }
 
     /**
