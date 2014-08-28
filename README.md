@@ -82,7 +82,7 @@ $me = $mediaSiloAPI->me();
 
 ##### Getting Assets By Folder
 
-```
+```php
 ... Initialize the API as shown above
 
 
