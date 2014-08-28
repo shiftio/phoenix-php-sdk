@@ -1,5 +1,4 @@
-![MediaSilo](https://s3.amazonaws.com/mediasilo-phoenix-php-sdk/mediasilo-logo.jpg)
-PHP SDK
+![MediaSilo](https://s3.amazonaws.com/mediasilo-phoenix-php-sdk/mediasilo-logo.jpg) PHP SDK
 ===============
 #### Overview
 
