@@ -85,8 +85,6 @@ $me = $mediaSiloAPI->me();
 ```php
 ... Initialize the API as shown above
 
-
-
 // Here's the project we're interested in traversing
 $projectId = "07706DCC-014B-2CE0-CF518D31A23C393E";
 
