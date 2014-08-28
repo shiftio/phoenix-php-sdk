@@ -9,24 +9,28 @@ The SDK is built on top of our REST API. To learn more about our REST API have a
 #### Requirements
 
 The SDK is most easily used with [Composer](https://getcomposer.org). To install Composer:
-```
+```bash
 cd <YOUR PROJECT ROOT>
 curl -sS https://getcomposer.org/installer | php
 ```   
 
 Check to see that composer has been installed:
+```php
 
     php composer.phar --version
+```
 
 Install the SDK's dependencies:
+```php
 
     php composer.phar install
+```
 
 #### Install the SDK into your project
 
 In the root of your project create a composer.json as follows. More info on getting started with composer can be found [here](https://getcomposer.org/doc/00-intro.md). 
 
-```
+```json
 {
     "repositories": [
         {
@@ -41,13 +45,14 @@ In the root of your project create a composer.json as follows. More info on gett
 ```
 
 Next, install the SDK using
-```
+```shell
 composer install
 ```
-
+#### What can I do?
+The MediaSiloAPI file is a wrapper to everything that the SDK can do for you. 
 #### Usage
 
-```
+```php
 <?php
 
 require_once('vendor/autoload.php');
