@@ -52,7 +52,7 @@ composer install
 The MediaSiloAPI file is a wrapper to everything that the SDK can do for you. Refer to this file any time you want to see what functions are available to you.
 
 ![alt MediaSilo API Methods](https://s3.amazonaws.com/mediasilo-phoenix-php-sdk/apiMenu.jpg)
-#### Usage
+#### Sample Usage
 
 ```php
 <?php
@@ -78,9 +78,9 @@ catch(\mediasilo\http\exception\NotAuthenticatedException $e) {
 // Start making some calls
 $me = $mediaSiloAPI->me();
 ```
-#### Examples
+#### An Example
 
-##### Get Assets By Folder
+##### Getting Assets By Folder
 
 ```
 ... Initialize the API as shown above
