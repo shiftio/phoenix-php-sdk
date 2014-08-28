@@ -49,7 +49,9 @@ Next, install the SDK using
 composer install
 ```
 #### What can I do?
-The MediaSiloAPI file is a wrapper to everything that the SDK can do for you. 
+The MediaSiloAPI file is a wrapper to everything that the SDK can do for you. Refer to this file any time you want to see what functions are available to you.
+
+![alt MediaSilo API Methods](https://s3.amazonaws.com/mediasilo-phoenix-php-sdk/apiMenu.jpg)
 #### Usage
 
 ```php
