@@ -8,6 +8,8 @@ use mediasilo\http\oauth\TwoLeggedOauthClient;
 use mediasilo\http\oauth\OAuthException;
 use mediasilo\config\Meta;
 use mediasilo\http\MediaSiloResourcePaths;
+use mediasilo\user\PasswordResetRequest;
+use mediasilo\user\PasswordReset;
 
 class SystemAPI extends MediaSiloAPI
 {
