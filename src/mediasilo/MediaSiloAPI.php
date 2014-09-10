@@ -544,11 +544,12 @@ class MediaSiloAPI
      * Gets assets based on an array of key value search queries
      * @param $searchParams
      * @param $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @param $wrapPagination (if true, the array of assets will be wrapped in an object with the pagination information)
      * @return Assets
      */
-    public function getAssets($searchParams, $acl = false)
+    public function getAssets($searchParams, $acl = false, $wrapPagination = false)
     {
-        return $this->assetProxy->getAssets($searchParams, $acl);
+        return $this->assetProxy->getAssets($searchParams, $acl, $wrapPagination);
     }
 
     /**

@@ -65,9 +65,10 @@ class AssetProxy {
      * Gets an exiting asset given search an array of search parameters
      * @param Array $searchParams - Array of search parameters
      * @param Bool $acl - Array of search parameters
+     * @param Bool $wrapPagination
      * @return Array(Asset)
      */
-    public function getAssets($searchParams, $acl = false) {
+    public function getAssets($searchParams, $acl = false, $wrapPagination = false) {
         $assets = array();
         $searchQuery = '?';
 
@@ -76,21 +77,44 @@ class AssetProxy {
         }
 
         $searchQuery = substr($searchQuery, 0, -1);
-        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::ASSETS) . $searchQuery);
-        $results = json_decode($clientResponse->getBody());
+        $clientResponse = $this->webClient->get(MediaSiloResourcePaths::ASSETS . $searchQuery);
+        $assetsResults = json_decode($clientResponse->getBody());
 
-        if (!empty($results)) {
-            foreach($results as $assetsResult) {
-                $asset = Asset::fromStdClass($assetsResult);
+        if (!empty($assetsResults)) {
+            foreach($assetsResults as $assetResult) {
+                $asset = Asset::fromStdClass($assetResult);
+
                 if($acl) {
-                    $acl = Asset::convertAssetPermissionsArrayToAcl($assetsResult->permissions);
+                    $acl = Asset::convertAssetPermissionsArrayToAcl($assetResult->permissions);
                     $asset->setAcl($acl);
                 }
+
                 array_push($assets, $asset);
             }
         }
 
-        return $assets;
+
+        if ($wrapPagination) {
+            $response = new stdClass();
+            $response->paging = new stdClass();
+
+            try {
+                foreach($clientResponse->getHeaders() as $header) {
+                    $parts = explode(":", $header);
+                    if ($parts[0] == 'total-results') {
+                        $response->paging->total = intval($parts[1]);
+                    }
+                }
+            } catch (\Exception $e) {
+                $response->paging->total = 0;
+            }
+
+            $response->results = $assets;
+            return $response;
+
+        } else {
+            return $assets;
+        }
     }
 
     /**
@@ -130,9 +154,12 @@ class AssetProxy {
             $response->paging = new stdClass();
 
             try {
-                $headers = $clientResponse->getHeaders();
-                $totalResults = $headers['total-results'];
-                $response->paging->total = intval($totalResults);
+                foreach($clientResponse->getHeaders() as $header) {
+                    $parts = explode(":", $header);
+                    if ($parts[0] == 'total-results') {
+                        $response->paging->total = intval($parts[1]);
+                    }
+                }
             } catch (\Exception $e) {
                 $response->paging->total = 0;
             }
@@ -183,9 +210,12 @@ class AssetProxy {
             $response->paging = new stdClass();
 
             try {
-                $headers = $clientResponse->getHeaders();
-                $totalResults = $headers['total-results'];
-                $response->paging->total = intval($totalResults);
+                foreach($clientResponse->getHeaders() as $header) {
+                    $parts = explode(":", $header);
+                    if ($parts[0] == 'total-results') {
+                        $response->paging->total = intval($parts[1]);
+                    }
+                }
             } catch (\Exception $e) {
                 $response->paging->total = 0;
             }
