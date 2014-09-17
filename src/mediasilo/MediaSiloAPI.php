@@ -292,6 +292,13 @@ class MediaSiloAPI
         return $this->assetProxy->getAssetsByFolderId($folderId, $acl);
     }
 
+    // Asset WebVTT //
+    public function getWebVTT($id) {
+        $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_WEBVTT, $id);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return $clientResponse->getBody();
+    }
+
 
     // Channel //
 
