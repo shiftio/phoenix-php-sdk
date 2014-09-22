@@ -588,9 +588,16 @@ class MediaSiloAPI
         return $this->assetProxy->getAssetsByFolderId($folderId, $acl, $searchParams, $wrapPagination);
     }
 
-
-
-
+    /**
+     * Gets the WebVTT Data for a given asset
+     * @param $id - Asset ID
+     * @return string - Contains WebVTT Text Data
+     */
+    public function getWebVTT($id) {
+        $resourcePath = sprintf(MediaSiloResourcePaths::ASSET_WEBVTT, $id);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return $clientResponse->getBody();
+    }
 
 
 
