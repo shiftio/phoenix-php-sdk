@@ -1023,7 +1023,18 @@ class MediaSiloAPI
         $this->quicklinkProxy->updateQuicklink($quickLink);
     }
 
-
+    /**
+     * Gets assets in the given quicklink
+     * @param $quicklinkId
+     * @param $searchParams
+     * @param $acl (if true the ACL for the requesting user will be attached to each asset)
+     * @param $wrapPagination (if true, the array of assets will be wrapped in an object with the pagination information)
+     * @return Array(Asset)
+     */
+    public function getAssetsByQuicklink($quicklinkId, $acl = false, $searchParams = array(), $wrapPagination = false)
+    {
+        return $this->assetProxy->getAssetsByQuicklinkId($quicklinkId, $acl, $searchParams, $wrapPagination);
+    }
 
 
 
