@@ -39,6 +39,7 @@ use mediasilo\portal\Portal;
 use mediasilo\portal\PortalProxy;
 use mediasilo\portal\Channel as PortalChannel;
 use mediasilo\portal\Setting as PortalSetting;
+use mediasilo\batch\BatchProxy;
 
 use mediasilo\config\Meta;
 
@@ -81,6 +82,7 @@ class MediaSiloAPI
     protected $accountPreferencesProxy;
     protected $userProxy;
     protected $userPreferencesProxy;
+    protected $batchProxy;
     protected $consumerKey;
     protected $consumerSecret;
     protected $baseUrl;
@@ -108,6 +110,7 @@ class MediaSiloAPI
         $this->accountPreferencesProxy = new AccountPreferencesProxy($this->webClient);
         $this->userProxy = new UserProxy($this->webClient);
         $this->userPreferencesProxy = new UserPreferencesProxy($this->webClient);
+        $this->batchProxy = new BatchProxy($this->webClient);
     }
 
     /**
@@ -1776,6 +1779,51 @@ class MediaSiloAPI
     public function expirePortal($id)
     {
         $this->portalProxy->expirePortal($id);
+    }
+
+
+
+    /******************************************************************************************
+     * Batch Phoenix Request Support
+     *
+     * http://developers.mediasilo.com/batch
+     *
+     * Batch requests allow users to submit multiple request to phoenix in batches of up 50
+     * phoenix requests in one request. This is done by submitting an array of requests objects
+     * that contain a method, path, and optional payload.
+     *
+     * Example Raw Batch Request:
+     *   [{
+     *       "httpMethod": "GET",
+     *       "resourcePath": "/quicklinks/54206e20e4b0ec8a5361d697/assets/9E024A11-EE81-4ACF-B07EA2C40930E85E/comments",
+     *   },
+     *   {
+     *       "httpMethod": "POST",
+     *       "resourcePath": "/quicklinks/54206e20e4b0ec8a5361d697comments",
+     *       "payload": {
+     *            "context":"53be99c23004ee843625efa7",
+     *            "at":"a9023e05-6e3e-4ca6-b53f-961456a6a024",
+     *            "body":"Thanks for the suggestion Ranger Smith, but I really want to show off the pic-a-nic area.",
+     *            "startTimeCode": 3500,
+     *            "endTimeCode": 3600,
+     *            "user": {
+     *                "id":null,
+     *                "userName":null,
+     *                "firstName":"Yogi",
+     *                "lastName":"Bear",
+     *                "email":"yogi@example.com"
+     *            }
+     *       }
+     *   }]
+     ******************************************************************************************/
+
+    /**
+     * Allows for batch requests to Phoenix
+     * @param Array - accepts an array of the following: BatchRequest Object, a Standard Object, or properly keyed array
+     */
+    public function batchRequest($requests)
+    {
+        return $this->batchProxy->processRequests($requests);
     }
 
 }
