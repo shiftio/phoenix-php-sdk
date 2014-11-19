@@ -1794,11 +1794,11 @@ class MediaSiloAPI
      *
      * Example Raw Batch Request:
      *   [{
-     *       "httpMethod": "GET",
+     *       "method": "GET",
      *       "resourcePath": "/quicklinks/54206e20e4b0ec8a5361d697/assets/9E024A11-EE81-4ACF-B07EA2C40930E85E/comments",
      *   },
      *   {
-     *       "httpMethod": "POST",
+     *       "method": "POST",
      *       "resourcePath": "/quicklinks/54206e20e4b0ec8a5361d697comments",
      *       "payload": {
      *            "context":"53be99c23004ee843625efa7",

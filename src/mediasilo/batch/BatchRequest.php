@@ -6,14 +6,14 @@ use mediasilo\model\Serializable;
 
 class BatchRequest implements Serializable {
 
-    public $httpMethod = "";
+    public $method = "";
     public $resourcePath = "";
     public $payload = null;
 
     public static $validHttpMethods = Array('GET', 'POST', 'PUT', 'DELETE');
 
-    function __construct($httpMethod, $resourcePath, $payload = null) {
-        $this->httpMethod = $httpMethod;
+    function __construct($method, $resourcePath, $payload = null) {
+        $this->method = $method;
         $this->resourcePath = $resourcePath;
         if (!is_null($payload)) {
             $this->payload = $payload;
@@ -21,7 +21,7 @@ class BatchRequest implements Serializable {
     }
 
     function isValid() {
-        return in_array(strtoupper($this->httpMethod), BatchRequest::$validHttpMethods) && !empty($this->resourcePath);
+        return in_array(strtoupper($this->method), BatchRequest::$validHttpMethods) && !empty($this->resourcePath);
     }
 
 
@@ -37,7 +37,7 @@ class BatchRequest implements Serializable {
         if (!isset($mixed->payload)) {
             $mixed->payload = null;
         }
-        return new BatchRequest($mixed->httpMethod, $mixed->resourcePath, $mixed->payload);
+        return new BatchRequest($mixed->method, $mixed->resourcePath, $mixed->payload);
     }
 
 }

@@ -2,11 +2,8 @@
 
 namespace mediasilo\batch;
 
-
-use mediasilo\http\WebClient;
 use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\http\exception\ValidationException;
-use stdClass;
 
 class BatchProxy {
 
@@ -52,11 +49,11 @@ class BatchProxy {
 
 
     private function parseArrayRequest($request) {
-        if (!array_key_exists('httpMethod', $request)) {
+        if (!array_key_exists('method', $request)) {
             throw new ValidationException('All requests must have a request method.', null);
         }
-        else if (!in_array(strtoupper($request['httpMethod']), BatchRequest::$validHttpMethods)) {
-            throw new ValidationException(sprintf('Invalid http method "%s".', $request['httpMethod']), null);
+        else if (!in_array(strtoupper($request['method']), BatchRequest::$validHttpMethods)) {
+            throw new ValidationException(sprintf('Invalid http method "%s".', $request['method']), null);
         }
         else if (!array_key_exists('resourcePath', $request)) {
             throw new ValidationException('All requests must have a request path', null);
@@ -67,16 +64,16 @@ class BatchProxy {
         } else {
             $payload = null;
         }
-        return new BatchRequest(strtoupper($request['httpMethod']), $request['resourcePath'], $payload);
+        return new BatchRequest(strtoupper($request['method']), $request['resourcePath'], $payload);
     }
 
 
     private function parseObjectRequest($request) {
-        if (!property_exists($request, 'httpMethod')) {
+        if (!property_exists($request, 'method')) {
             throw new ValidationException('All requests must have a request method.', null);
         }
-        else if (!in_array(strtoupper($request->httpMethod), BatchRequest::$validHttpMethods)) {
-            throw new ValidationException(sprintf('Invalid http method "%s".', $request['httpMethod']), null);
+        else if (!in_array(strtoupper($request->method), BatchRequest::$validHttpMethods)) {
+            throw new ValidationException(sprintf('Invalid http method "%s".', $request['method']), null);
         }
         else if (!property_exists($request, 'resourcePath')) {
             throw new ValidationException('All requests must have a request path', null);
@@ -87,7 +84,7 @@ class BatchProxy {
             } else {
                 $payload = null;
             }
-            return new BatchRequest(strtoupper($request->httpMethod), $request->resourcePath, $payload);
+            return new BatchRequest(strtoupper($request->method), $request->resourcePath, $payload);
         }
     }
 
