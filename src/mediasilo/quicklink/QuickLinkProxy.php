@@ -7,14 +7,13 @@ use mediasilo\http\MediaSiloResourcePaths;
 use mediasilo\quicklink\analytics\AnalyticsEvent;
 use mediasilo\quicklink\analytics\AnalyzedQuickLink;
 use mediasilo\quicklink\analytics\QuickLinkAnalyticsProxy;
-use stdClass;
 
 class QuickLinkProxy {
 
     private $webClient;
     private $quicklinkAnalyticsProxy;
 
-    public function __construct($webClient) {
+    public function __construct(WebClient $webClient) {
         $this->webClient = $webClient;
         $this->quicklinkAnalyticsProxy = new QuickLinkAnalyticsProxy($webClient);
     }
@@ -96,23 +95,7 @@ class QuickLinkProxy {
             }
         }
 
-        if ($wrapPagination) {
-            $response = new stdClass();
-            $response->paging = new stdClass();
-
-            foreach($clientResponse->getHeaders() as $header) {
-                $parts = explode(":", $header);
-                if ($parts[0] == 'total-results') {
-                    $response->paging->total = intval($parts[1]);
-                }
-            }
-
-            $response->results = $quicklinks;
-            return $response;
-
-        } else {
-            return $quicklinks;
-        }
+        return $wrapPagination ? $clientResponse->buildPaginatedResponse($quicklinks) : $quicklinks;
     }
 
     /**

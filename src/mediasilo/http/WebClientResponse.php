@@ -2,6 +2,9 @@
 
 namespace mediasilo\http;
 
+use Exception;
+use stdClass;
+
 class WebClientResponse {
 
     private $code;
@@ -62,4 +65,34 @@ class WebClientResponse {
     {
         return $this->code;
     }
+
+    /**
+     * @param $queryResults
+     * @return stdClass
+     */
+    public function buildPaginatedResponse($queryResults) {
+        $response = new stdClass();
+        $response->paging = new stdClass();
+
+        try {
+            foreach($this->getHeaders() as $header) {
+                $parts = explode(":", $header);
+                if ($parts[0] == 'total-results') {
+                    $response->paging->total = intval($parts[1]);
+                }
+            }
+
+            if (!isset($response->paging->total)) {
+                $headers = $this->getHeaders();
+                $response->paging->total = intval($headers['total-results']);
+            }
+
+        } catch (Exception $e) {
+            $response->paging->total = 0;
+        }
+
+        $response->results = $queryResults;
+        return $response;
+    }
+
 }
