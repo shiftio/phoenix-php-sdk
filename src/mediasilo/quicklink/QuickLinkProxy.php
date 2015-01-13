@@ -13,7 +13,7 @@ class QuickLinkProxy {
     private $webClient;
     private $quicklinkAnalyticsProxy;
 
-    public function __construct(WebClient $webClient) {
+    public function __construct($webClient) {
         $this->webClient = $webClient;
         $this->quicklinkAnalyticsProxy = new QuickLinkAnalyticsProxy($webClient);
     }
