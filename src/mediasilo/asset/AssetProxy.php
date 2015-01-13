@@ -4,17 +4,14 @@ namespace mediasilo\asset;
 
 use mediasilo\http\WebClient;
 use mediasilo\http\MediaSiloResourcePaths;
-use mediasilo\asset\Asset;
 use mediasilo\role\RoleManager;
-use mediasilo\http\exception\NotFoundException;
-use stdClass;
 
 class AssetProxy {
 
     private $webClient;
     private $roleManager;
 
-    public function __construct($webClient) {
+    public function __construct(WebClient $webClient) {
         $this->webClient = $webClient;
     }
 
@@ -93,28 +90,7 @@ class AssetProxy {
             }
         }
 
-
-        if ($wrapPagination) {
-            $response = new stdClass();
-            $response->paging = new stdClass();
-
-            try {
-                foreach($clientResponse->getHeaders() as $header) {
-                    $parts = explode(":", $header);
-                    if ($parts[0] == 'total-results') {
-                        $response->paging->total = intval($parts[1]);
-                    }
-                }
-            } catch (\Exception $e) {
-                $response->paging->total = 0;
-            }
-
-            $response->results = $assets;
-            return $response;
-
-        } else {
-            return $assets;
-        }
+        return $wrapPagination ? $clientResponse->buildPaginatedResponse($assets) : $assets;
     }
 
     /**
@@ -149,27 +125,7 @@ class AssetProxy {
             }
         }
 
-        if ($wrapPagination) {
-            $response = new stdClass();
-            $response->paging = new stdClass();
-
-            try {
-                foreach($clientResponse->getHeaders() as $header) {
-                    $parts = explode(":", $header);
-                    if ($parts[0] == 'total-results') {
-                        $response->paging->total = intval($parts[1]);
-                    }
-                }
-            } catch (\Exception $e) {
-                $response->paging->total = 0;
-            }
-
-            $response->results = $assets;
-            return $response;
-
-        } else {
-            return $assets;
-        }
+        return $wrapPagination ? $clientResponse->buildPaginatedResponse($assets) : $assets;
     }
 
     /**
@@ -205,27 +161,7 @@ class AssetProxy {
             }
         }
 
-        if ($wrapPagination) {
-            $response = new stdClass();
-            $response->paging = new stdClass();
-
-            try {
-                foreach($clientResponse->getHeaders() as $header) {
-                    $parts = explode(":", $header);
-                    if ($parts[0] == 'total-results') {
-                        $response->paging->total = intval($parts[1]);
-                    }
-                }
-            } catch (\Exception $e) {
-                $response->paging->total = 0;
-            }
-
-            $response->results = $assets;
-            return $response;
-
-        } else {
-            return $assets;
-        }
+        return $wrapPagination ? $clientResponse->buildPaginatedResponse($assets) : $assets;
     }
 
 
@@ -262,27 +198,7 @@ class AssetProxy {
             }
         }
 
-        if ($wrapPagination) {
-            $response = new stdClass();
-            $response->paging = new stdClass();
-
-            try {
-                foreach($clientResponse->getHeaders() as $header) {
-                    $parts = explode(":", $header);
-                    if ($parts[0] == 'total-results') {
-                        $response->paging->total = intval($parts[1]);
-                    }
-                }
-            } catch (\Exception $e) {
-                $response->paging->total = 0;
-            }
-
-            $response->results = $assets;
-            return $response;
-
-        } else {
-            return $assets;
-        }
+        return $wrapPagination ? $clientResponse->buildPaginatedResponse($assets) : $assets;
     }
 
 
