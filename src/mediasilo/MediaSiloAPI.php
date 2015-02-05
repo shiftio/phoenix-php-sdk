@@ -592,6 +592,18 @@ class MediaSiloAPI
     }
 
     /**
+     * Get assets based on the given saved search
+     * @param $savedSearchId
+     * @param bool $acl
+     * @param array $searchParams
+     * @param bool $wrapPagination
+     * @return Array(Asset)
+     */
+    public function getAssetsBySavedSearch($savedSearchId, $acl = false, $searchParams = array(), $wrapPagination = false) {
+        return $this->assetProxy->getAssetsBySavedSearchId($savedSearchId, $acl, $searchParams, $wrapPagination);
+    }
+
+    /**
      * Gets the WebVTT Data for a given asset
      * @param $id - Asset ID
      * @return string - Contains WebVTT Text Data

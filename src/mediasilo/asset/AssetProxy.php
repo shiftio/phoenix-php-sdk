@@ -202,6 +202,42 @@ class AssetProxy {
     }
 
 
+    /**
+     * Gets multiple assets given Saved Search Id
+     * @param String $savedSearchId
+     * @param Bool $acl - True to include acl hash on asset object
+     * @param Array $searchParams - Array of search parameters
+     * @param Bool $wrapPagination
+     * @return Array(Asset)
+     */
+    public function getAssetsBySavedSearchId($savedSearchId, $acl = false, $searchParams = array(), $wrapPagination = false) {
+        $assets = array();
+        $searchQuery = '?';
+
+        foreach ($searchParams as $key => $value) {
+            $searchQuery .= $key . '=' . $value . '&';
+        }
+        $searchQuery = substr($searchQuery, 0, -1);
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::SAVED_SEARCH_ASSETS, $savedSearchId) . $searchQuery);
+        $assetsResults = json_decode($clientResponse->getBody());
+
+        if (!empty($assetsResults)) {
+            foreach($assetsResults as $assetResult) {
+                $asset = Asset::fromStdClass($assetResult);
+
+                if($acl) {
+                    $acl = Asset::convertAssetPermissionsArrayToAcl($assetResult->permissions);
+                    $asset->setAcl($acl);
+                }
+
+                array_push($assets, $asset);
+            }
+        }
+
+        return $wrapPagination ? $clientResponse->buildPaginatedResponse($assets) : $assets;
+    }
+
+
     private function getRoleManager() {
         if (isset($this->roleManager)) {
             return $this->roleManager;
