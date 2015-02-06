@@ -36,6 +36,7 @@ class MediaSiloResourcePaths
     const PROJECT_ASSETS = "/projects/%s/assets";
     const FOLDER_ASSETS = "/folders/%s/assets";
     const QUICKLINK_ASSETS = "/quicklinks/%s/assets";
+    const SAVED_SEARCH_ASSETS = "/savedsearches/%s/assets";
     const USER_PROJECT_ROLES = "/projects/%s/roles";
     const CHANNELS = "/channels";
     const TRANSCRIPTS = "/transcripts";
