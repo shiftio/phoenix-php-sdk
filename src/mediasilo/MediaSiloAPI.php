@@ -602,7 +602,10 @@ class MediaSiloAPI
         return $clientResponse->getBody();
     }
 
-
+    public function getAssetDownload($id)
+    {
+        return $this->assetProxy->getAssetDownload($id);
+    }
 
 
 

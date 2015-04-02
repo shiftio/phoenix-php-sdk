@@ -45,4 +45,5 @@ class MediaSiloResourcePaths
     const ACCOUNT_PREFERENCES = "/account/%s/preferences";
     const PASSWORD_RESET = "/users/password/reset";
     const BATCH = "/batch";
+    const DOWNLOAD = "/assets/%s/download";
 }
