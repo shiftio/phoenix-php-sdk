@@ -127,11 +127,11 @@ class SystemAPI extends MediaSiloAPI
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_ANALYTICS, $quicklinkId, join(",", $events));
         $resourcePath = sprintf("%s?data.mediasiloUserId=%s", $resourcePath, $userId);
-        $resourcePath = sprintf("%s&%s", $resourcePath, $query)
+        $resourcePath = sprintf("%s&%s", $resourcePath, $query);
         $clientResponse = json_decode($this->webClient->GET($resourcePath));
         return $clientResponse;
     }
-    
+
     /**
      * Performs a Password Reset Request (sends password reset link with token to user's email)
      *
