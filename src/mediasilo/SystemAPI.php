@@ -127,11 +127,11 @@ class SystemAPI extends MediaSiloAPI
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_ANALYTICS, $quicklinkId, join(",", $events));
         $resourcePath = sprintf("%s?data.mediasiloUserId=%s", $resourcePath, $userId);
-        $resourcePath = sprintf("%s&%s", $resourcePath, $query)
+        $resourcePath = sprintf("%s&%s", $resourcePath, $query);
         $clientResponse = json_decode($this->webClient->GET($resourcePath));
         return $clientResponse;
     }
-    
+
     /**
      * Get a list of tracked events specified by the events list and filtered by a quicklink id
      * @param String $quicklinkid
