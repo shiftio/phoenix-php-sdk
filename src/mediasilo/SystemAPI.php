@@ -114,7 +114,7 @@ class SystemAPI extends MediaSiloAPI
     {
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_ANALYTICS, $quicklinkId, join(",", $events));
         $resourcePath = sprintf("%s?%s", $resourcePath, $query);
-        $clientResponse = json_decode($this->webClient->GET($resourcePath));
+        $clientResponse = json_decode($this->webClient->GET($resourcePath)->getBody());
         return $clientResponse;
     }
     /**
@@ -128,7 +128,7 @@ class SystemAPI extends MediaSiloAPI
         $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_ANALYTICS, $quicklinkId, join(",", $events));
         $resourcePath = sprintf("%s?data.mediasiloUserId=%s", $resourcePath, $userId);
         $resourcePath = sprintf("%s&%s", $resourcePath, $query);
-        $clientResponse = json_decode($this->webClient->GET($resourcePath));
+        $clientResponse = json_decode($this->webClient->GET($resourcePath)->getBody());
         return $clientResponse;
     }
 
