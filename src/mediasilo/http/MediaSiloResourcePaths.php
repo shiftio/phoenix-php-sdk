@@ -43,6 +43,7 @@ class MediaSiloResourcePaths
     const TRANSCRIPT_SERVICES = "/transcripts/services";
     const ANALYTICS = "/analytics";
     const ANALYTICS_SPECIFIC = "/analytics/%s";
+    const QUICKLINK_ANALYTICS = "/quicklinks/%s/analytics/%s";
     const ACCOUNT_PREFERENCES = "/account/%s/preferences";
     const PASSWORD_RESET = "/users/password/reset";
     const BATCH = "/batch";
