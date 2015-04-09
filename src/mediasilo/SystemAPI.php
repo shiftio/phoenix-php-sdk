@@ -104,7 +104,34 @@ class SystemAPI extends MediaSiloAPI
         $clientResponse = json_decode($this->webClient->post($resourcePath, $query));
         return $clientResponse;
     }
-
+    /**
+     * Get a list of tracked events specified by the events list and filtered by a quicklink id
+     * @param String $quicklinkid
+     * @param Array $events
+     * @return Array[Object]
+     */
+    public function getQuickLinkAnalytics($quicklinkId, $events, $query)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_ANALYTICS, $quicklinkId, join(",", $events));
+        $resourcePath = sprintf("%s?%s", $resourcePath, $query);
+        $clientResponse = json_decode($this->webClient->GET($resourcePath));
+        return $clientResponse;
+    }
+    /**
+     * Get a list of tracked events specified by the events list and filtered by a quicklink id
+     * @param String $quicklinkid
+     * @param Array $events
+     * @return Array[Object]
+     */
+    public function getUserQuickLinkAnalytics($quicklinkId, $userId, $events, $query)
+    {
+        $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_ANALYTICS, $quicklinkId, join(",", $events));
+        $resourcePath = sprintf("%s?data.mediasiloUserId=%s", $resourcePath, $userId);
+        $resourcePath = sprintf("%s&%s", $resourcePath, $query)
+        $clientResponse = json_decode($this->webClient->GET($resourcePath));
+        return $clientResponse;
+    }
+    
     /**
      * Performs a Password Reset Request (sends password reset link with token to user's email)
      *
