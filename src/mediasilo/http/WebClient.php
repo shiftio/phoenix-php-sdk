@@ -152,7 +152,13 @@ class WebClient {
             $authHeader = "Authorization: Basic ".base64_encode($this->username.":".$this->password);
             array_push($headers, $authHeader);
         }
-
+        $cookieHeader = "Cookie: ";
+        $delim = "";
+        foreach ($_COOKIE as $key => $val) {
+            $cookieHeader = $cookieHeader . $delim . $key . "=" . $val;
+            $delim = "; ";
+        }
+        array_push($headers, $cookieHeader);
         return $headers;
     }
 
