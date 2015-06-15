@@ -93,7 +93,6 @@ class MediaSiloAPI
 
     protected function init() {
         $this->proxyInit();
-        $this->me();
     }
 
     protected function proxyInit() {
