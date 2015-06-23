@@ -152,6 +152,8 @@ class WebClient {
             $authHeader = "Authorization: Basic ".base64_encode($this->username.":".$this->password);
             array_push($headers, $authHeader);
         }
+
+        // pass through cookies
         $cookieHeader = "Cookie: ";
         $delim = "";
         foreach ($_COOKIE as $key => $val) {
@@ -159,6 +161,13 @@ class WebClient {
             $delim = "; ";
         }
         array_push($headers, $cookieHeader);
+
+        // pass through our nonce header if it's sent
+        $sentHeaders = apache_request_headers();
+        $n1 = $sentHeaders["n1"];
+        if (isset($n1) && strlen($n1) > 0) {
+            array_push($headers, "n1: " . $n1);
+        }
         return $headers;
     }
 
