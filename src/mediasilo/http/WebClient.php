@@ -142,7 +142,7 @@ class WebClient {
     }
 
     private function getRequestHeaders() {
-        $headers = array("Content-Type: application/json; charset=utf-8","Accept:application/json");
+        $headers = array("Content-Type: application/json; charset=utf-8","Accept: application/json, text/plain");
         $hostHeader = "MediaSiloHostContext:".$this->host;
         array_push($headers, $hostHeader);
         if ($this->useSession) {
