@@ -20,6 +20,7 @@ class MediaSiloResourcePaths
     const USER_LOOKUPS = "/users/keyvaluecollections";
     const ASSET_METADATA = "/assets/%s/metadata";
     const ASSET_WEBVTT = "/assets/%s/webvtt";
+    const QUICKLINK_ASSET_WEBVTT = "/quicklinks/%s/assets/%s/webvtt";
     const QUICK_LINK_COMMENTS = "/quicklinks/%s/assets/%s/comments";
     const QUICKLINK_COMMENTS_EXPORT = "/quicklinks/%s/assets/%s/comments.%s";
     const QUICK_LINK_SETTINGS = "/users/quicklinksettings";
