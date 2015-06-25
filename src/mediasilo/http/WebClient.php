@@ -142,7 +142,7 @@ class WebClient {
     }
 
     private function getRequestHeaders() {
-        $headers = array("Content-Type: application/json; charset=utf-8","Accept:application/json");
+        $headers = array("Content-Type: application/json; charset=utf-8","Accept: application/json, text/plain");
         $hostHeader = "MediaSiloHostContext:".$this->host;
         array_push($headers, $hostHeader);
         if ($this->useSession) {
@@ -153,6 +153,21 @@ class WebClient {
             array_push($headers, $authHeader);
         }
 
+        // pass through cookies
+        $cookieHeader = "Cookie: ";
+        $delim = "";
+        foreach ($_COOKIE as $key => $val) {
+            $cookieHeader = $cookieHeader . $delim . $key . "=" . $val;
+            $delim = "; ";
+        }
+        array_push($headers, $cookieHeader);
+
+        // pass through our nonce header if it's sent
+        $sentHeaders = apache_request_headers();
+        $n1 = $sentHeaders["n1"];
+        if (isset($n1) && strlen($n1) > 0) {
+            array_push($headers, "n1: " . $n1);
+        }
         return $headers;
     }
 

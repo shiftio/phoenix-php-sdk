@@ -93,7 +93,6 @@ class MediaSiloAPI
 
     protected function init() {
         $this->proxyInit();
-        $this->me();
     }
 
     protected function proxyInit() {
@@ -614,7 +613,21 @@ class MediaSiloAPI
         return $clientResponse->getBody();
     }
 
+    /**
+     * Gets the WebVTT Data for a given asset in the context of a quicklink
+     * @param $id - Asset ID
+     * @return string - Contains WebVTT Text Data
+     */
+    public function getQuickLinkWebVTT($quickLinkId, $assetId) {
+        $resourcePath = sprintf(MediaSiloResourcePaths::QUICKLINK_ASSET_WEBVTT, $quickLinkId, $assetId);
+        $clientResponse = $this->webClient->get($resourcePath);
+        return $clientResponse->getBody();
+    }
 
+    public function getAssetDownload($id)
+    {
+        return $this->assetProxy->getAssetDownload($id);
+    }
 
 
 

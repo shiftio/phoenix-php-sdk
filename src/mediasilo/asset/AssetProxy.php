@@ -237,6 +237,12 @@ class AssetProxy {
         return $wrapPagination ? $clientResponse->buildPaginatedResponse($assets) : $assets;
     }
 
+    public function getAssetDownload($id) {
+        $clientResponse = $this->webClient->get(sprintf(MediaSiloResourcePaths::DOWNLOAD, $id));
+        $link = json_decode($clientResponse->getBody());
+
+        return $link;
+    }
 
     private function getRoleManager() {
         if (isset($this->roleManager)) {
