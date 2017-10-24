@@ -1406,7 +1406,7 @@ class MediaSiloAPI
     public function updateUserProfile($userId, $firstName = null, $lastName = null, $username = null, $email = null, $password = null,
                                $address = null, $phone = null, $mobile = null, $company = null, $status = null, $defaultRowTemplateId = null)
     {
-        $user = new User($address,$company,$defaultRowTemplateId, $email,$firstName, $userId, $lastName, $mobile, null, $phone, null, null, null, $status, $username, null);
+        $user = new User($address,$company,$defaultRowTemplateId, $email,$firstName, $userId, $lastName, $mobile, null, $phone, array(), null, null, $status, $username, null);
 
         if (!is_null($password)) {
             $user->setPassword($password);
