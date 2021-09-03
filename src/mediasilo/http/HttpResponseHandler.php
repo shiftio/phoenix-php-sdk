@@ -33,8 +33,7 @@ class HttpResponseHandler {
             throw new ConnectionException("There was a problem connecting to the MediaSilo API", json_decode($response));
         }
         if ($responseCode == 303) {
-          throw new ConnectionException("This account has been migrated", json_decode($response))
+          throw new ConnectionException("This account has been migrated", json_decode($response));
         }
     }
-
 }
